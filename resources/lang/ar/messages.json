@@ -1,0 +1,72 @@
+{
+    "success": {
+        "operation_successful": "تمت العملية بنجاح",
+        "user_registered": "تم تسجيل المستخدم بنجاح",
+        "user_logged_in": "تم تسجيل الدخول بنجاح",
+        "user_logged_out": "تم تسجيل الخروج بنجاح",
+        "token_refreshed": "تم تحديث الرمز بنجاح",
+        "profile_fetched": "تم جلب الملف الشخصي بنجاح",
+        "api_running": "واجهة برمجة التطبيقات مكوك تعمل",
+        "api_healthy": "واجهة برمجة التطبيقات تعمل بشكل صحيح",
+        "dashboard_loaded": "تم تحميل لوحة التحكم بنجاح",
+        "api_working": "واجهة برمجة التطبيقات للمستخدم تعمل بشكل صحيح"
+    },
+    "errors": {
+        "validation_failed": "فشل التحقق من صحة البيانات",
+        "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+        "account_disabled": "الحساب معطل",
+        "unauthenticated": "غير مصرح. يرجى تسجيل الدخول أولاً",
+        "access_denied": "تم رفض الوصول. ليس لديك إذن لتنفيذ هذا الإجراء",
+        "resource_not_found": "المورد غير موجود",
+        "route_not_found": "المسار غير موجود",
+        "endpoint_not_found": "نقطة نهاية واجهة برمجة التطبيقات غير موجودة",
+        "method_not_allowed": "الطريقة غير مسموحة",
+        "token_expired": "انتهت صلاحية الرمز المميز. يرجى تحديث الرمز المميز",
+        "token_invalid": "الرمز المميز غير صالح",
+        "token_not_provided": "لم يتم توفير الرمز المميز",
+        "token_refresh_failed": "فشل تحديث الرمز",
+        "database_error": "حدث خطأ في قاعدة البيانات",
+        "server_error": "حدث خطأ غير متوقع",
+        "too_many_requests": "طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً"
+    },
+    "validation": {
+        "required": "حقل :attribute مطلوب",
+        "email": ":attribute يجب أن يكون عنوان بريد إلكتروني صالح",
+        "min": ":attribute يجب أن يكون على الأقل :min أحرف",
+        "max": ":attribute يجب ألا يزيد عن :max أحرف",
+        "confirmed": "تأكيد :attribute غير متطابق",
+        "unique": ":attribute مُستخدم مسبقاً",
+        "string": ":attribute يجب أن يكون نص",
+        "between": ":attribute يجب أن يكون بين :min و :max أحرف",
+        "in": ":attribute المحدد غير صالح",
+        "numeric": ":attribute يجب أن يكون رقم",
+        "integer": ":attribute يجب أن يكون رقم صحيح",
+        "boolean": "حقل :attribute يجب أن يكون صحيح أو خطأ",
+        "date": ":attribute ليس تاريخ صالح",
+        "image": ":attribute يجب أن يكون صورة",
+        "mimes": ":attribute يجب أن يكون ملف من نوع: :values",
+        "size": ":attribute يجب أن يكون :size كيلوبايت",
+        "regex": "تنسيق :attribute غير صالح"
+    },
+    "attributes": {
+        "name": "الاسم",
+        "email": "عنوان البريد الإلكتروني",
+        "password": "كلمة المرور",
+        "password_confirmation": "تأكيد كلمة المرور",
+        "store_name": "اسم المتجر",
+        "phone": "رقم الهاتف",
+        "address": "العنوان",
+        "role": "الدور",
+        "vehicle_type": "نوع المركبة",
+        "vehicle_number": "رقم المركبة",
+        "license_number": "رقم الرخصة",
+        "availability": "التوفر",
+        "status": "الحالة"
+    },
+    "guards": {
+        "user_dashboard": "لوحة تحكم المستخدم",
+        "store_dashboard": "لوحة تحكم المتجر",
+        "admin_dashboard": "لوحة تحكم المدير",
+        "delivery_dashboard": "لوحة تحكم التوصيل"
+    }
+}

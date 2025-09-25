@@ -1,0 +1,72 @@
+{
+    "success": {
+        "operation_successful": "Operation completed successfully",
+        "user_registered": "User successfully registered",
+        "user_logged_in": "Login successful",
+        "user_logged_out": "Successfully logged out",
+        "token_refreshed": "Token refreshed successfully",
+        "profile_fetched": "Profile fetched successfully",
+        "api_running": "Makkok API is running",
+        "api_healthy": "API is healthy",
+        "dashboard_loaded": "Dashboard loaded successfully",
+        "api_working": "User API is working"
+    },
+    "errors": {
+        "validation_failed": "Validation failed",
+        "invalid_credentials": "Invalid email or password",
+        "account_disabled": "Account is disabled",
+        "unauthenticated": "Unauthenticated. Please login first",
+        "access_denied": "Access denied. You do not have permission to perform this action",
+        "resource_not_found": "Resource not found",
+        "route_not_found": "Route not found",
+        "endpoint_not_found": "API endpoint not found",
+        "method_not_allowed": "Method not allowed",
+        "token_expired": "Token has expired. Please refresh your token",
+        "token_invalid": "Token is invalid",
+        "token_not_provided": "Token not provided",
+        "token_refresh_failed": "Token refresh failed",
+        "database_error": "Database error occurred",
+        "server_error": "An unexpected error occurred",
+        "too_many_requests": "Too many requests. Please try again later"
+    },
+    "validation": {
+        "required": "The :attribute field is required",
+        "email": "The :attribute must be a valid email address",
+        "min": "The :attribute must be at least :min characters",
+        "max": "The :attribute may not be greater than :max characters",
+        "confirmed": "The :attribute confirmation does not match",
+        "unique": "The :attribute has already been taken",
+        "string": "The :attribute must be a string",
+        "between": "The :attribute must be between :min and :max characters",
+        "in": "The selected :attribute is invalid",
+        "numeric": "The :attribute must be a number",
+        "integer": "The :attribute must be an integer",
+        "boolean": "The :attribute field must be true or false",
+        "date": "The :attribute is not a valid date",
+        "image": "The :attribute must be an image",
+        "mimes": "The :attribute must be a file of type: :values",
+        "size": "The :attribute must be :size kilobytes",
+        "regex": "The :attribute format is invalid"
+    },
+    "attributes": {
+        "name": "name",
+        "email": "email address",
+        "password": "password",
+        "password_confirmation": "password confirmation",
+        "store_name": "store name",
+        "phone": "phone number",
+        "address": "address",
+        "role": "role",
+        "vehicle_type": "vehicle type",
+        "vehicle_number": "vehicle number",
+        "license_number": "license number",
+        "availability": "availability",
+        "status": "status"
+    },
+    "guards": {
+        "user_dashboard": "User Dashboard",
+        "store_dashboard": "Store Dashboard", 
+        "admin_dashboard": "Admin Dashboard",
+        "delivery_dashboard": "Delivery Dashboard"
+    }
+}
