@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Api\StoreUser;
 
 use App\Http\Controllers\Controller;
 use App\Models\StoreUser;
+use App\Services\ValidationService;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
     /**
      * Create a new AuthController instance.
      */
@@ -25,7 +27,7 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $validator = ValidationService::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:store_users',
             'password' => 'required|string|confirmed|min:6',
@@ -35,11 +37,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message_en' => $validator->errors()->first(),
-                'message_ar' => 'خطأ في التحقق من البيانات'
-            ], 422);
+            return $this->validationErrorWithFirstMessage($validator);
         }
 
         $storeUser = StoreUser::create([
@@ -54,15 +52,12 @@ class AuthController extends Controller
 
         $token = Auth::guard('store_users')->login($storeUser);
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Store user successfully registered',
-            'message_ar' => 'تم تسجيل مستخدم المتجر بنجاح',
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('store_users')->factory()->getTTL() * 60,
             'user' => $storeUser
-        ], 201);
+        ], 'success.store_user_registered', [], 201);
     }
 
     /**
@@ -70,27 +65,19 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $validator = ValidationService::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message_en' => $validator->errors()->first(),
-                'message_ar' => 'خطأ في التحقق من البيانات'
-            ], 422);
+            return $this->validationErrorWithFirstMessage($validator);
         }
 
         $credentials = $request->only('email', 'password');
 
         if (!$token = Auth::guard('store_users')->attempt($credentials)) {
-            return response()->json([
-                'success' => false,
-                'message_en' => 'Invalid email or password',
-                'message_ar' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-            ], 401);
+            return $this->errorResponse('errors.invalid_credentials', [], 401);
         }
 
         $storeUser = Auth::guard('store_users')->user();
@@ -98,22 +85,15 @@ class AuthController extends Controller
         // Check if store user is active
         if (!$storeUser->status) {
             Auth::guard('store_users')->logout();
-            return response()->json([
-                'success' => false,
-                'message_en' => 'Account is disabled',
-                'message_ar' => 'الحساب معطل'
-            ], 403);
+            return $this->errorResponse('errors.account_disabled', [], 403);
         }
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Login successful',
-            'message_ar' => 'تم تسجيل الدخول بنجاح',
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('store_users')->factory()->getTTL() * 60,
             'user' => $storeUser
-        ]);
+        ], 'success.store_user_logged_in');
     }
 
     /**
@@ -123,12 +103,7 @@ class AuthController extends Controller
     {
         $storeUser = Auth::guard('store_users')->user();
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Profile fetched successfully',
-            'message_ar' => 'تم جلب الملف الشخصي بنجاح',
-            'user' => $storeUser
-        ]);
+        return $this->successResponse($storeUser, 'success.profile_fetched');
     }
 
     /**
@@ -138,11 +113,7 @@ class AuthController extends Controller
     {
         Auth::guard('store_users')->logout();
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Successfully logged out',
-            'message_ar' => 'تم تسجيل الخروج بنجاح'
-        ]);
+        return $this->successResponse(null, 'success.store_user_logged_out');
     }
 
     /**
@@ -150,15 +121,16 @@ class AuthController extends Controller
      */
     public function refresh(): JsonResponse
     {
-        $token = Auth::guard('store_users')->refresh();
+        try {
+            $token = Auth::guard('store_users')->refresh();
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.token_refresh_failed', [], 401);
+        }
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Token refreshed successfully',
-            'message_ar' => 'تم تحديث الرمز بنجاح',
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('store_users')->factory()->getTTL() * 60
-        ]);
+        ], 'success.token_refreshed');
     }
 }

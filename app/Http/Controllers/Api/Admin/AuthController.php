@@ -4,14 +4,16 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Services\ValidationService;
+use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    use ApiResponse;
     /**
      * Create a new AuthController instance.
      */
@@ -25,20 +27,16 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $validator = ValidationService::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:admins',
-            'password' => 'required|string|confirmed|min:6',
+            'password' => 'required|string|min:6',
             'role' => 'nullable|string|in:admin,super_admin,manager',
             'phone' => 'nullable|string|max:20',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message_en' => $validator->errors()->first(),
-                'message_ar' => 'خطأ في التحقق من البيانات'
-            ], 422);
+            return $this->validationErrorWithFirstMessage($validator);
         }
 
         $admin = Admin::create([
@@ -52,15 +50,12 @@ class AuthController extends Controller
 
         $token = Auth::guard('admins')->login($admin);
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Admin successfully registered',
-            'message_ar' => 'تم تسجيل المدير بنجاح',
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('admins')->factory()->getTTL() * 60,
             'user' => $admin
-        ], 201);
+        ], 'success.admin_registered', [], 201);
     }
 
     /**
@@ -68,27 +63,19 @@ class AuthController extends Controller
      */
     public function login(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $validator = ValidationService::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message_en' => $validator->errors()->first(),
-                'message_ar' => 'خطأ في التحقق من البيانات'
-            ], 422);
+            return $this->validationErrorWithFirstMessage($validator);
         }
 
         $credentials = $request->only('email', 'password');
 
         if (!$token = Auth::guard('admins')->attempt($credentials)) {
-            return response()->json([
-                'success' => false,
-                'message_en' => 'Invalid email or password',
-                'message_ar' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-            ], 401);
+            return $this->errorResponse('errors.invalid_credentials', [], 401);
         }
 
         $admin = Auth::guard('admins')->user();
@@ -96,22 +83,15 @@ class AuthController extends Controller
         // Check if admin is active
         if (!$admin->status) {
             Auth::guard('admins')->logout();
-            return response()->json([
-                'success' => false,
-                'message_en' => 'Account is disabled',
-                'message_ar' => 'الحساب معطل'
-            ], 403);
+            return $this->errorResponse('errors.account_disabled', [], 403);
         }
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Login successful',
-            'message_ar' => 'تم تسجيل الدخول بنجاح',
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('admins')->factory()->getTTL() * 60,
             'user' => $admin
-        ]);
+        ], 'success.admin_logged_in');
     }
 
     /**
@@ -121,12 +101,7 @@ class AuthController extends Controller
     {
         $admin = Auth::guard('admins')->user();
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Profile fetched successfully',
-            'message_ar' => 'تم جلب الملف الشخصي بنجاح',
-            'user' => $admin
-        ]);
+        return $this->successResponse($admin, 'success.profile_fetched');
     }
 
     /**
@@ -136,11 +111,7 @@ class AuthController extends Controller
     {
         Auth::guard('admins')->logout();
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Successfully logged out',
-            'message_ar' => 'تم تسجيل الخروج بنجاح'
-        ]);
+        return $this->successResponse(null, 'success.admin_logged_out');
     }
 
     /**
@@ -148,15 +119,16 @@ class AuthController extends Controller
      */
     public function refresh(): JsonResponse
     {
-        $token = Auth::guard('admins')->refresh();
+        try {
+            $token = Auth::guard('admins')->refresh();
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.token_refresh_failed', [], 401);
+        }
 
-        return response()->json([
-            'success' => true,
-            'message_en' => 'Token refreshed successfully',
-            'message_ar' => 'تم تحديث الرمز بنجاح',
+        return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('admins')->factory()->getTTL() * 60
-        ]);
+        ], 'success.token_refreshed');
     }
 }
