@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\App;
+
+class MainCategory extends Model
+{
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'main_categories';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name_en',
+        'name_ar',
+        'description_en',
+        'description_ar',
+        'image',
+        'status',
+        'sort_order',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'status' => 'boolean',
+        'sort_order' => 'integer',
+    ];
+
+    /**
+     * Get the name attribute based on the current locale.
+     *
+     * @return string|null
+     */
+    public function getNameAttribute()
+    {
+        $locale = App::getLocale();
+        return $locale === 'ar' ? $this->name_ar : $this->name_en;
+    }
+
+    /**
+     * Get the description attribute based on the current locale.
+     *
+     * @return string|null
+     */
+    public function getDescriptionAttribute()
+    {
+        $locale = App::getLocale();
+        return $locale === 'ar' ? $this->description_ar : $this->description_en;
+    }
+
+    /**
+     * Scope a query to only include active categories.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', true);
+    }
+
+    /**
+     * Scope a query to order by sort_order.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('sort_order', 'asc');
+    }
+}

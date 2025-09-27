@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\MainCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,17 @@ Route::prefix('admin')->group(function () {
                 'message_ar' => 'إعدادات النظام',
                 'guard' => 'admins'
             ]);
+        });
+
+        // Main Categories CRUD routes
+        Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/active', 'getActiveCategories');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
         });
     });
 });

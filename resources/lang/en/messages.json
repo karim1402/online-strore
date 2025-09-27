@@ -9,7 +9,17 @@
         "api_running": "Makkok API is running",
         "api_healthy": "API is healthy",
         "dashboard_loaded": "Dashboard loaded successfully",
-        "api_working": "User API is working"
+        "api_working": "User API is working",
+        "admin_registered": "Admin successfully registered",
+        "admin_logged_in": "Admin login successful",
+        "admin_logged_out": "Admin successfully logged out",
+        "main_categories_retrieved": "Main categories retrieved successfully",
+        "main_category_created": "Main category created successfully",
+        "main_category_retrieved": "Main category retrieved successfully",
+        "main_category_updated": "Main category updated successfully",
+        "main_category_deleted": "Main category deleted successfully",
+        "main_category_status_updated": "Main category status updated successfully",
+        "active_main_categories_retrieved": "Active main categories retrieved successfully"
     },
     "errors": {
         "validation_failed": "Validation failed",
