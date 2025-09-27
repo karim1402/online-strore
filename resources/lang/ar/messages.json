@@ -9,7 +9,17 @@
         "api_running": "واجهة برمجة التطبيقات مكوك تعمل",
         "api_healthy": "واجهة برمجة التطبيقات تعمل بشكل صحيح",
         "dashboard_loaded": "تم تحميل لوحة التحكم بنجاح",
-        "api_working": "واجهة برمجة التطبيقات للمستخدم تعمل بشكل صحيح"
+        "api_working": "واجهة برمجة التطبيقات للمستخدم تعمل بشكل صحيح",
+        "admin_registered": "تم تسجيل المدير بنجاح",
+        "admin_logged_in": "تم تسجيل دخول المدير بنجاح",
+        "admin_logged_out": "تم تسجيل خروج المدير بنجاح",
+        "main_categories_retrieved": "تم استرداد الفئات الرئيسية بنجاح",
+        "main_category_created": "تم إنشاء الفئة الرئيسية بنجاح",
+        "main_category_retrieved": "تم استرداد الفئة الرئيسية بنجاح",
+        "main_category_updated": "تم تحديث الفئة الرئيسية بنجاح",
+        "main_category_deleted": "تم حذف الفئة الرئيسية بنجاح",
+        "main_category_status_updated": "تم تحديث حالة الفئة الرئيسية بنجاح",
+        "active_main_categories_retrieved": "تم استرداد الفئات الرئيسية النشطة بنجاح"
     },
     "errors": {
         "validation_failed": "فشل التحقق من صحة البيانات",
