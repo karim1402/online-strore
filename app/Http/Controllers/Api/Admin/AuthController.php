@@ -22,41 +22,7 @@ class AuthController extends Controller
         // Middleware will be handled in routes
     }
 
-    /**
-     * Register a new admin
-     */
-    public function register(Request $request): JsonResponse
-    {
-        $validator = ValidationService::make($request->all(), [
-            'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:admins',
-            'password' => 'required|string|min:6',
-            'role' => 'nullable|string|in:admin,super_admin,manager',
-            'phone' => 'nullable|string|max:20',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->validationErrorWithFirstMessage($validator);
-        }
-
-        $admin = Admin::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'admin',
-            'phone' => $request->phone,
-            'status' => true,
-        ]);
-
-        $token = Auth::guard('admins')->login($admin);
-
-        return $this->successResponse([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => Auth::guard('admins')->factory()->getTTL() * 60,
-            'user' => $admin
-        ], 'success.admin_registered', [], 201);
-    }
+    
 
     /**
      * Login admin
@@ -102,6 +68,43 @@ class AuthController extends Controller
         $admin = Auth::guard('admins')->user();
 
         return $this->successResponse($admin, 'success.profile_fetched');
+    }
+
+    /**
+     * Update admin profile
+     */
+    public function updateProfile(Request $request): JsonResponse
+    {
+        try {
+            $admin = Auth::guard('admins')->user();
+
+            $validator = ValidationService::make($request->all(), [
+                'name' => 'required|string|between:2,100',
+                'email' => 'required|string|email|max:100|unique:admins,email,' . $admin->id,
+                'password' => 'nullable|string|min:6',
+                'phone' => 'nullable|string|max:20',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            $data = $validator->validated();
+
+            // Handle password update
+            if (!empty($data['password'])) {
+                $data['password'] = Hash::make($data['password']);
+            } else {
+                unset($data['password']);
+            }
+
+            $admin->update($data);
+
+            return $this->successResponse($admin->fresh(), 'success.profile_updated');
+
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
     }
 
     /**
