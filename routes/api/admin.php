@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
+use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\Admin\MainCategoryController;
 
 /*
@@ -18,11 +19,11 @@ use App\Http\Controllers\Api\Admin\MainCategoryController;
 Route::prefix('admin')->group(function () {
     // Authentication routes
     Route::controller(AuthController::class)->group(function () {
-        Route::post('register', 'register');
         Route::post('login', 'login');
         Route::post('logout', 'logout')->middleware('auth:admins');
         Route::post('refresh', 'refresh')->middleware('auth:admins');
         Route::get('profile', 'profile')->middleware('auth:admins');
+        Route::put('profile', 'updateProfile')->middleware('auth:admins');
     });
 
     // Protected admin routes
@@ -60,6 +61,16 @@ Route::prefix('admin')->group(function () {
             Route::get('/', 'index');
             Route::post('/', 'store');
             Route::get('/active', 'getActiveCategories');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+        });
+
+        // Admin Users CRUD routes (only authenticated admins)
+        Route::controller(AdminUserController::class)->prefix('admin-users')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
             Route::delete('/{id}', 'destroy');
