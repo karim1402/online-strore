@@ -6,10 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Spatie\Permission\Traits\HasRoles;
 
 class Admin extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
+
+    /**
+     * The guard name for permissions.
+     *
+     * @var string
+     */
+    protected $guard_name = 'admins';
 
     /**
      * The table associated with the model.
@@ -74,6 +82,8 @@ class Admin extends Authenticatable implements JWTSubject
             'guard' => 'admins',
             'email' => $this->email,
             'role' => $this->role,
+            'permissions' => $this->getAllPermissions()->pluck('name')->toArray(),
+            'roles' => $this->getRoleNames()->toArray(),
         ];
     }
 }

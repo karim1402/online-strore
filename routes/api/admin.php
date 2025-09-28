@@ -4,6 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\Admin\MainCategoryController;
+use App\Http\Controllers\Api\Admin\RoleController;
+use App\Http\Controllers\Api\Admin\PermissionController;
+use App\Http\Controllers\Api\Admin\RoleAssignmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,25 +59,75 @@ Route::prefix('admin')->group(function () {
             ]);
         });
 
-        // Main Categories CRUD routes
+        // Main Categories CRUD routes (permission-based)
         Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
-            Route::get('/', 'index');
-            Route::post('/', 'store');
-            Route::get('/active', 'getActiveCategories');
-            Route::get('/{id}', 'show');
-            Route::put('/{id}', 'update');
-            Route::delete('/{id}', 'destroy');
-            Route::patch('/{id}/toggle-status', 'toggleStatus');
+            Route::middleware('permission:categories.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/active', 'getActiveCategories');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:categories.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:categories.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:categories.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
         });
 
-        // Admin Users CRUD routes (only authenticated admins)
+        // Admin Users CRUD routes (permission-based)
         Route::controller(AdminUserController::class)->prefix('admin-users')->group(function () {
-            Route::get('/', 'index');
-            Route::post('/', 'store');
-            Route::get('/{id}', 'show');
-            Route::put('/{id}', 'update');
-            Route::delete('/{id}', 'destroy');
-            Route::patch('/{id}/toggle-status', 'toggleStatus');
+            Route::middleware('permission:admin-users.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:admin-users.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:admin-users.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:admin-users.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Role Management routes (super_admin only)
+        Route::middleware('role:super_admin,admins')->group(function () {
+            Route::controller(RoleController::class)->prefix('roles')->group(function () {
+                Route::get('/', 'index');
+                Route::post('/', 'store');
+                Route::get('/permissions', 'getPermissions');
+                Route::get('/{id}', 'show');
+                Route::put('/{id}', 'update');
+                Route::delete('/{id}', 'destroy');
+            });
+
+            Route::controller(PermissionController::class)->prefix('permissions')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/categories', 'getByCategory');
+                Route::get('/{id}', 'show');
+            });
+        });
+
+        // Role Assignment routes (admin-users.roles permission)
+        Route::middleware('permission:admin-users.roles,admins')->group(function () {
+            Route::controller(RoleAssignmentController::class)->prefix('users')->group(function () {
+                Route::get('/{userId}/roles', 'getUserRoles');
+                Route::post('/{userId}/roles/assign', 'assignRole');
+                Route::post('/{userId}/roles/remove', 'removeRole');
+                Route::post('/{userId}/roles/sync', 'syncRoles');
+            });
         });
     });
 });

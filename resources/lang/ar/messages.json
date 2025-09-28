@@ -26,7 +26,19 @@
         "main_category_updated": "تم تحديث الفئة الرئيسية بنجاح",
         "main_category_deleted": "تم حذف الفئة الرئيسية بنجاح",
         "main_category_status_updated": "تم تحديث حالة الفئة الرئيسية بنجاح",
-        "active_main_categories_retrieved": "تم استرداد الفئات الرئيسية النشطة بنجاح"
+        "active_main_categories_retrieved": "تم استرداد الفئات الرئيسية النشطة بنجاح",
+        "roles_retrieved": "تم جلب الأدوار بنجاح",
+        "role_created": "تم إنشاء الدور بنجاح",
+        "role_retrieved": "تم جلب الدور بنجاح",
+        "role_updated": "تم تحديث الدور بنجاح",
+        "role_deleted": "تم حذف الدور بنجاح",
+        "permissions_retrieved": "تم جلب الصلاحيات بنجاح",
+        "permissions_by_category_retrieved": "تم جلب الصلاحيات حسب الفئة بنجاح",
+        "permission_retrieved": "تم جلب الصلاحية بنجاح",
+        "user_roles_retrieved": "تم جلب أدوار المستخدم بنجاح",
+        "role_assigned": "تم تعيين الدور بنجاح",
+        "role_removed": "تم إزالة الدور بنجاح",
+        "roles_synced": "تم مزامنة أدوار المستخدم بنجاح"
     },
     "errors": {
         "validation_failed": "فشل التحقق من صحة البيانات",
@@ -34,6 +46,8 @@
         "account_disabled": "الحساب معطل",
         "unauthenticated": "غير مصرح. يرجى تسجيل الدخول أولاً",
         "access_denied": "تم رفض الوصول. ليس لديك إذن لتنفيذ هذا الإجراء",
+        "insufficient_permissions": "ليس لديك صلاحية لتنفيذ هذا الإجراء",
+        "insufficient_role": "دورك لا يسمح بهذا الإجراء",
         "resource_not_found": "المورد غير موجود",
         "route_not_found": "المسار غير موجود",
         "endpoint_not_found": "نقطة نهاية واجهة برمجة التطبيقات غير موجودة",
@@ -41,10 +55,13 @@
         "token_expired": "انتهت صلاحية الرمز المميز. يرجى تحديث الرمز المميز",
         "token_invalid": "الرمز المميز غير صالح",
         "token_not_provided": "لم يتم توفير الرمز المميز",
-        "token_refresh_failed": "فشل تحديث الرمز",
+        "token_refresh_failed": "فشل تحديث الرمز المميز",
         "database_error": "حدث خطأ في قاعدة البيانات",
         "server_error": "حدث خطأ غير متوقع",
-        "too_many_requests": "طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً"
+        "too_many_requests": "طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً",
+        "user_not_found": "المستخدم غير موجود",
+        "role_not_found": "الدور غير موجود",
+        "role_has_users": "لا يمكن حذف دور مُعيَّن للمستخدمين"
     },
     "validation": {
         "required": "حقل :attribute مطلوب",

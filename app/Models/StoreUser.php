@@ -6,10 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Spatie\Permission\Traits\HasRoles;
 
 class StoreUser extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
+
+    /**
+     * The guard name for permissions.
+     *
+     * @var string
+     */
+    protected $guard_name = 'store_users';
 
     /**
      * The table associated with the model.
@@ -74,6 +82,9 @@ class StoreUser extends Authenticatable implements JWTSubject
         return [
             'guard' => 'store_users',
             'email' => $this->email,
+            'store_name' => $this->store_name,
+            'permissions' => $this->getAllPermissions()->pluck('name')->toArray(),
+            'roles' => $this->getRoleNames()->toArray(),
         ];
     }
 }
