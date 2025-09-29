@@ -102,6 +102,11 @@ Route::prefix('admin')->group(function () {
             });
         });
 
+        // Get roles list (accessible to all authenticated admins)
+        Route::controller(RoleController::class)->prefix('roles')->group(function () {
+            Route::get('/list', 'getRolesList');
+        });
+
         // Role Management routes (super_admin only)
         Route::middleware('role:super_admin,admins')->group(function () {
             Route::controller(RoleController::class)->prefix('roles')->group(function () {

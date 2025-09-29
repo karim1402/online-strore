@@ -9,6 +9,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class AdminUserController extends Controller
 {
@@ -25,7 +26,7 @@ class AdminUserController extends Controller
             $status = $request->get('status'); // true/false/null
             $role = $request->get('role');
 
-            $query = Admin::query()->orderBy('id', 'desc');
+            $query = Admin::with('roles')->orderBy('id', 'desc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
@@ -39,7 +40,9 @@ class AdminUserController extends Controller
             }
 
             if ($role) {
-                $query->where('role', $role);
+                $query->whereHas('roles', function ($q) use ($role) {
+                    $q->where('name', $role);
+                });
             }
 
             $admins = $query->paginate($perPage);
@@ -60,7 +63,7 @@ class AdminUserController extends Controller
                 'name' => 'required|string|between:2,100',
                 'email' => 'required|string|email|max:100|unique:admins,email',
                 'password' => 'required|string|min:6',
-                'role' => 'required|string|in:admin,super_admin,manager',
+                'role_id' => 'required|integer|exists:roles,id',
                 'phone' => 'nullable|string|max:20',
                 'status' => 'boolean',
             ]);
@@ -70,12 +73,23 @@ class AdminUserController extends Controller
             }
 
             $data = $validator->validated();
+            $roleId = $data['role_id'];
+            unset($data['role_id']);
+            
             $data['password'] = Hash::make($data['password']);
             $data['status'] = $data['status'] ?? true;
 
             $admin = Admin::create($data);
+            
+            // Assign single role to the admin
+            $role = Role::where('id', $roleId)
+                       ->where('guard_name', 'admins')
+                       ->first();
+            if ($role) {
+                $admin->assignRole($role);
+            }
 
-            return $this->successResponse($admin, 'success.admin_user_created', [], 201);
+            return $this->successResponse($admin->load('roles'), 'success.admin_user_created', [], 201);
         } catch (\Throwable $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
@@ -87,7 +101,7 @@ class AdminUserController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $admin = Admin::findOrFail($id);
+            $admin = Admin::with('roles')->findOrFail($id);
             return $this->successResponse($admin, 'success.admin_user_retrieved');
         } catch (\Throwable $e) {
             return $this->notFoundResponse('errors.resource_not_found');
@@ -103,10 +117,10 @@ class AdminUserController extends Controller
             $admin = Admin::findOrFail($id);
 
             $validator = ValidationService::make($request->all(), [
-                'name' => 'required|string|between:2,100',
-                'email' => 'required|string|email|max:100|unique:admins,email,' . $id,
+                'name' => 'nullable|string|between:2,100',
+                'email' => 'nullable|string|email|max:100|unique:admins,email,' . $id,
                 'password' => 'nullable|string|min:6',
-                'role' => 'required|string|in:admin,super_admin,manager',
+                'role_id' => 'nullable|integer|exists:roles,id',
                 'phone' => 'nullable|string|max:20',
                 'status' => 'boolean',
             ]);
@@ -116,6 +130,8 @@ class AdminUserController extends Controller
             }
 
             $data = $validator->validated();
+            $roleId = $data['role_id'] ?? null;
+            unset($data['role_id']);
 
             if (!empty($data['password'])) {
                 $data['password'] = Hash::make($data['password']);
@@ -124,8 +140,18 @@ class AdminUserController extends Controller
             }
 
             $admin->update($data);
+            
+            // Update role if provided
+            if ($roleId !== null) {
+                $role = Role::where('id', $roleId)
+                           ->where('guard_name', 'admins')
+                           ->first();
+                if ($role) {
+                    $admin->syncRoles([$role]); // Sync with single role
+                }
+            }
 
-            return $this->successResponse($admin->fresh(), 'success.admin_user_updated');
+            return $this->successResponse($admin->fresh()->load('roles'), 'success.admin_user_updated');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('errors.resource_not_found');
         } catch (\Throwable $e) {

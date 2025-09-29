@@ -155,4 +155,22 @@ class RoleController extends Controller
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
+
+    /**
+     * Get all roles with just id and name for dropdown/select purposes.
+     */
+    public function getRolesList(Request $request): JsonResponse
+    {
+        try {
+            $guard = $request->get('guard', 'admins');
+            $roles = Role::where('guard_name', $guard)
+                        ->select('id', 'name')
+                        ->orderBy('name')
+                        ->get();
+
+            return $this->successResponse($roles, 'success.roles_list_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
 }

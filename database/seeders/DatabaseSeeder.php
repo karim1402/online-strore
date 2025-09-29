@@ -20,7 +20,11 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-
-        // MainCategorySeeder::class;
+        $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            AdminSeeder::class,
+            MainCategorySeeder::class,
+        ]);
     }
 }

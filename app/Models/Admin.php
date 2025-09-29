@@ -35,7 +35,6 @@ class Admin extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'role',
         'phone',
         'status',
     ];
@@ -81,7 +80,6 @@ class Admin extends Authenticatable implements JWTSubject
         return [
             'guard' => 'admins',
             'email' => $this->email,
-            'role' => $this->role,
             'permissions' => $this->getAllPermissions()->pluck('name')->toArray(),
             'roles' => $this->getRoleNames()->toArray(),
         ];
