@@ -31,6 +31,12 @@ return Application::configure(basePath: dirname(__DIR__))
         
         // Add JSON response middleware for all requests
         $middleware->append(\App\Http\Middleware\ForceJsonResponse::class);
+        
+        // Register permission and role middleware
+        $middleware->alias([
+            'permission' => \App\Http\Middleware\CheckPermission::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Handle authentication exceptions

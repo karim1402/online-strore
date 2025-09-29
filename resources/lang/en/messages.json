@@ -26,7 +26,19 @@
         "main_category_updated": "Main category updated successfully",
         "main_category_deleted": "Main category deleted successfully",
         "main_category_status_updated": "Main category status updated successfully",
-        "active_main_categories_retrieved": "Active main categories retrieved successfully"
+        "active_main_categories_retrieved": "Active main categories retrieved successfully",
+        "roles_retrieved": "Roles retrieved successfully",
+        "role_created": "Role created successfully",
+        "role_retrieved": "Role retrieved successfully",
+        "role_updated": "Role updated successfully",
+        "role_deleted": "Role deleted successfully",
+        "permissions_retrieved": "Permissions retrieved successfully",
+        "permissions_by_category_retrieved": "Permissions by category retrieved successfully",
+        "permission_retrieved": "Permission retrieved successfully",
+        "user_roles_retrieved": "User roles retrieved successfully",
+        "role_assigned": "Role assigned successfully",
+        "role_removed": "Role removed successfully",
+        "roles_synced": "User roles synchronized successfully"
     },
     "errors": {
         "validation_failed": "Validation failed",
@@ -34,6 +46,8 @@
         "account_disabled": "Account is disabled",
         "unauthenticated": "Unauthenticated. Please login first",
         "access_denied": "Access denied. You do not have permission to perform this action",
+        "insufficient_permissions": "You don't have permission to perform this action",
+        "insufficient_role": "Your role doesn't allow this action",
         "resource_not_found": "Resource not found",
         "route_not_found": "Route not found",
         "endpoint_not_found": "API endpoint not found",
@@ -44,7 +58,10 @@
         "token_refresh_failed": "Token refresh failed",
         "database_error": "Database error occurred",
         "server_error": "An unexpected error occurred",
-        "too_many_requests": "Too many requests. Please try again later"
+        "too_many_requests": "Too many requests. Please try again later",
+        "user_not_found": "User not found",
+        "role_not_found": "Role not found",
+        "role_has_users": "Cannot delete role that is assigned to users"
     },
     "validation": {
         "required": "The :attribute field is required",
