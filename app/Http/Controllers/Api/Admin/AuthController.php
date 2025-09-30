@@ -52,11 +52,27 @@ class AuthController extends Controller
             return $this->errorResponse('errors.account_disabled', [], 403);
         }
 
+        // Get the primary role (first role) and its permissions
+        $primaryRole = $admin->roles->first();
+        $permissions = $admin->getAllPermissions()->pluck('name')->toArray();
+
         return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => Auth::guard('admins')->factory()->getTTL() * 60,
-            'user' => $admin
+            'user' => [
+                'id' => $admin->id,
+                'name' => $admin->name,
+                'email' => $admin->email,
+                'email_verified_at' => $admin->email_verified_at,
+                'phone' => $admin->phone,
+                'status' => $admin->status,
+                'created_at' => $admin->created_at,
+                'updated_at' => $admin->updated_at,
+                'role_id' => $primaryRole ? $primaryRole->id : null,
+                'role_name' => $primaryRole ? $primaryRole->name : null,
+                'permissions' => $permissions,
+            ]
         ], 'success.admin_logged_in');
     }
 
@@ -66,8 +82,26 @@ class AuthController extends Controller
     public function profile(): JsonResponse
     {
         $admin = Auth::guard('admins')->user();
+        
+        // Get the primary role (first role) and its permissions
+        $primaryRole = $admin->roles->first();
+        $permissions = $admin->getAllPermissions()->pluck('name')->toArray();
 
-        return $this->successResponse($admin, 'success.profile_fetched');
+        $profileData = [
+            'id' => $admin->id,
+            'name' => $admin->name,
+            'email' => $admin->email,
+            'email_verified_at' => $admin->email_verified_at,
+            'phone' => $admin->phone,
+            'status' => $admin->status,
+            'created_at' => $admin->created_at,
+            'updated_at' => $admin->updated_at,
+            'role_id' => $primaryRole ? $primaryRole->id : null,
+            'role_name' => $primaryRole ? $primaryRole->name : null,
+            'permissions' => $permissions,
+        ];
+
+        return $this->successResponse($profileData, 'success.profile_fetched');
     }
 
     /**
@@ -99,8 +133,27 @@ class AuthController extends Controller
             }
 
             $admin->update($data);
+            $admin = $admin->fresh();
 
-            return $this->successResponse($admin->fresh(), 'success.profile_updated');
+            // Get the primary role (first role) and its permissions
+            $primaryRole = $admin->roles->first();
+            $permissions = $admin->getAllPermissions()->pluck('name')->toArray();
+
+            $profileData = [
+                'id' => $admin->id,
+                'name' => $admin->name,
+                'email' => $admin->email,
+                'email_verified_at' => $admin->email_verified_at,
+                'phone' => $admin->phone,
+                'status' => $admin->status,
+                'created_at' => $admin->created_at,
+                'updated_at' => $admin->updated_at,
+                'role_id' => $primaryRole ? $primaryRole->id : null,
+                'role_name' => $primaryRole ? $primaryRole->name : null,
+                'permissions' => $permissions,
+            ];
+
+            return $this->successResponse($profileData, 'success.profile_updated');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
