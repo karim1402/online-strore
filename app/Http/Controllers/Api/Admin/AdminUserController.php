@@ -24,7 +24,7 @@ class AdminUserController extends Controller
             $perPage = (int) $request->get('per_page', 15);
             $search = $request->get('search');
             $status = $request->get('status'); // true/false/null
-            $role = $request->get('role');
+            $role = $request->get('role_id');
 
             $query = Admin::with('roles')->orderBy('id', 'desc');
 
@@ -41,7 +41,7 @@ class AdminUserController extends Controller
 
             if ($role) {
                 $query->whereHas('roles', function ($q) use ($role) {
-                    $q->where('name', $role);
+                    $q->where('id', $role);
                 });
             }
 
