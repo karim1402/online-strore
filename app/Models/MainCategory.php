@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Storage;
 
 class MainCategory extends Model
 {
@@ -43,6 +44,13 @@ class MainCategory extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['image_url'];
+
+    /**
      * Get the name attribute based on the current locale.
      *
      * @return string|null
@@ -62,6 +70,19 @@ class MainCategory extends Model
     {
         $locale = App::getLocale();
         return $locale === 'ar' ? $this->description_ar : $this->description_en;
+    }
+
+    /**
+     * Get the full URL for the image.
+     *
+     * @return string|null
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            return Storage::disk('public')->url($this->image);
+        }
+        return null;
     }
 
     /**
