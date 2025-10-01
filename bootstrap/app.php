@@ -52,10 +52,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Handle authorization exceptions
         $exceptions->render(function (\Illuminate\Auth\Access\AuthorizationException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.access_denied');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Access denied. You do not have permission to perform this action.',
-                'message_ar' => 'تم رفض الوصول. ليس لديك إذن لتنفيذ هذا الإجراء.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'access_denied'
             ], 403);
         });
@@ -75,20 +76,22 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Handle model not found exceptions
         $exceptions->render(function (\Illuminate\Database\Eloquent\ModelNotFoundException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.resource_not_found');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Resource not found.',
-                'message_ar' => 'المورد غير موجود.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'resource_not_found'
             ], 404);
         });
 
         // Handle method not allowed exceptions
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.method_not_allowed');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Method not allowed.',
-                'message_ar' => 'الطريقة غير مسموحة.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'method_not_allowed',
                 'allowed_methods' => $e->getHeaders()['Allow'] ?? []
             ], 405);
@@ -96,58 +99,64 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Handle route not found exceptions
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\NotFoundHttpException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.route_not_found');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Route not found.',
-                'message_ar' => 'المسار غير موجود.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'route_not_found'
             ], 404);
         });
 
         // Handle JWT token exceptions
         $exceptions->render(function (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.token_expired');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Token has expired. Please refresh your token.',
-                'message_ar' => 'انتهت صلاحية الرمز المميز. يرجى تحديث الرمز المميز.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'token_expired'
             ], 401);
         });
 
         $exceptions->render(function (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.token_invalid');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Token is invalid.',
-                'message_ar' => 'الرمز المميز غير صالح.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'token_invalid'
             ], 401);
         });
 
         $exceptions->render(function (\Tymon\JWTAuth\Exceptions\JWTException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.token_not_provided');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Token not provided.',
-                'message_ar' => 'لم يتم توفير الرمز المميز.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'token_not_provided'
             ], 401);
         });
 
         // Handle database connection exceptions
         $exceptions->render(function (\Illuminate\Database\QueryException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.database_error');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Database error occurred.',
-                'message_ar' => 'حدث خطأ في قاعدة البيانات.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'database_error'
             ], 500);
         });
 
         // Handle throttle exceptions
         $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, $request) {
+            $message = \App\Services\LocalizationService::getMessage('errors.too_many_requests');
             return response()->json([
                 'success' => false,
-                'message_en' => 'Too many requests. Please try again later.',
-                'message_ar' => 'طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً.',
+                'message' => $message,
+                'data' => null,
                 'error' => 'too_many_requests',
                 'retry_after' => $e->getHeaders()['Retry-After'] ?? null
             ], 429);
@@ -156,13 +165,16 @@ return Application::configure(basePath: dirname(__DIR__))
         // Handle general exceptions
         $exceptions->render(function (\Throwable $e, $request) {
             // Only show detailed error in development
-            $message = app()->environment('local') ? $e->getMessage() : 'An unexpected error occurred.';
-            $messageAr = app()->environment('local') ? $e->getMessage() : 'حدث خطأ غير متوقع.';
+            if (app()->environment('local')) {
+                $message = $e->getMessage();
+            } else {
+                $message = \App\Services\LocalizationService::getMessage('errors.server_error');
+            }
             
             return response()->json([
                 'success' => false,
-                'message_en' => $message,
-                'message_ar' => $messageAr,
+                'message' => $message,
+                'data' => null,
                 'error' => 'server_error',
                 'trace' => app()->environment('local') ? $e->getTraceAsString() : null
             ], 500);

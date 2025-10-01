@@ -28,20 +28,22 @@ Route::prefix('vendor')->group(function () {
     Route::middleware('auth:vendors')->group(function () {
         // Add more vendor-specific routes here
         Route::get('dashboard', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.store_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Vendor Dashboard',
-                'message_ar' => 'لوحة تحكم البائع',
-                'guard' => 'vendors'
+                'message' => $message,
+                'data' => null,
+                'guard' => 'store_users'
             ]);
         });
         
         Route::get('products', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.store_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Vendor Products',
-                'message_ar' => 'منتجات البائع',
-                'guard' => 'vendors'
+                'message' => $message,
+                'data' => ['info' => 'Store Products'],
+                'guard' => 'store_users'
             ]);
         });
     });

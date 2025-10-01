@@ -33,28 +33,31 @@ Route::prefix('admin')->group(function () {
     Route::middleware('auth:admins')->group(function () {
         // Add more admin-specific routes here
         Route::get('dashboard', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.admin_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Admin Dashboard',
-                'message_ar' => 'لوحة تحكم المدير',
+                'message' => $message,
+                'data' => null,
                 'guard' => 'admins'
             ]);
         });
         
         Route::get('users', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.admin_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'All Users Management',
-                'message_ar' => 'إدارة جميع المستخدمين',
+                'message' => $message,
+                'data' => ['info' => 'All Users Management'],
                 'guard' => 'admins'
             ]);
         });
         
         Route::get('settings', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.admin_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'System Settings',
-                'message_ar' => 'إعدادات النظام',
+                'message' => $message,
+                'data' => ['info' => 'System Settings'],
                 'guard' => 'admins'
             ]);
         });
