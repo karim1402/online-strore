@@ -28,19 +28,21 @@ Route::prefix('store')->group(function () {
     Route::middleware('auth:store_users')->group(function () {
         // Add more store-specific routes here
         Route::get('dashboard', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.store_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Store Dashboard',
-                'message_ar' => 'لوحة تحكم المتجر',
+                'message' => $message,
+                'data' => null,
                 'guard' => 'store_users'
             ]);
         });
         
         Route::get('products', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.store_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Store Products',
-                'message_ar' => 'منتجات المتجر',
+                'message' => $message,
+                'data' => ['info' => 'Store Products'],
                 'guard' => 'store_users'
             ]);
         });
