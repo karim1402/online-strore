@@ -38,10 +38,11 @@ return [
     |
     | Specify the length of time (in minutes) that the token will be valid for.
     | Defaults to 1 hour.
+    | Set to null to make tokens never expire.
     |
     */
 
-    'ttl' => env('JWT_TTL', 60),
+    'ttl' => env('JWT_TTL', null),
 
     /*
     |--------------------------------------------------------------------------
@@ -82,7 +83,7 @@ return [
     'required_claims' => [
         'iss',
         'iat',
-        'exp',
+        // 'exp', // Removed to allow tokens without expiration
         'nbf',
         'sub',
         'jti',
