@@ -46,7 +46,7 @@ class RoleController extends Controller
         try {
             $validator = ValidationService::make($request->all(), [
                 'name' => 'required|string|max:255|unique:roles,name',
-                'guard_name' => 'required|string|in:admins,store_users',
+                'guard_name' => 'required|string|in:admins,vendors',
                 'permissions' => 'array',
                 'permissions.*' => 'exists:permissions,name'
             ]);

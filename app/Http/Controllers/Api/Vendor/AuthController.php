@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\StoreUser;
+namespace App\Http\Controllers\Api\Vendor;
 
 use App\Http\Controllers\Controller;
-use App\Models\StoreUser;
+use App\Models\Vendor;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -23,13 +23,13 @@ class AuthController extends Controller
     }
 
     /**
-     * Register a new store user
+     * Register a new vendor
      */
     public function register(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
             'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:store_users',
+            'email' => 'required|string|email|max:100|unique:vendors',
             'password' => 'required|string|confirmed|min:6',
             'store_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
@@ -40,7 +40,7 @@ class AuthController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        $storeUser = StoreUser::create([
+        $vendor = Vendor::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
@@ -50,18 +50,18 @@ class AuthController extends Controller
             'status' => true,
         ]);
 
-        $token = Auth::guard('store_users')->login($storeUser);
+        $token = Auth::guard('vendors')->login($vendor);
 
         return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard('store_users')->factory()->getTTL() * 60,
-            'user' => $storeUser
-        ], 'success.store_user_registered', [], 201);
+            'expires_in' => Auth::guard('vendors')->factory()->getTTL() * 60,
+            'user' => $vendor
+        ], 'success.vendor_registered', [], 201);
     }
 
     /**
-     * Login store user
+     * Login vendor
      */
     public function login(Request $request): JsonResponse
     {
@@ -76,44 +76,44 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        if (!$token = Auth::guard('store_users')->attempt($credentials)) {
+        if (!$token = Auth::guard('vendors')->attempt($credentials)) {
             return $this->errorResponse('errors.invalid_credentials', [], 401);
         }
 
-        $storeUser = Auth::guard('store_users')->user();
+        $vendor = Auth::guard('vendors')->user();
         
-        // Check if store user is active
-        if (!$storeUser->status) {
-            Auth::guard('store_users')->logout();
+        // Check if vendor is active
+        if (!$vendor->status) {
+            Auth::guard('vendors')->logout();
             return $this->errorResponse('errors.account_disabled', [], 403);
         }
 
         return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard('store_users')->factory()->getTTL() * 60,
-            'user' => $storeUser
-        ], 'success.store_user_logged_in');
+            'expires_in' => Auth::guard('vendors')->factory()->getTTL() * 60,
+            'user' => $vendor
+        ], 'success.vendor_logged_in');
     }
 
     /**
-     * Get store user profile
+     * Get vendor profile
      */
     public function profile(): JsonResponse
     {
-        $storeUser = Auth::guard('store_users')->user();
+        $vendor = Auth::guard('vendors')->user();
 
-        return $this->successResponse($storeUser, 'success.profile_fetched');
+        return $this->successResponse($vendor, 'success.profile_fetched');
     }
 
     /**
-     * Logout store user
+     * Logout vendor
      */
     public function logout(): JsonResponse
     {
-        Auth::guard('store_users')->logout();
+        Auth::guard('vendors')->logout();
 
-        return $this->successResponse(null, 'success.store_user_logged_out');
+        return $this->successResponse(null, 'success.vendor_logged_out');
     }
 
     /**
@@ -122,7 +122,7 @@ class AuthController extends Controller
     public function refresh(): JsonResponse
     {
         try {
-            $token = Auth::guard('store_users')->refresh();
+            $token = Auth::guard('vendors')->refresh();
         } catch (\Exception $e) {
             return $this->errorResponse('errors.token_refresh_failed', [], 401);
         }
@@ -130,7 +130,7 @@ class AuthController extends Controller
         return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard('store_users')->factory()->getTTL() * 60
+            'expires_in' => Auth::guard('vendors')->factory()->getTTL() * 60
         ], 'success.token_refreshed');
     }
 }

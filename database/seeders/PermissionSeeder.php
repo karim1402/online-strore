@@ -48,8 +48,8 @@ class PermissionSeeder extends Seeder
             ]);
         }
 
-        // Store permissions
-        $storePermissions = [
+        // Vendor permissions
+        $vendorPermissions = [
             // Product Management
             ['name' => 'products.view', 'category' => 'Product Management'],
             ['name' => 'products.create', 'category' => 'Product Management'],
@@ -67,15 +67,15 @@ class PermissionSeeder extends Seeder
             ['name' => 'staff.update', 'category' => 'Staff Management'],
             ['name' => 'staff.delete', 'category' => 'Staff Management'],
             
-            // Store Settings
-            ['name' => 'store-settings.view', 'category' => 'Store Settings'],
-            ['name' => 'store-settings.update', 'category' => 'Store Settings'],
+            // Vendor Settings
+            ['name' => 'vendor-settings.view', 'category' => 'Vendor Settings'],
+            ['name' => 'vendor-settings.update', 'category' => 'Vendor Settings'],
         ];
 
-        foreach ($storePermissions as $permission) {
+        foreach ($vendorPermissions as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission['name'],
-                'guard_name' => 'store_users',
+                'guard_name' => 'vendors',
             ]);
         }
     }

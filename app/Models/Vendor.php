@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
 
-class StoreUser extends Authenticatable implements JWTSubject
+class Vendor extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable, HasRoles;
 
@@ -17,14 +17,14 @@ class StoreUser extends Authenticatable implements JWTSubject
      *
      * @var string
      */
-    protected $guard_name = 'store_users';
+    protected $guard_name = 'vendors';
 
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'store_users';
+    protected $table = 'vendors';
 
     /**
      * The attributes that are mass assignable.
@@ -80,7 +80,7 @@ class StoreUser extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [
-            'guard' => 'store_users',
+            'guard' => 'vendors',
             'email' => $this->email,
             'store_name' => $this->store_name,
             'permissions' => $this->getAllPermissions()->pluck('name')->toArray(),

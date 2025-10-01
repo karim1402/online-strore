@@ -1,47 +1,47 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\StoreUser\AuthController;
+use App\Http\Controllers\Api\Vendor\AuthController;
 
 /*
 |--------------------------------------------------------------------------
-| Store User API Routes
+| Vendor API Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register API routes for store users.
+| Here is where you can register API routes for vendors.
 | These routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group.
 |
 */
 
-Route::prefix('store')->group(function () {
+Route::prefix('vendor')->group(function () {
     // Authentication routes
     Route::controller(AuthController::class)->group(function () {
         Route::post('register', 'register');
         Route::post('login', 'login');
-        Route::post('logout', 'logout')->middleware('auth:store_users');
-        Route::post('refresh', 'refresh')->middleware('auth:store_users');
-        Route::get('profile', 'profile')->middleware('auth:store_users');
+        Route::post('logout', 'logout')->middleware('auth:vendors');
+        Route::post('refresh', 'refresh')->middleware('auth:vendors');
+        Route::get('profile', 'profile')->middleware('auth:vendors');
     });
 
-    // Protected store routes
-    Route::middleware('auth:store_users')->group(function () {
-        // Add more store-specific routes here
+    // Protected vendor routes
+    Route::middleware('auth:vendors')->group(function () {
+        // Add more vendor-specific routes here
         Route::get('dashboard', function () {
             return response()->json([
                 'success' => true,
-                'message_en' => 'Store Dashboard',
-                'message_ar' => 'لوحة تحكم المتجر',
-                'guard' => 'store_users'
+                'message_en' => 'Vendor Dashboard',
+                'message_ar' => 'لوحة تحكم البائع',
+                'guard' => 'vendors'
             ]);
         });
         
         Route::get('products', function () {
             return response()->json([
                 'success' => true,
-                'message_en' => 'Store Products',
-                'message_ar' => 'منتجات المتجر',
-                'guard' => 'store_users'
+                'message_en' => 'Vendor Products',
+                'message_ar' => 'منتجات البائع',
+                'guard' => 'vendors'
             ]);
         });
     });
