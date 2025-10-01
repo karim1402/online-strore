@@ -20,14 +20,18 @@ class CheckRole
         if (!auth($guard)->check()) {
             return response()->json([
                 'success' => false,
-                'message' => \App\Services\LocalizationService::getMessage('errors.unauthenticated')
+                'message' => \App\Services\LocalizationService::getMessage('errors.unauthenticated'),
+                'data' => null,
+                'error' => 'authentication_required'
             ], 401);
         }
 
         if (!auth($guard)->user()->hasRole($role)) {
             return response()->json([
                 'success' => false,
-                'message' => \App\Services\LocalizationService::getMessage('errors.insufficient_role')
+                'message' => \App\Services\LocalizationService::getMessage('errors.insufficient_role'),
+                'data' => null,
+                'error' => 'insufficient_role'
             ], 403);
         }
 

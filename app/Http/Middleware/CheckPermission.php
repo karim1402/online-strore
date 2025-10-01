@@ -20,14 +20,18 @@ class CheckPermission
         if (!auth($guard)->check()) {
             return response()->json([
                 'success' => false,
-                'message' => \App\Services\LocalizationService::getMessage('errors.unauthenticated')
+                'message' => \App\Services\LocalizationService::getMessage('errors.unauthenticated'),
+                'data' => null,
+                'error' => 'authentication_required'
             ], 401);
         }
 
         if (!auth($guard)->user()->can($permission)) {
             return response()->json([
                 'success' => false,
-                'message' => \App\Services\LocalizationService::getMessage('errors.insufficient_permissions')
+                'message' => \App\Services\LocalizationService::getMessage('errors.insufficient_permissions'),
+                'data' => null,
+                'error' => 'insufficient_permissions'
             ], 403);
         }
 

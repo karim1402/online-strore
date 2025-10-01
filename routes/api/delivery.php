@@ -28,19 +28,21 @@ Route::prefix('delivery')->group(function () {
     Route::middleware('auth:deliveries')->group(function () {
         // Add more delivery-specific routes here
         Route::get('dashboard', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.delivery_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Delivery Dashboard',
-                'message_ar' => 'لوحة تحكم التوصيل',
+                'message' => $message,
+                'data' => null,
                 'guard' => 'deliveries'
             ]);
         });
         
         Route::get('orders', function () {
+            $message = \App\Services\LocalizationService::getMessage('guards.delivery_dashboard');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Delivery Orders',
-                'message_ar' => 'طلبات التوصيل',
+                'message' => $message,
+                'data' => ['info' => 'Delivery Orders'],
                 'guard' => 'deliveries'
             ]);
         });
@@ -50,11 +52,13 @@ Route::prefix('delivery')->group(function () {
             $user->availability = !$user->availability;
             $user->save();
             
+            $message = \App\Services\LocalizationService::getMessage('success.operation_successful');
             return response()->json([
                 'success' => true,
-                'message_en' => 'Availability updated successfully',
-                'message_ar' => 'تم تحديث حالة التوفر بنجاح',
-                'availability' => $user->availability
+                'message' => $message,
+                'data' => [
+                    'availability' => $user->availability
+                ]
             ]);
         });
     });
