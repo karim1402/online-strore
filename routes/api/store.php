@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Vendor\AuthController;
+use App\Http\Controllers\Api\Vendor\StoreController;
+use App\Http\Controllers\Api\Vendor\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,28 +24,50 @@ Route::prefix('vendor')->group(function () {
         Route::post('logout', 'logout')->middleware('auth:vendors');
         Route::post('refresh', 'refresh')->middleware('auth:vendors');
         Route::get('profile', 'profile')->middleware('auth:vendors');
+        Route::put('profile', 'updateProfile')->middleware('auth:vendors');
+    });
+
+    // Categories routes (public for registration)
+    Route::controller(CategoryController::class)->prefix('categories')->group(function () {
+        Route::get('/', 'index');
     });
 
     // Protected vendor routes
     Route::middleware('auth:vendors')->group(function () {
+        // Store management routes
+        Route::controller(StoreController::class)->prefix('store')->group(function () {
+            Route::get('/', 'show');
+            Route::put('/', 'update');
+            // Route::post('/', 'update'); // For form-data with _method=PUT
+        });
+
         // Add more vendor-specific routes here
         Route::get('dashboard', function () {
-            $message = \App\Services\LocalizationService::getMessage('guards.store_dashboard');
+            $vendor = auth('vendors')->user();
+            $vendor->load(['store.mainCategories']);
+            
+            $message = \App\Services\LocalizationService::getMessage('guards.vendor_dashboard');
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'data' => null,
-                'guard' => 'store_users'
+                'data' => [
+                    'vendor' => $vendor
+                ],
+                'guard' => 'vendors'
             ]);
         });
         
         Route::get('products', function () {
-            $message = \App\Services\LocalizationService::getMessage('guards.store_dashboard');
+            $vendor = auth('vendors')->user();
+            $message = \App\Services\LocalizationService::getMessage('guards.vendor_dashboard');
             return response()->json([
                 'success' => true,
                 'message' => $message,
-                'data' => ['info' => 'Store Products'],
-                'guard' => 'store_users'
+                'data' => [
+                    'info' => 'Vendor Products',
+                    'store_id' => $vendor->store?->id
+                ],
+                'guard' => 'vendors'
             ]);
         });
     });

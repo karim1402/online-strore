@@ -35,9 +35,9 @@ class Vendor extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
-        'store_name',
         'phone',
         'address',
+        'store_id',
         'status',
     ];
 
@@ -82,9 +82,17 @@ class Vendor extends Authenticatable implements JWTSubject
         return [
             'guard' => 'vendors',
             'email' => $this->email,
-            'store_name' => $this->store_name,
+            'store_id' => $this->store?->id,
             'permissions' => $this->getAllPermissions()->pluck('name')->toArray(),
             'roles' => $this->getRoleNames()->toArray(),
         ];
+    }
+
+    /**
+     * Get the store that the vendor belongs to.
+     */
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 }
