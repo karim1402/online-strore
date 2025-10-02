@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Traits\ApiResponse;
 use App\Services\ValidationService;
 use App\Models\Admin;
-use App\Models\StoreUser;
+use App\Models\Vendor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
@@ -49,7 +49,7 @@ class RoleAssignmentController extends Controller
     {
         try {
             $validator = ValidationService::make($request->all(), [
-                'guard' => 'required|string|in:admins,store_users',
+                'guard' => 'required|string|in:admins,vendors',
                 'role' => 'required|string|exists:roles,name'
             ]);
 
@@ -93,7 +93,7 @@ class RoleAssignmentController extends Controller
     {
         try {
             $validator = ValidationService::make($request->all(), [
-                'guard' => 'required|string|in:admins,store_users',
+                'guard' => 'required|string|in:admins,vendors',
                 'role' => 'required|string'
             ]);
 
@@ -128,7 +128,7 @@ class RoleAssignmentController extends Controller
     {
         try {
             $validator = ValidationService::make($request->all(), [
-                'guard' => 'required|string|in:admins,store_users',
+                'guard' => 'required|string|in:admins,vendors',
                 'roles' => 'array',
                 'roles.*' => 'string|exists:roles,name'
             ]);
@@ -170,8 +170,8 @@ class RoleAssignmentController extends Controller
         switch ($guard) {
             case 'admins':
                 return Admin::find($userId);
-            case 'store_users':
-                return StoreUser::find($userId);
+            case 'vendors':
+                return Vendor::find($userId);
             default:
                 return null;
         }

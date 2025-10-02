@@ -50,41 +50,41 @@ class RoleSeeder extends Seeder
             'stores.view'
         ]);
 
-        // Store roles
-        $storeOwner = Role::firstOrCreate([
-            'name' => 'store_owner',
-            'guard_name' => 'store_users',
+        // Vendor roles
+        $vendorOwner = Role::firstOrCreate([
+            'name' => 'vendor_owner',
+            'guard_name' => 'vendors',
         ]);
-        $storeOwner->givePermissionTo(Permission::where('guard_name', 'store_users')->get());
+        $vendorOwner->givePermissionTo(Permission::where('guard_name', 'vendors')->get());
 
-        $storeManager = Role::firstOrCreate([
-            'name' => 'store_manager',
-            'guard_name' => 'store_users',
+        $vendorManager = Role::firstOrCreate([
+            'name' => 'vendor_manager',
+            'guard_name' => 'vendors',
         ]);
-        $storeManager->givePermissionTo([
+        $vendorManager->givePermissionTo([
             'products.view', 'products.create', 'products.update',
             'orders.view', 'orders.update',
             'staff.view',
-            'store-settings.view'
+            'vendor-settings.view'
         ]);
 
-        $storeStaff = Role::firstOrCreate([
-            'name' => 'store_staff',
-            'guard_name' => 'store_users',
+        $vendorStaff = Role::firstOrCreate([
+            'name' => 'vendor_staff',
+            'guard_name' => 'vendors',
         ]);
-        $storeStaff->givePermissionTo([
+        $vendorStaff->givePermissionTo([
             'products.view',
             'orders.view', 'orders.update'
         ]);
 
-        $storeViewer = Role::firstOrCreate([
-            'name' => 'store_viewer',
-            'guard_name' => 'store_users',
+        $vendorViewer = Role::firstOrCreate([
+            'name' => 'vendor_viewer',
+            'guard_name' => 'vendors',
         ]);
-        $storeViewer->givePermissionTo([
+        $vendorViewer->givePermissionTo([
             'products.view',
             'orders.view',
-            'store-settings.view'
+            'vendor-settings.view'
         ]);
     }
 }

@@ -177,7 +177,7 @@ return [
     /*
      * All guards that should be used for permissions and roles.
      */
-    'guards' => ['web', 'admins', 'store_users', 'deliveries'],
+    'guards' => ['web', 'admins', 'vendors', 'deliveries'],
 
     /* Cache-specific settings */
 

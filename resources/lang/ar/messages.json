@@ -38,7 +38,11 @@
         "user_roles_retrieved": "تم جلب أدوار المستخدم بنجاح",
         "role_assigned": "تم تعيين الدور بنجاح",
         "role_removed": "تم إزالة الدور بنجاح",
-        "roles_synced": "تم مزامنة أدوار المستخدم بنجاح"
+        "roles_synced": "تم مزامنة أدوار المستخدم بنجاح",
+        "vendor_registered": "تم تسجيل البائع والمتجر بنجاح. بانتظار الموافقة",
+        "vendor_logged_in": "تم تسجيل دخول البائع بنجاح",
+        "vendor_logged_out": "تم تسجيل خروج البائع بنجاح",
+        "store_created": "تم إنشاء المتجر بنجاح"
     },
     "errors": {
         "validation_failed": "فشل التحقق من صحة البيانات",
@@ -61,7 +65,9 @@
         "too_many_requests": "طلبات كثيرة جداً. يرجى المحاولة مرة أخرى لاحقاً",
         "user_not_found": "المستخدم غير موجود",
         "role_not_found": "الدور غير موجود",
-        "role_has_users": "لا يمكن حذف دور مُعيَّن للمستخدمين"
+        "role_has_users": "لا يمكن حذف دور مُعيَّن للمستخدمين",
+        "store_creation_failed": "فشل إنشاء المتجر",
+        "category_not_found": "الفئة الرئيسية غير موجودة"
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
@@ -80,7 +86,11 @@
         "image": ":attribute يجب أن يكون صورة",
         "mimes": ":attribute يجب أن يكون ملف من نوع: :values",
         "size": ":attribute يجب أن يكون :size كيلوبايت",
-        "regex": "تنسيق :attribute غير صالح"
+        "regex": "تنسيق :attribute غير صالح",
+        "exists": ":attribute المحدد غير صالح",
+        "decimal": ":attribute يجب أن يكون رقم عشري صالح",
+        "array": ":attribute يجب أن يكون مصفوفة",
+        "min_array": ":attribute يجب أن يحتوي على :min عنصر على الأقل"
     },
     "attributes": {
         "name": "الاسم",
@@ -95,11 +105,22 @@
         "vehicle_number": "رقم المركبة",
         "license_number": "رقم الرخصة",
         "availability": "التوفر",
-        "status": "الحالة"
+        "status": "الحالة",
+        "name_en": "الاسم بالإنجليزية",
+        "name_ar": "الاسم بالعربية",
+        "description_en": "الوصف بالإنجليزية",
+        "description_ar": "الوصف بالعربية",
+        "latitude": "خط العرض",
+        "longitude": "خط الطول",
+        "logo": "الشعار",
+        "document": "المستند",
+        "main_category_id": "الفئة الرئيسية",
+        "main_category_ids": "الفئات الرئيسية"
     },
     "guards": {
         "user_dashboard": "لوحة تحكم المستخدم",
         "store_dashboard": "لوحة تحكم المتجر",
+        "vendor_dashboard": "لوحة تحكم البائع",
         "admin_dashboard": "لوحة تحكم المدير",
         "delivery_dashboard": "لوحة تحكم التوصيل"
     }

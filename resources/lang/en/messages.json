@@ -38,7 +38,11 @@
         "user_roles_retrieved": "User roles retrieved successfully",
         "role_assigned": "Role assigned successfully",
         "role_removed": "Role removed successfully",
-        "roles_synced": "User roles synchronized successfully"
+        "roles_synced": "User roles synchronized successfully",
+        "vendor_registered": "Vendor and store registered successfully. Awaiting approval",
+        "vendor_logged_in": "Vendor login successful",
+        "vendor_logged_out": "Vendor successfully logged out",
+        "store_created": "Store created successfully"
     },
     "errors": {
         "validation_failed": "Validation failed",
@@ -61,7 +65,9 @@
         "too_many_requests": "Too many requests. Please try again later",
         "user_not_found": "User not found",
         "role_not_found": "Role not found",
-        "role_has_users": "Cannot delete role that is assigned to users"
+        "role_has_users": "Cannot delete role that is assigned to users",
+        "store_creation_failed": "Failed to create store",
+        "category_not_found": "Main category not found"
     },
     "validation": {
         "required": "The :attribute field is required",
@@ -80,7 +86,11 @@
         "image": "The :attribute must be an image",
         "mimes": "The :attribute must be a file of type: :values",
         "size": "The :attribute must be :size kilobytes",
-        "regex": "The :attribute format is invalid"
+        "regex": "The :attribute format is invalid",
+        "exists": "The selected :attribute is invalid",
+        "decimal": "The :attribute must be a valid decimal number",
+        "array": "The :attribute must be an array",
+        "min_array": "The :attribute must have at least :min items"
     },
     "attributes": {
         "name": "name",
@@ -95,11 +105,22 @@
         "vehicle_number": "vehicle number",
         "license_number": "license number",
         "availability": "availability",
-        "status": "status"
+        "status": "status",
+        "name_en": "English name",
+        "name_ar": "Arabic name",
+        "description_en": "English description",
+        "description_ar": "Arabic description",
+        "latitude": "latitude",
+        "longitude": "longitude",
+        "logo": "logo",
+        "document": "document",
+        "main_category_id": "main category",
+        "main_category_ids": "main categories"
     },
     "guards": {
         "user_dashboard": "User Dashboard",
-        "store_dashboard": "Store Dashboard", 
+        "store_dashboard": "Store Dashboard",
+        "vendor_dashboard": "Vendor Dashboard",
         "admin_dashboard": "Admin Dashboard",
         "delivery_dashboard": "Delivery Dashboard"
     }

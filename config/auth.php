@@ -46,9 +46,9 @@ return [
             'provider' => 'users',
         ],
         
-        'store_users' => [
+        'vendors' => [
             'driver' => 'jwt',
-            'provider' => 'store_users',
+            'provider' => 'vendors',
         ],
         
         'admins' => [
@@ -85,9 +85,9 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
         
-        'store_users' => [
+        'vendors' => [
             'driver' => 'eloquent',
-            'model' => App\Models\StoreUser::class,
+            'model' => App\Models\Vendor::class,
         ],
         
         'admins' => [
@@ -133,9 +133,9 @@ return [
             'throttle' => 60,
         ],
         
-        'store_users' => [
-            'provider' => 'store_users',
-            'table' => 'store_password_reset_tokens',
+        'vendors' => [
+            'provider' => 'vendors',
+            'table' => 'vendor_password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
         ],
