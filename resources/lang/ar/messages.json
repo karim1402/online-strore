@@ -42,7 +42,16 @@
         "vendor_registered": "تم تسجيل البائع والمتجر بنجاح. بانتظار الموافقة",
         "vendor_logged_in": "تم تسجيل دخول البائع بنجاح",
         "vendor_logged_out": "تم تسجيل خروج البائع بنجاح",
-        "store_created": "تم إنشاء المتجر بنجاح"
+        "store_created": "تم إنشاء المتجر بنجاح",
+        "data_retrieved": "تم استرجاع البيانات بنجاح",
+        "store_approved": "تم اعتماد المتجر بنجاح",
+        "store_rejected": "تم رفض المتجر بنجاح",
+        "store_suspended": "تم إيقاف المتجر بنجاح",
+        "store_reactivated": "تم إعادة تفعيل المتجر بنجاح",
+        "store_status_updated": "تم تحديث حالة المتجر بنجاح",
+        "store_deleted": "تم حذف المتجر بنجاح",
+        "store_fetched": "تم استرجاع تفاصيل المتجر بنجاح",
+        "store_updated": "تم تحديث المتجر بنجاح"
     },
     "errors": {
         "validation_failed": "فشل التحقق من صحة البيانات",
@@ -67,7 +76,14 @@
         "role_not_found": "الدور غير موجود",
         "role_has_users": "لا يمكن حذف دور مُعيَّن للمستخدمين",
         "store_creation_failed": "فشل إنشاء المتجر",
-        "category_not_found": "الفئة الرئيسية غير موجودة"
+        "category_not_found": "الفئة الرئيسية غير موجودة",
+        "not_found": "المورد غير موجود",
+        "store_not_found": "المتجر غير موجود",
+        "store_already_approved": "المتجر معتمد بالفعل",
+        "only_approved_can_suspend": "يمكن إيقاف المتاجر المعتمدة فقط",
+        "only_suspended_can_reactivate": "يمكن إعادة تفعيل المتاجر الموقوفة فقط",
+        "cannot_delete_store_with_vendors": "لا يمكن حذف المتجر الذي يحتوي على موظفين نشطين. قم بإزالة الموظفين أولاً",
+        "store_update_failed": "فشل تحديث المتجر"
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
