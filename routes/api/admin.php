@@ -114,6 +114,10 @@ Route::prefix('admin')->group(function () {
                 Route::get('/{id}', 'show');
             });
             
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
             Route::middleware('permission:stores.approve,admins')->group(function () {
                 Route::post('/{id}/approve', 'approve');
                 Route::post('/{id}/reject', 'reject');
