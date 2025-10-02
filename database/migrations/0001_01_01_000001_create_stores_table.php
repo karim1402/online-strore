@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('longitude', 10, 7);
             $table->string('logo');
             $table->string('document');
-            $table->boolean('status')->default(false); // false = pending approval
+            $table->enum('status', ['pending', 'approved', 'rejected', 'suspended'])->default('pending');
             $table->timestamps();
 
             // Indexes for better performance

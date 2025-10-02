@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
 use App\Http\Controllers\Api\Admin\MainCategoryController;
+use App\Http\Controllers\Api\Admin\StoreController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleAssignmentController;
@@ -101,6 +102,31 @@ Route::prefix('admin')->group(function () {
             });
             
             Route::middleware('permission:admin-users.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Store Management routes (permission-based)
+        Route::controller(StoreController::class)->prefix('stores')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/pending', 'getPendingStores');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:stores.approve,admins')->group(function () {
+                Route::post('/{id}/approve', 'approve');
+                Route::post('/{id}/reject', 'reject');
+                Route::post('/{id}/suspend', 'suspend');
+                Route::post('/{id}/reactivate', 'reactivate');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
                 Route::delete('/{id}', 'destroy');
             });
         });

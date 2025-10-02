@@ -42,7 +42,16 @@
         "vendor_registered": "Vendor and store registered successfully. Awaiting approval",
         "vendor_logged_in": "Vendor login successful",
         "vendor_logged_out": "Vendor successfully logged out",
-        "store_created": "Store created successfully"
+        "store_created": "Store created successfully",
+        "data_retrieved": "Data retrieved successfully",
+        "store_approved": "Store approved successfully",
+        "store_rejected": "Store rejected successfully",
+        "store_suspended": "Store suspended successfully",
+        "store_reactivated": "Store reactivated successfully",
+        "store_status_updated": "Store status updated successfully",
+        "store_deleted": "Store deleted successfully",
+        "store_fetched": "Store details retrieved successfully",
+        "store_updated": "Store updated successfully"
     },
     "errors": {
         "validation_failed": "Validation failed",
@@ -67,7 +76,14 @@
         "role_not_found": "Role not found",
         "role_has_users": "Cannot delete role that is assigned to users",
         "store_creation_failed": "Failed to create store",
-        "category_not_found": "Main category not found"
+        "category_not_found": "Main category not found",
+        "not_found": "Resource not found",
+        "store_not_found": "Store not found",
+        "store_already_approved": "Store is already approved",
+        "only_approved_can_suspend": "Only approved stores can be suspended",
+        "only_suspended_can_reactivate": "Only suspended stores can be reactivated",
+        "cannot_delete_store_with_vendors": "Cannot delete store with active vendors. Remove vendors first",
+        "store_update_failed": "Failed to update store"
     },
     "validation": {
         "required": "The :attribute field is required",

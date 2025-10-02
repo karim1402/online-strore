@@ -92,7 +92,7 @@ class AuthController extends Controller
                 'longitude' => $request->longitude,
                 'logo' => $logoPath,
                 'document' => $documentPath,
-                'status' => false, // Pending approval
+                'status' => 'pending', // Pending approval
             ]);
 
             // Attach main categories to store

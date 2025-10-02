@@ -34,6 +34,9 @@ class Store extends Model
         'logo',
         'document',
         'status',
+        'rejection_note',
+        'approved_at',
+        'approved_by',
     ];
 
     /**
@@ -42,9 +45,9 @@ class Store extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'status' => 'boolean',
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
+        'approved_at' => 'datetime',
     ];
 
     /**
@@ -68,6 +71,14 @@ class Store extends Model
     public function mainCategories()
     {
         return $this->belongsToMany(MainCategory::class, 'main_category_store');
+    }
+
+    /**
+     * Get the admin who approved the store.
+     */
+    public function approvedBy()
+    {
+        return $this->belongsTo(Admin::class, 'approved_by');
     }
 
     /**
@@ -119,14 +130,14 @@ class Store extends Model
     }
 
     /**
-     * Scope a query to only include active stores.
+     * Scope a query to only include approved stores.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function scopeActive($query)
+    public function scopeApproved($query)
     {
-        return $query->where('status', true);
+        return $query->where('status', 'approved');
     }
 
     /**
@@ -137,6 +148,78 @@ class Store extends Model
      */
     public function scopePending($query)
     {
-        return $query->where('status', false);
+        return $query->where('status', 'pending');
+    }
+
+    /**
+     * Scope a query to only include rejected stores.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRejected($query)
+    {
+        return $query->where('status', 'rejected');
+    }
+
+    /**
+     * Check if store is approved.
+     *
+     * @return bool
+     */
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
+
+    /**
+     * Check if store is pending.
+     *
+     * @return bool
+     */
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+
+    /**
+     * Check if store is rejected.
+     *
+     * @return bool
+     */
+    public function isRejected(): bool
+    {
+        return $this->status === 'rejected';
+    }
+
+    /**
+     * Scope a query to only include suspended stores.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSuspended($query)
+    {
+        return $query->where('status', 'suspended');
+    }
+
+    /**
+     * Check if store is suspended.
+     *
+     * @return bool
+     */
+    public function isSuspended(): bool
+    {
+        return $this->status === 'suspended';
+    }
+
+    /**
+     * Check if store can process orders (approved and not suspended).
+     *
+     * @return bool
+     */
+    public function canProcessOrders(): bool
+    {
+        return $this->status === 'approved';
     }
 }
