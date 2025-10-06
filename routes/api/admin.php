@@ -118,6 +118,10 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', 'store');
             });
             
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+            });
+            
             Route::middleware('permission:stores.approve,admins')->group(function () {
                 Route::post('/{id}/approve', 'approve');
                 Route::post('/{id}/reject', 'reject');

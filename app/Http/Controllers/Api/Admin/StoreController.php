@@ -252,6 +252,143 @@ class StoreController extends Controller
     }
 
     /**
+     * Update an existing store
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        try {
+            $store = Store::find($id);
+
+            if (!$store) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            $validator = ValidationService::make($request->all(), [
+                // Store fields
+                'main_category_ids' => 'nullable|array|min:1',
+                'main_category_ids.*' => 'nullable|integer|exists:main_categories,id',
+                'name_en' => 'nullable|string|max:255',
+                'name_ar' => 'nullable|string|max:255',
+                'description_en' => 'nullable|string',
+                'description_ar' => 'nullable|string',
+                'address' => 'nullable|string',
+                'latitude' => 'nullable|numeric|between:-90,90',
+                'longitude' => 'nullable|numeric|between:-180,180',
+                'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'document' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:5120',
+                'status' => 'nullable|in:pending,approved,rejected,suspended',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            $oldLogoPath = $store->logo;
+            $oldDocumentPath = $store->document;
+
+            // Handle logo upload
+            if ($request->hasFile('logo')) {
+                $logoPath = $request->file('logo')->store('stores/logos', 'public');
+                $store->logo = $logoPath;
+                
+                // Delete old logo
+                if ($oldLogoPath && Storage::disk('public')->exists($oldLogoPath)) {
+                    Storage::disk('public')->delete($oldLogoPath);
+                }
+            }
+
+            // Handle document upload
+            if ($request->hasFile('document')) {
+                $documentPath = $request->file('document')->store('stores/documents', 'public');
+                $store->document = $documentPath;
+                
+                // Delete old document
+                if ($oldDocumentPath && Storage::disk('public')->exists($oldDocumentPath)) {
+                    Storage::disk('public')->delete($oldDocumentPath);
+                }
+            }
+
+            // Update store fields
+            if ($request->filled('name_en')) {
+                $store->name_en = $request->name_en;
+            }
+            if ($request->filled('name_ar')) {
+                $store->name_ar = $request->name_ar;
+            }
+            if ($request->filled('description_en')) {
+                $store->description_en = $request->description_en;
+            }
+            if ($request->filled('description_ar')) {
+                $store->description_ar = $request->description_ar;
+            }
+            if ($request->filled('address')) {
+                $store->address = $request->address;
+            }
+            if ($request->filled('latitude')) {
+                $store->latitude = $request->latitude;
+            }
+            if ($request->filled('longitude')) {
+                $store->longitude = $request->longitude;
+            }
+
+            // Handle status change
+            if ($request->filled('status')) {
+                $admin = auth('admins')->user();
+                $newStatus = $request->status;
+                
+                // If status is being changed to approved
+                if ($newStatus === 'approved' && $store->status !== 'approved') {
+                    $store->status = 'approved';
+                    $store->approved_at = now();
+                    $store->approved_by = $admin->id;
+                    $store->rejection_note = null;
+                } 
+                // If status is being changed from approved
+                elseif ($store->status === 'approved' && $newStatus !== 'approved') {
+                    $store->status = $newStatus;
+                    if ($newStatus !== 'suspended') {
+                        $store->approved_at = null;
+                        $store->approved_by = null;
+                    }
+                } 
+                // Any other status change
+                else {
+                    $store->status = $newStatus;
+                }
+            }
+
+            $store->save();
+
+            // Update main categories if provided
+            if ($request->has('main_category_ids')) {
+                $store->mainCategories()->sync($request->main_category_ids);
+            }
+
+            // Reload relationships
+            $store->load(['mainCategories', 'vendors']);
+
+            DB::commit();
+
+            return $this->successResponse($store, 'success.store_updated');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            // Clean up uploaded files if update failed
+            if (isset($logoPath) && Storage::disk('public')->exists($logoPath)) {
+                Storage::disk('public')->delete($logoPath);
+            }
+            if (isset($documentPath) && Storage::disk('public')->exists($documentPath)) {
+                Storage::disk('public')->delete($documentPath);
+            }
+            
+            return $this->errorResponse('errors.store_update_failed', [], 500);
+        }
+    }
+
+    /**
      * Approve a store
      */
     public function approve($id): JsonResponse
