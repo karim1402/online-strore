@@ -282,7 +282,7 @@ class StoreController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $store = Store::with(['vendors', 'mainCategories', 'branches'])->find($id);
+            $store = Store::with(['vendors', 'mainCategories', 'branches','categories'])->find($id);
 
             if (!$store) {
                 return $this->errorResponse('errors.not_found', [], 404);
