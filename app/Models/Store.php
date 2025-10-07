@@ -93,6 +93,14 @@ class Store extends Model
     }
 
     /**
+     * Get the product categories that belong to the store.
+     */
+    public function categories()
+    {
+        return $this->hasMany(Category::class);
+    }
+
+    /**
      * Get the admin who approved the store.
      */
     public function approvedBy()
