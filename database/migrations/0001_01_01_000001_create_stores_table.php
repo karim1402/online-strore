@@ -17,12 +17,12 @@ return new class extends Migration
             $table->string('name_ar');
             $table->text('description_en');
             $table->text('description_ar');
-            $table->text('address');
-            $table->decimal('latitude', 10, 7);
-            $table->decimal('longitude', 10, 7);
             $table->string('logo');
             $table->string('document');
             $table->enum('status', ['pending', 'approved', 'rejected', 'suspended'])->default('pending');
+            $table->text('rejection_note')->nullable();
+            $table->timestamp('approved_at')->nullable();
+            $table->unsignedBigInteger('approved_by')->nullable();
             $table->timestamps();
 
             // Indexes for better performance

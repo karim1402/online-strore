@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\StoreController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleAssignmentController;
+use App\Http\Controllers\Api\Admin\BranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -128,6 +129,29 @@ Route::prefix('admin')->group(function () {
                 Route::post('/{id}/suspend', 'suspend');
                 Route::post('/{id}/reactivate', 'reactivate');
                 Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Branch Management routes (permission-based)
+        Route::controller(BranchController::class)->prefix('branches')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/store/{storeId}', 'getStoreBranches');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+                Route::patch('/{id}/set-main', 'setAsMain');
             });
             
             Route::middleware('permission:stores.delete,admins')->group(function () {

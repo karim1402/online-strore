@@ -22,7 +22,7 @@ class StoreController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Store::with(['vendors', 'mainCategories']);
+            $query = Store::with(['vendors', 'mainCategories', 'branches']);
 
             // Search functionality
             if ($request->has('search') && $request->search) {
@@ -30,10 +30,14 @@ class StoreController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('name_en', 'like', "%{$search}%")
                       ->orWhere('name_ar', 'like', "%{$search}%")
-                      ->orWhere('address', 'like', "%{$search}%")
                       ->orWhereHas('vendors', function ($vq) use ($search) {
                           $vq->where('name', 'like', "%{$search}%")
                             ->orWhere('email', 'like', "%{$search}%");
+                      })
+                      ->orWhereHas('branches', function ($bq) use ($search) {
+                          $bq->where('name_en', 'like', "%{$search}%")
+                            ->orWhere('name_ar', 'like', "%{$search}%")
+                            ->orWhere('address', 'like', "%{$search}%");
                       });
                 });
             }
@@ -104,12 +108,21 @@ class StoreController extends Controller
                 'name_ar' => 'required|string|max:255',
                 'description_en' => 'required|string',
                 'description_ar' => 'required|string',
-                'address' => 'required|string',
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180',
                 'logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
                 'document' => 'required|file|mimes:pdf,jpeg,jpg,png|max:5120',
                 'status' => 'nullable|in:pending,approved,rejected,suspended',
+                
+                // Branches array (required for store creation)
+                'branches' => 'required|array|min:1',
+                'branches.*.name_en' => 'required|string|max:255',
+                'branches.*.name_ar' => 'required|string|max:255',
+                'branches.*.address' => 'required|string',
+                'branches.*.latitude' => 'required|numeric|between:-90,90',
+                'branches.*.longitude' => 'required|numeric|between:-180,180',
+                'branches.*.phone' => 'nullable|string|max:20',
+                'branches.*.description_en' => 'nullable|string',
+                'branches.*.description_ar' => 'nullable|string',
+                'branches.*.is_main' => 'nullable|boolean',
                 
                 // Optional vendor fields
                 'vendor_name' => 'nullable|string|between:2,100',
@@ -145,9 +158,6 @@ class StoreController extends Controller
                 'name_ar' => $request->name_ar,
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
-                'address' => $request->address,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
                 'logo' => $logoPath,
                 'document' => $documentPath,
                 'status' => $request->get('status', 'pending'),
@@ -164,6 +174,39 @@ class StoreController extends Controller
             // Attach main categories
             $store->mainCategories()->attach($request->main_category_ids);
 
+            // Create branches for the store
+            $hasMainBranch = false;
+            $branches = [];
+            
+            foreach ($request->branches as $index => $branchData) {
+                $isMain = isset($branchData['is_main']) && $branchData['is_main'];
+                
+                // If this is marked as main, unset any previous main branch
+                if ($isMain) {
+                    $hasMainBranch = true;
+                }
+                
+                $branch = $store->branches()->create([
+                    'name_en' => $branchData['name_en'],
+                    'name_ar' => $branchData['name_ar'],
+                    'address' => $branchData['address'],
+                    'latitude' => $branchData['latitude'],
+                    'longitude' => $branchData['longitude'],
+                    'phone' => $branchData['phone'] ?? null,
+                    'description_en' => $branchData['description_en'] ?? null,
+                    'description_ar' => $branchData['description_ar'] ?? null,
+                    'is_main' => $isMain,
+                    'is_active' => true,
+                ]);
+                
+                $branches[] = $branch;
+            }
+            
+            // If no branch was marked as main, make the first one main
+            if (!$hasMainBranch && count($branches) > 0) {
+                $branches[0]->update(['is_main' => true]);
+            }
+
             // Create vendor if vendor details provided
             $vendor = null;
             if ($request->filled('vendor_name') && $request->filled('vendor_email') && $request->filled('vendor_password')) {
@@ -178,7 +221,7 @@ class StoreController extends Controller
             }
 
             // Reload relationships
-            $store->load(['mainCategories', 'vendors']);
+            $store->load(['mainCategories', 'vendors', 'branches']);
 
             DB::commit();
 
@@ -219,7 +262,7 @@ class StoreController extends Controller
     public function getPendingStores(): JsonResponse
     {
         try {
-            $stores = Store::with(['vendors', 'mainCategories'])
+            $stores = Store::with(['vendors', 'mainCategories', 'branches'])
                 ->where('status', 'pending')
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -239,7 +282,7 @@ class StoreController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $store = Store::with(['vendors', 'mainCategories'])->find($id);
+            $store = Store::with(['vendors', 'mainCategories', 'branches'])->find($id);
 
             if (!$store) {
                 return $this->errorResponse('errors.not_found', [], 404);
@@ -271,9 +314,6 @@ class StoreController extends Controller
                 'name_ar' => 'nullable|string|max:255',
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
-                'address' => 'nullable|string',
-                'latitude' => 'nullable|numeric|between:-90,90',
-                'longitude' => 'nullable|numeric|between:-180,180',
                 'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
                 'document' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:5120',
                 'status' => 'nullable|in:pending,approved,rejected,suspended',
@@ -323,15 +363,6 @@ class StoreController extends Controller
             if ($request->filled('description_ar')) {
                 $store->description_ar = $request->description_ar;
             }
-            if ($request->filled('address')) {
-                $store->address = $request->address;
-            }
-            if ($request->filled('latitude')) {
-                $store->latitude = $request->latitude;
-            }
-            if ($request->filled('longitude')) {
-                $store->longitude = $request->longitude;
-            }
 
             // Handle status change
             if ($request->filled('status')) {
@@ -367,7 +398,7 @@ class StoreController extends Controller
             }
 
             // Reload relationships
-            $store->load(['mainCategories', 'vendors']);
+            $store->load(['mainCategories', 'vendors', 'branches']);
 
             DB::commit();
 
@@ -416,7 +447,7 @@ class StoreController extends Controller
             ]);
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories']);
+            $store->load(['vendors', 'mainCategories', 'branches']);
 
             return $this->successResponse($store, 'success.store_approved');
         } catch (\Exception $e) {
@@ -453,7 +484,7 @@ class StoreController extends Controller
             ]);
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories']);
+            $store->load(['vendors', 'mainCategories', 'branches']);
 
             return $this->successResponse($store, 'success.store_rejected');
         } catch (\Exception $e) {
@@ -532,7 +563,7 @@ class StoreController extends Controller
             ]);
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories']);
+            $store->load(['vendors', 'mainCategories', 'branches']);
 
             return $this->successResponse($store, 'success.store_suspended');
         } catch (\Exception $e) {
@@ -568,7 +599,7 @@ class StoreController extends Controller
             ]);
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories']);
+            $store->load(['vendors', 'mainCategories', 'branches']);
 
             return $this->successResponse($store, 'success.store_reactivated');
         } catch (\Exception $e) {
@@ -600,4 +631,5 @@ class StoreController extends Controller
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
+
 }
