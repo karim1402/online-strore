@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Vendor;
 use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Models\Store;
+use App\Models\Branch;
 use App\Models\MainCategory;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
@@ -14,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -46,12 +48,23 @@ class AuthController extends Controller
             'name_ar' => 'required|string|max:255',
             'description_en' => 'required|string',
             'description_ar' => 'required|string',
-            'store_address' => 'required|string',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
-            'logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
-            'document' => 'required|file|mimes:pdf,jpeg,jpg,png|max:5120',
+            'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'document' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:5120',
+            
+            // Branches array (required for store creation)
+            'branches' => 'required|array|min:1',
+            'branches.*.name_en' => 'required|string|max:255',
+            'branches.*.name_ar' => 'required|string|max:255',
+            'branches.*.address' => 'required|string',
+            'branches.*.latitude' => 'required|numeric|between:-90,90',
+            'branches.*.longitude' => 'required|numeric|between:-180,180',
+            'branches.*.phone' => 'nullable|string|max:20',
+            'branches.*.description_en' => 'nullable|string',
+            'branches.*.description_ar' => 'nullable|string',
+            'branches.*.is_main' => 'nullable|boolean',
         ]);
+
+     
 
         if ($validator->fails()) {
             return $this->validationErrorWithFirstMessage($validator);
@@ -62,10 +75,19 @@ class AuthController extends Controller
             ->where('status', true)
             ->pluck('id')
             ->toArray();
+
+       
             
         if (count($activeCategories) !== count($request->main_category_ids)) {
             return $this->errorResponse('errors.category_not_found', [], 404);
         }
+
+        // Debug: Log the received data
+        Log::info('Vendor registration data:', [
+            'branches' => $request->branches,
+            'main_category_ids' => $request->main_category_ids,
+            'all_data' => $request->except(['password', 'logo', 'document'])
+        ]);
 
         DB::beginTransaction();
         try {
@@ -87,16 +109,50 @@ class AuthController extends Controller
                 'name_ar' => $request->name_ar,
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
-                'address' => $request->store_address,
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
                 'logo' => $logoPath,
                 'document' => $documentPath,
                 'status' => 'pending', // Pending approval
             ]);
 
+         
+
+          
+
             // Attach main categories to store
             $store->mainCategories()->attach($request->main_category_ids);
+
+            // Create branches for the store
+            $hasMainBranch = false;
+            $branches = [];
+            
+            foreach ($request->branches as $index => $branchData) {
+                $isMain = isset($branchData['is_main']) && $branchData['is_main'];
+                
+                // If this is marked as main, unset any previous main branch
+                if ($isMain) {
+                    $hasMainBranch = true;
+                }
+                
+                $branch = $store->branches()->create([
+                    'name_en' => $branchData['name_en'],
+                    'name_ar' => $branchData['name_ar'],
+                    'address' => $branchData['address'],
+                    'latitude' => $branchData['latitude'],
+                    'longitude' => $branchData['longitude'],
+                    'phone' => $branchData['phone'] ?? null,
+                    'description_en' => $branchData['description_en'] ?? null,
+                    'description_ar' => $branchData['description_ar'] ?? null,
+                    'is_main' => $isMain,
+                    'is_active' => true,
+                ]);
+                
+                $branches[] = $branch;
+            }
+            
+            // If no branch was marked as main, make the first one main
+            if (!$hasMainBranch && count($branches) > 0) {
+                $branches[0]->update(['is_main' => true]);
+            }
 
             // Create vendor and assign to store
             $vendor = Vendor::create([
@@ -140,7 +196,14 @@ class AuthController extends Controller
                 Storage::disk('public')->delete($documentPath);
             }
             
-            return $this->errorResponse('errors.store_creation_failed', [], 500);
+            // Log the actual error for debugging
+            Log::error('Vendor registration failed: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return $this->errorResponse('errors.store_creation_failed', ['error' => $e->getMessage()], 500);
         }
     }
 

@@ -28,9 +28,6 @@ class Store extends Model
         'name_ar',
         'description_en',
         'description_ar',
-        'address',
-        'latitude',
-        'longitude',
         'logo',
         'document',
         'status',
@@ -45,8 +42,6 @@ class Store extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'latitude' => 'decimal:7',
-        'longitude' => 'decimal:7',
         'approved_at' => 'datetime',
     ];
 
@@ -63,6 +58,30 @@ class Store extends Model
     public function vendors()
     {
         return $this->hasMany(Vendor::class);
+    }
+
+    /**
+     * Get the branches that belong to the store.
+     */
+    public function branches()
+    {
+        return $this->hasMany(Branch::class);
+    }
+
+    /**
+     * Get the main branch of the store.
+     */
+    public function mainBranch()
+    {
+        return $this->hasOne(Branch::class)->where('is_main', true);
+    }
+
+    /**
+     * Get the active branches of the store.
+     */
+    public function activeBranches()
+    {
+        return $this->hasMany(Branch::class)->where('is_active', true);
     }
 
     /**
