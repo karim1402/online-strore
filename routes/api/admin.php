@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleAssignmentController;
 use App\Http\Controllers\Api\Admin\BranchController;
+use App\Http\Controllers\Api\Admin\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -152,6 +153,29 @@ Route::prefix('admin')->group(function () {
                 Route::put('/{id}', 'update');
                 Route::patch('/{id}/toggle-status', 'toggleStatus');
                 Route::patch('/{id}/set-main', 'setAsMain');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Category Management routes (store-specific categories)
+        Route::controller(CategoryController::class)->prefix('categories')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/store/{storeId}', 'getStoreCategories');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+                Route::post('/update-sort-order', 'updateSortOrder');
             });
             
             Route::middleware('permission:stores.delete,admins')->group(function () {
