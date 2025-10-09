@@ -1,0 +1,474 @@
+{
+	"info": {
+		"name": "Product System API",
+		"description": "Complete API collection for Product Management System with Options and Addons",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{admin_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/admin",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Option Groups",
+			"item": [
+				{
+					"name": "Get All Option Groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/option-groups",
+							"host": ["{{base_url}}"],
+							"path": ["option-groups"]
+						}
+					}
+				},
+				{
+					"name": "Create Option Group",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name_en\": \"Size\",\n  \"name_ar\": \"الحجم\",\n  \"type\": \"size\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/option-groups",
+							"host": ["{{base_url}}"],
+							"path": ["option-groups"]
+						}
+					}
+				},
+				{
+					"name": "Get Option Group by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["option-groups", "{{option_group_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Option Group",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name_en\": \"Size Updated\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["option-groups", "{{option_group_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Toggle Option Group Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/option-groups/{{option_group_id}}/toggle-status",
+							"host": ["{{base_url}}"],
+							"path": ["option-groups", "{{option_group_id}}", "toggle-status"]
+						}
+					}
+				},
+				{
+					"name": "Delete Option Group",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["option-groups", "{{option_group_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Option Values",
+			"item": [
+				{
+					"name": "Get Option Values by Group",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/option-values/group/{{option_group_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["option-values", "group", "{{option_group_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Create Option Value - Small",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"option_group_id\": {{option_group_id}},\n  \"value_en\": \"Small\",\n  \"value_ar\": \"صغير\",\n  \"sort_order\": 1,\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/option-values",
+							"host": ["{{base_url}}"],
+							"path": ["option-values"]
+						}
+					}
+				},
+				{
+					"name": "Create Option Value - Medium",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"option_group_id\": {{option_group_id}},\n  \"value_en\": \"Medium\",\n  \"value_ar\": \"متوسط\",\n  \"sort_order\": 2,\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/option-values",
+							"host": ["{{base_url}}"],
+							"path": ["option-values"]
+						}
+					}
+				},
+				{
+					"name": "Update Option Value",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"value_en\": \"Large\",\n  \"value_ar\": \"كبير\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/option-values/{{option_value_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["option-values", "{{option_value_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products?store_id={{store_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["products"],
+							"query": [{"key": "store_id", "value": "{{store_id}}"}]
+						}
+					}
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"store_id\": {{store_id}},\n  \"category_id\": {{category_id}},\n  \"name_en\": \"Margherita Pizza\",\n  \"name_ar\": \"بيتزا مارغريتا\",\n  \"description_en\": \"Classic Italian pizza\",\n  \"description_ar\": \"بيتزا إيطالية كلاسيكية\",\n  \"base_price\": 100.00,\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": ["{{base_url}}"],
+							"path": ["products"]
+						}
+					}
+				},
+				{
+					"name": "Get Product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["products", "{{product_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name_en\": \"Updated Pizza\",\n  \"base_price\": 120.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["products", "{{product_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Toggle Product Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}/toggle-status",
+							"host": ["{{base_url}}"],
+							"path": ["products", "{{product_id}}", "toggle-status"]
+						}
+					}
+				},
+				{
+					"name": "Duplicate Product",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}/duplicate",
+							"host": ["{{base_url}}"],
+							"path": ["products", "{{product_id}}", "duplicate"]
+						}
+					}
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["products", "{{product_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Product Options",
+			"item": [
+				{
+					"name": "Get Product Options",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product-options/product/{{product_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["product-options", "product", "{{product_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Assign Option Group to Product",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_id\": {{product_id}},\n  \"option_group_id\": {{option_group_id}},\n  \"is_required\": true,\n  \"sort_order\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/product-options/assign-group",
+							"host": ["{{base_url}}"],
+							"path": ["product-options", "assign-group"]
+						}
+					}
+				},
+				{
+					"name": "Assign Option Values with Pricing",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_option_id\": {{product_option_id}},\n  \"option_values\": [\n    {\n      \"option_value_id\": 1,\n      \"price_type\": \"additional\",\n      \"price_value\": 0.00,\n      \"stock_quantity\": 100,\n      \"is_available\": true\n    },\n    {\n      \"option_value_id\": 2,\n      \"price_type\": \"additional\",\n      \"price_value\": 30.00,\n      \"stock_quantity\": 80,\n      \"is_available\": true\n    },\n    {\n      \"option_value_id\": 3,\n      \"price_type\": \"additional\",\n      \"price_value\": 50.00,\n      \"stock_quantity\": 60,\n      \"is_available\": true\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/product-options/assign-values",
+							"host": ["{{base_url}}"],
+							"path": ["product-options", "assign-values"]
+						}
+					}
+				},
+				{
+					"name": "Update Option Value Pricing",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price_type\": \"additional\",\n  \"price_value\": 35.00,\n  \"stock_quantity\": 75\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["product-options", "values", "{{product_option_value_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Stock",
+					"request": {
+						"method": "PATCH",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"stock_quantity\": 150\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}/stock",
+							"host": ["{{base_url}}"],
+							"path": ["product-options", "values", "{{product_option_value_id}}", "stock"]
+						}
+					}
+				},
+				{
+					"name": "Remove Option Group from Product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product-options/{{product_option_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["product-options", "{{product_option_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Addons",
+			"item": [
+				{
+					"name": "Get All Addons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/addons?store_id={{store_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["addons"],
+							"query": [{"key": "store_id", "value": "{{store_id}}"}]
+						}
+					}
+				},
+				{
+					"name": "Create Addon - Extra Cheese",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"store_id\": {{store_id}},\n  \"name_en\": \"Extra Cheese\",\n  \"name_ar\": \"جبن إضافي\",\n  \"description_en\": \"Add extra cheese\",\n  \"description_ar\": \"أضف جبن إضافي\",\n  \"price\": 15.00,\n  \"addon_category\": \"extras\",\n  \"is_active\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/addons",
+							"host": ["{{base_url}}"],
+							"path": ["addons"]
+						}
+					}
+				},
+				{
+					"name": "Update Addon",
+					"request": {
+						"method": "PUT",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": 20.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/addons/{{addon_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["addons", "{{addon_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Delete Addon",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/addons/{{addon_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["addons", "{{addon_id}}"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Product Addons",
+			"item": [
+				{
+					"name": "Get Product Addons",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product-addons/product/{{product_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["product-addons", "product", "{{product_id}}"]
+						}
+					}
+				},
+				{
+					"name": "Assign Addons to Product",
+					"request": {
+						"method": "POST",
+						"header": [{"key": "Content-Type", "value": "application/json"}],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_id\": {{product_id}},\n  \"addon_ids\": [1, 2, 3]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/product-addons/assign",
+							"host": ["{{base_url}}"],
+							"path": ["product-addons", "assign"]
+						}
+					}
+				},
+				{
+					"name": "Remove Addon from Product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/product-addons/product/{{product_id}}/addon/{{addon_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["product-addons", "product", "{{product_id}}", "addon", "{{addon_id}}"]
+						}
+					}
+				}
+			]
+		}
+	]
+}

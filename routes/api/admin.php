@@ -10,6 +10,12 @@ use App\Http\Controllers\Api\Admin\PermissionController;
 use App\Http\Controllers\Api\Admin\RoleAssignmentController;
 use App\Http\Controllers\Api\Admin\BranchController;
 use App\Http\Controllers\Api\Admin\CategoryController;
+use App\Http\Controllers\Api\Admin\ProductController;
+use App\Http\Controllers\Api\Admin\OptionGroupController;
+use App\Http\Controllers\Api\Admin\OptionValueController;
+use App\Http\Controllers\Api\Admin\ProductOptionController;
+use App\Http\Controllers\Api\Admin\AddonController;
+use App\Http\Controllers\Api\Admin\ProductAddonController;
 
 /*
 |--------------------------------------------------------------------------
@@ -180,6 +186,140 @@ Route::prefix('admin')->group(function () {
             
             Route::middleware('permission:stores.delete,admins')->group(function () {
                 Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Product Management routes (store-specific products)
+        Route::controller(ProductController::class)->prefix('products')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+                Route::post('/{id}/duplicate', 'duplicate');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+                Route::post('/{id}/images', 'uploadImages');
+                Route::delete('/images/{id}', 'deleteImage');
+                Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
+                Route::post('/images/reorder', 'reorderImages');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Option Group Management routes
+        Route::controller(OptionGroupController::class)->prefix('option-groups')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/types', 'getTypes');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Option Value Management routes
+        Route::controller(OptionValueController::class)->prefix('option-values')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/group/{groupId}', 'index');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::post('/reorder', 'reorder');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Product Option Management routes (assign options to products)
+        Route::controller(ProductOptionController::class)->prefix('product-options')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/product/{productId}', 'index');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/assign-group', 'assignOptionGroup');
+                Route::post('/assign-values', 'assignOptionValues');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'updateOptionGroup');
+                Route::put('/values/{id}', 'updateOptionValue');
+                Route::patch('/values/{id}/stock', 'updateStock');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'removeOptionGroup');
+                Route::delete('/values/{id}', 'removeOptionValue');
+            });
+        });
+
+        // Addon Management routes
+        Route::controller(AddonController::class)->prefix('addons')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/categories/{storeId}', 'getCategories');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Product Addon Management routes (assign addons to products)
+        Route::controller(ProductAddonController::class)->prefix('product-addons')->group(function () {
+            Route::middleware('permission:stores.view,admins')->group(function () {
+                Route::get('/product/{productId}', 'index');
+            });
+            
+            Route::middleware('permission:stores.create,admins')->group(function () {
+                Route::post('/assign', 'assignAddons');
+            });
+            
+            Route::middleware('permission:stores.update,admins')->group(function () {
+                Route::put('/product/{productId}/addon/{addonId}', 'updateAddon');
+                Route::post('/reorder', 'reorderAddons');
+            });
+            
+            Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/product/{productId}/addon/{addonId}', 'removeAddon');
             });
         });
 
