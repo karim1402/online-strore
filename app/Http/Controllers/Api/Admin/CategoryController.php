@@ -22,7 +22,7 @@ class CategoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Category::with('store:id,name_en,name_ar');
+            $query = Category::with(['store:id,name_en,name_ar', 'products']);
 
             // Filter by store
             if ($request->filled('store_id')) {
@@ -59,7 +59,7 @@ class CategoryController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $category = Category::with('store:id,name_en,name_ar')->find($id);
+            $category = Category::with(['store:id,name_en,name_ar', 'products'])->find($id);
 
             if (!$category) {
                 return $this->errorResponse('errors.not_found', [], 404);
@@ -117,7 +117,7 @@ class CategoryController extends Controller
                 'sort_order' => $request->get('sort_order', 0),
             ]);
 
-            $category->load('store:id,name_en,name_ar');
+            $category->load(['store:id,name_en,name_ar', 'products']);
 
             DB::commit();
 
@@ -194,7 +194,7 @@ class CategoryController extends Controller
             }
 
             $category->save();
-            $category->load('store:id,name_en,name_ar');
+            $category->load(['store:id,name_en,name_ar', 'products']);
 
             DB::commit();
 
@@ -249,7 +249,7 @@ class CategoryController extends Controller
 
             $category->is_active = !$category->is_active;
             $category->save();
-            $category->load('store:id,name_en,name_ar');
+            $category->load(['store:id,name_en,name_ar', 'products']);
 
             return $this->successResponse($category, 'success.status_updated');
         } catch (\Exception $e) {
@@ -269,7 +269,8 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $categories = Category::where('store_id', $storeId)
+            $categories = Category::with('products')
+                ->where('store_id', $storeId)
                 ->orderBy('sort_order', 'asc')
                 ->orderBy('created_at', 'desc')
                 ->get();
