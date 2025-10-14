@@ -135,14 +135,50 @@ Content-Type: application/json
   "is_active": true,
   "search_keywords": "pizza italian",
   "sort_order": 1,
-  "metadata": {}
+  "metadata": {},
+  "option_groups": [
+    {
+      "option_group_id": 1,
+      "is_required": true,
+      "sort_order": 1,
+      "option_values": [
+        {
+          "option_value_id": 1,
+          "price_type": "additional",
+          "price_value": 0,
+          "stock_quantity": 100
+        },
+        {
+          "option_value_id": 2,
+          "price_type": "additional",
+          "price_value": 30,
+          "stock_quantity": 80
+        }
+      ]
+    },
+    {
+      "option_group_id": 2,
+      "is_required": false,
+      "sort_order": 2,
+      "option_values": [
+        {
+          "option_value_id": 4,
+          "price_type": "additional",
+          "price_value": 0,
+          "stock_quantity": 100
+        }
+      ]
+    }
+  ]
 }
 ```
-**With images:** Use form-data with `images[]` array
+**With images:** Use form-data with `images[]` array  
+**NEW!** You can now assign option groups AND option values with pricing in one call!
 
 ### PUT /products/{id}
 **Permission:** `stores.update`  
-**Body:** Same as POST (all fields optional)
+**Body:** Same as POST (all fields optional)  
+**Note:** When updating `option_groups`, it will replace all existing assignments
 
 ### PATCH /products/{id}/toggle-status
 **Permission:** `stores.update`
@@ -416,36 +452,54 @@ Content-Type: application/json
 
 ## 💡 Common Patterns
 
-### Create Product with Options (Full Flow)
+### Create Product with Options (Ultra-Simplified Flow - NEW! 🔥)
+
+```javascript
+// 1. Create complete product in ONE call
+POST /products
+{ 
+  name, price, ...,
+  option_groups: [
+    { 
+      option_group_id: 1, 
+      is_required: true,
+      option_values: [
+        { option_value_id: 1, price_type: "additional", price_value: 0, stock_quantity: 100 },
+        { option_value_id: 2, price_type: "additional", price_value: 30, stock_quantity: 80 }
+      ]
+    }
+  ]
+}
+// Response: product with options AND pricing fully configured!
+
+// 2. Assign addons (optional)
+POST /product-addons/assign
+{ product_id, addon_ids: [1, 2, 3] }
+
+// 3. View complete product
+GET /products/{product_id}
+```
+
+**That's it! From 5+ API calls to 2 API calls!** ⚡
+
+### Create Product with Options (Old Flow - Still Supported)
 
 ```javascript
 // 1. Create product
 POST /products { name, price, ... }
-// Response: product_id
 
-// 2. Upload images
-POST /products/{product_id}/images 
-// FormData with images[]
-
-// 3. Assign option group
+// 2. Assign option group
 POST /product-options/assign-group
 { product_id, option_group_id, is_required: true }
-// Response: product_option_id
 
-// 4. Assign values with pricing
+// 3. Assign values with pricing
 POST /product-options/assign-values
-{ 
-  product_option_id,
-  option_values: [
-    { option_value_id, price_type, price_value, stock }
-  ]
-}
+{ product_option_id, option_values: [...] }
 
-// 5. Assign addons
+// 4. Assign addons
 POST /product-addons/assign
-{ product_id, addon_ids: [1, 2, 3] }
 
-// 6. View complete product
+// 5. View complete product
 GET /products/{product_id}
 ```
 
