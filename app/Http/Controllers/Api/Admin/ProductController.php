@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductOption;
+use App\Models\ProductOptionValue;
 use App\Models\Store;
 use App\Models\Category;
+use App\Models\OptionGroup;
+use App\Models\OptionValue;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -115,6 +119,18 @@ class ProductController extends Controller
                 'metadata' => 'nullable|array',
                 'images' => 'nullable|array',
                 'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:2048',
+                'option_groups' => 'nullable|array',
+                'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
+                'option_groups.*.is_required' => 'nullable|boolean',
+                'option_groups.*.sort_order' => 'nullable|integer|min:0',
+                'option_groups.*.option_values' => 'nullable|array',
+                'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
+                'option_groups.*.option_values.*.price_type' => 'required_with:option_groups.*.option_values|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
+                'option_groups.*.option_values.*.stock_quantity' => 'nullable|integer|min:0',
+                'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
+                'addon_ids' => 'nullable|array',
+                'addon_ids.*' => 'integer|exists:addons,id',
             ]);
 
             if ($validator->fails()) {
@@ -168,7 +184,59 @@ class ProductController extends Controller
                 }
             }
 
-            $product->load(['store', 'category', 'images']);
+            // Handle option groups assignment
+            if ($request->filled('option_groups')) {
+                foreach ($request->option_groups as $optionGroup) {
+                    // Check if option group already assigned
+                    $productOption = ProductOption::where('product_id', $product->id)
+                        ->where('option_group_id', $optionGroup['option_group_id'])
+                        ->first();
+
+                    if (!$productOption) {
+                        $productOption = ProductOption::create([
+                            'product_id' => $product->id,
+                            'option_group_id' => $optionGroup['option_group_id'],
+                            'is_required' => $optionGroup['is_required'] ?? false,
+                            'sort_order' => $optionGroup['sort_order'] ?? 0,
+                        ]);
+                    }
+
+                    // Handle option values if provided
+                    if (isset($optionGroup['option_values']) && is_array($optionGroup['option_values'])) {
+                        foreach ($optionGroup['option_values'] as $optionValue) {
+                            // Check if option value belongs to this option group
+                            $valueExists = OptionValue::where('id', $optionValue['option_value_id'])
+                                ->where('option_group_id', $optionGroup['option_group_id'])
+                                ->exists();
+
+                            if ($valueExists) {
+                                // Check if not already assigned
+                                $povExists = ProductOptionValue::where('product_option_id', $productOption->id)
+                                    ->where('option_value_id', $optionValue['option_value_id'])
+                                    ->exists();
+
+                                if (!$povExists) {
+                                    ProductOptionValue::create([
+                                        'product_option_id' => $productOption->id,
+                                        'option_value_id' => $optionValue['option_value_id'],
+                                        'price_type' => $optionValue['price_type'],
+                                        'price_value' => $optionValue['price_value'],
+                                        'stock_quantity' => $optionValue['stock_quantity'] ?? 0,
+                                        'is_available' => $optionValue['is_available'] ?? true,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Handle addons assignment
+            if ($request->filled('addon_ids')) {
+                $product->addons()->sync($request->addon_ids);
+            }
+
+            $product->load(['store', 'category', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
 
             DB::commit();
 
@@ -202,6 +270,18 @@ class ProductController extends Controller
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
                 'metadata' => 'nullable|array',
+                'option_groups' => 'nullable|array',
+                'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
+                'option_groups.*.is_required' => 'nullable|boolean',
+                'option_groups.*.sort_order' => 'nullable|integer|min:0',
+                'option_groups.*.option_values' => 'nullable|array',
+                'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
+                'option_groups.*.option_values.*.price_type' => 'required_with:option_groups.*.option_values|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
+                'option_groups.*.option_values.*.stock_quantity' => 'nullable|integer|min:0',
+                'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
+                'addon_ids' => 'nullable|array',
+                'addon_ids.*' => 'integer|exists:addons,id',
             ]);
 
             if ($validator->fails()) {
@@ -252,7 +332,81 @@ class ProductController extends Controller
             }
 
             $product->save();
-            $product->load(['store', 'category', 'images']);
+
+            // Handle option groups update
+            if ($request->has('option_groups')) {
+                if (is_array($request->option_groups) && count($request->option_groups) > 0) {
+                    // Get current option group IDs
+                    $newOptionGroupIds = collect($request->option_groups)->pluck('option_group_id')->toArray();
+                    
+                    // Remove option groups that are not in the new list
+                    ProductOption::where('product_id', $product->id)
+                        ->whereNotIn('option_group_id', $newOptionGroupIds)
+                        ->delete();
+
+                    // Update or create option groups
+                    foreach ($request->option_groups as $optionGroup) {
+                        $productOption = ProductOption::updateOrCreate(
+                            [
+                                'product_id' => $product->id,
+                                'option_group_id' => $optionGroup['option_group_id']
+                            ],
+                            [
+                                'is_required' => $optionGroup['is_required'] ?? false,
+                                'sort_order' => $optionGroup['sort_order'] ?? 0,
+                            ]
+                        );
+
+                        // Handle option values if provided
+                        if (isset($optionGroup['option_values']) && is_array($optionGroup['option_values'])) {
+                            // Get new option value IDs
+                            $newOptionValueIds = collect($optionGroup['option_values'])->pluck('option_value_id')->toArray();
+                            
+                            // Remove option values that are not in the new list
+                            ProductOptionValue::where('product_option_id', $productOption->id)
+                                ->whereNotIn('option_value_id', $newOptionValueIds)
+                                ->delete();
+
+                            // Update or create option values
+                            foreach ($optionGroup['option_values'] as $optionValue) {
+                                // Verify option value belongs to this option group
+                                $valueExists = OptionValue::where('id', $optionValue['option_value_id'])
+                                    ->where('option_group_id', $optionGroup['option_group_id'])
+                                    ->exists();
+
+                                if ($valueExists) {
+                                    ProductOptionValue::updateOrCreate(
+                                        [
+                                            'product_option_id' => $productOption->id,
+                                            'option_value_id' => $optionValue['option_value_id']
+                                        ],
+                                        [
+                                            'price_type' => $optionValue['price_type'],
+                                            'price_value' => $optionValue['price_value'],
+                                            'stock_quantity' => $optionValue['stock_quantity'] ?? 0,
+                                            'is_available' => $optionValue['is_available'] ?? true,
+                                        ]
+                                    );
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // If empty array provided, remove all option groups
+                    ProductOption::where('product_id', $product->id)->delete();
+                }
+            }
+
+            // Handle addons update
+            if ($request->has('addon_ids')) {
+                if (is_array($request->addon_ids)) {
+                    $product->addons()->sync($request->addon_ids);
+                } else {
+                    $product->addons()->detach();
+                }
+            }
+
+            $product->load(['store', 'category', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
 
             DB::commit();
 
