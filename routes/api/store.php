@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Vendor\AuthController;
 use App\Http\Controllers\Api\Vendor\StoreController;
 use App\Http\Controllers\Api\Vendor\CategoryController;
+use App\Http\Controllers\Api\Vendor\BranchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,18 @@ Route::prefix('vendor')->group(function () {
             Route::get('/', 'show');
             Route::put('/', 'update');
             // Route::post('/', 'update'); // For form-data with _method=PUT
+        });
+
+        // Branch management routes
+        Route::controller(BranchController::class)->prefix('branches')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/main', 'getMainBranch');
+            Route::get('/{id}', 'show');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+            Route::patch('/{id}/set-main', 'setAsMain');
         });
 
         // Add more vendor-specific routes here
