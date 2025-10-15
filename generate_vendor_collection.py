@@ -1,0 +1,135 @@
+import json
+
+collection = {
+    "info": {
+        "name": "Vendor Product System - Complete",
+        "description": "47 endpoints. store_id auto-set from authenticated vendor!",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{vendor_token}}"}]},
+    "variable": [{"key": "base_url", "value": "http://localhost:8000/api/vendor"}],
+    "item": [
+        {
+            "name": "1. Authentication",
+            "item": [{
+                "name": "Vendor Login",
+                "event": [{"listen": "test", "script": {"exec": ["if(pm.response.code===200){pm.environment.set('vendor_token',pm.response.json().access_token);}"]}}],
+                "request": {
+                    "auth": {"type": "noauth"},
+                    "method": "POST",
+                    "body": {"mode": "formdata", "formdata": [{"key": "email", "value": "vendor@example.com"}, {"key": "password", "value": "password"}]},
+                    "url": "{{base_url}}/login"
+                }
+            }]
+        },
+        {
+            "name": "2. Products (11)",
+            "item": [
+                {"name": "Get All", "request": {"method": "GET", "url": "{{base_url}}/products"}},
+                {"name": "Get by ID", "request": {"method": "GET", "url": "{{base_url}}/products/{{product_id}}"}},
+                {
+                    "name": "Create Complete Product",
+                    "event": [{"listen": "test", "script": {"exec": ["if(pm.response.code===201){pm.environment.set('product_id',pm.response.json().data.id);}"]}}],
+                    "request": {
+                        "method": "POST",
+                        "body": {"mode": "formdata", "formdata": [
+                            {"key": "category_id", "value": "1"}, {"key": "name_en", "value": "Supreme Pizza"}, {"key": "name_ar", "value": "بيتزا سوبريم"},
+                            {"key": "base_price", "value": "120"}, {"key": "is_active", "value": "1"},
+                            {"key": "option_groups[0][option_group_id]", "value": "1"}, {"key": "option_groups[0][is_required]", "value": "1"},
+                            {"key": "option_groups[0][option_values][0][option_value_id]", "value": "1"}, {"key": "option_groups[0][option_values][0][price_type]", "value": "additional"},
+                            {"key": "option_groups[0][option_values][0][price_value]", "value": "0"}, {"key": "option_groups[0][option_values][0][stock_quantity]", "value": "100"},
+                            {"key": "addon_ids[]", "value": "1"}
+                        ]},
+                        "url": "{{base_url}}/products"
+                    }
+                },
+                {"name": "Update", "request": {"method": "PUT", "body": {"mode": "formdata", "formdata": [{"key": "base_price", "value": "150"}]}, "url": "{{base_url}}/products/{{product_id}}"}},
+                {"name": "Toggle Status", "request": {"method": "PATCH", "url": "{{base_url}}/products/{{product_id}}/toggle-status"}},
+                {"name": "Duplicate", "request": {"method": "POST", "url": "{{base_url}}/products/{{product_id}}/duplicate"}},
+                {"name": "Delete", "request": {"method": "DELETE", "url": "{{base_url}}/products/{{product_id}}"}},
+                {"name": "Upload Images", "request": {"method": "POST", "body": {"mode": "formdata", "formdata": [{"key": "images[]", "type": "file"}]}, "url": "{{base_url}}/products/{{product_id}}/images"}},
+                {"name": "Set Primary Image", "request": {"method": "PATCH", "url": "{{base_url}}/products/images/{{image_id}}/set-primary"}},
+                {"name": "Reorder Images", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"images\":[{\"id\":1,\"sort_order\":0}]}"}, "url": "{{base_url}}/products/images/reorder"}},
+                {"name": "Delete Image", "request": {"method": "DELETE", "url": "{{base_url}}/products/images/{{image_id}}"}}
+            ]
+        },
+        {
+            "name": "3. Option Groups (7)",
+            "item": [
+                {"name": "Get All", "request": {"method": "GET", "url": "{{base_url}}/option-groups"}},
+                {"name": "Get by ID", "request": {"method": "GET", "url": "{{base_url}}/option-groups/{{option_group_id}}"}},
+                {"name": "Get Types", "request": {"method": "GET", "url": "{{base_url}}/option-groups/types"}},
+                {
+                    "name": "Create - Size",
+                    "event": [{"listen": "test", "script": {"exec": ["if(pm.response.code===201){pm.environment.set('option_group_id',pm.response.json().data.id);}"]}}],
+                    "request": {"method": "POST", "body": {"mode": "formdata", "formdata": [{"key": "name_en", "value": "Size"}, {"key": "name_ar", "value": "الحجم"}, {"key": "type", "value": "size"}, {"key": "is_active", "value": "1"}]}, "url": "{{base_url}}/option-groups"}
+                },
+                {"name": "Update", "request": {"method": "PUT", "body": {"mode": "formdata", "formdata": [{"key": "name_en", "value": "Size Updated"}]}, "url": "{{base_url}}/option-groups/{{option_group_id}}"}},
+                {"name": "Toggle Status", "request": {"method": "PATCH", "url": "{{base_url}}/option-groups/{{option_group_id}}/toggle-status"}},
+                {"name": "Delete", "request": {"method": "DELETE", "url": "{{base_url}}/option-groups/{{option_group_id}}"}}
+            ]
+        },
+        {
+            "name": "4. Option Values (6)",
+            "item": [
+                {"name": "Get by Group", "request": {"method": "GET", "url": "{{base_url}}/option-values/group/{{option_group_id}}"}},
+                {"name": "Get by ID", "request": {"method": "GET", "url": "{{base_url}}/option-values/{{option_value_id}}"}},
+                {
+                    "name": "Create - Small",
+                    "event": [{"listen": "test", "script": {"exec": ["if(pm.response.code===201){pm.environment.set('option_value_id',pm.response.json().data.id);}"]}}],
+                    "request": {"method": "POST", "body": {"mode": "formdata", "formdata": [{"key": "option_group_id", "value": "{{option_group_id}}"}, {"key": "value_en", "value": "Small"}, {"key": "value_ar", "value": "صغير"}, {"key": "is_active", "value": "1"}]}, "url": "{{base_url}}/option-values"}
+                },
+                {"name": "Update", "request": {"method": "PUT", "body": {"mode": "formdata", "formdata": [{"key": "value_en", "value": "Large"}]}, "url": "{{base_url}}/option-values/{{option_value_id}}"}},
+                {"name": "Reorder", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"values\":[{\"id\":1,\"sort_order\":0}]}"}, "url": "{{base_url}}/option-values/reorder"}},
+                {"name": "Delete", "request": {"method": "DELETE", "url": "{{base_url}}/option-values/{{option_value_id}}"}}
+            ]
+        },
+        {
+            "name": "5. Addons (7) - store_id AUTO-SET",
+            "item": [
+                {"name": "Get All", "request": {"method": "GET", "url": "{{base_url}}/addons"}},
+                {"name": "Get by ID", "request": {"method": "GET", "url": "{{base_url}}/addons/{{addon_id}}"}},
+                {"name": "Get Categories", "request": {"method": "GET", "url": "{{base_url}}/addons/categories"}},
+                {
+                    "name": "Create - Extra Cheese (NO store_id needed!)",
+                    "event": [{"listen": "test", "script": {"exec": ["if(pm.response.code===201){pm.environment.set('addon_id',pm.response.json().data.id);console.log('✅ Addon created! store_id auto-set from auth user!');}"]}}],
+                    "request": {"method": "POST", "body": {"mode": "formdata", "formdata": [{"key": "name_en", "value": "Extra Cheese"}, {"key": "name_ar", "value": "جبن إضافي"}, {"key": "description_en", "value": "Add extra cheese"}, {"key": "price", "value": "15.00"}, {"key": "addon_category", "value": "extras"}, {"key": "is_active", "value": "1"}]}, "url": "{{base_url}}/addons"}
+                },
+                {"name": "Update", "request": {"method": "PUT", "body": {"mode": "formdata", "formdata": [{"key": "price", "value": "20.00"}]}, "url": "{{base_url}}/addons/{{addon_id}}"}},
+                {"name": "Toggle Status", "request": {"method": "PATCH", "url": "{{base_url}}/addons/{{addon_id}}/toggle-status"}},
+                {"name": "Delete", "request": {"method": "DELETE", "url": "{{base_url}}/addons/{{addon_id}}"}}
+            ]
+        },
+        {
+            "name": "6. Product Options (8)",
+            "item": [
+                {"name": "Get Product Options", "request": {"method": "GET", "url": "{{base_url}}/product-options/product/{{product_id}}"}},
+                {"name": "Assign Group", "request": {"method": "POST", "body": {"mode": "formdata", "formdata": [{"key": "product_id", "value": "{{product_id}}"}, {"key": "option_group_id", "value": "{{option_group_id}}"}, {"key": "is_required", "value": "1"}]}, "url": "{{base_url}}/product-options/assign-group"}},
+                {"name": "Update Group", "request": {"method": "PUT", "body": {"mode": "formdata", "formdata": [{"key": "is_required", "value": "0"}]}, "url": "{{base_url}}/product-options/{{product_option_id}}"}},
+                {"name": "Remove Group", "request": {"method": "DELETE", "url": "{{base_url}}/product-options/{{product_option_id}}"}},
+                {"name": "Assign Values", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"product_option_id\":1,\"option_values\":[{\"option_value_id\":1,\"price_type\":\"additional\",\"price_value\":0,\"stock_quantity\":100}]}"}, "url": "{{base_url}}/product-options/assign-values"}},
+                {"name": "Update Value", "request": {"method": "PUT", "body": {"mode": "formdata", "formdata": [{"key": "price_value", "value": "30"}]}, "url": "{{base_url}}/product-options/values/{{product_option_value_id}}"}},
+                {"name": "Update Stock", "request": {"method": "PATCH", "body": {"mode": "formdata", "formdata": [{"key": "stock_quantity", "value": "150"}]}, "url": "{{base_url}}/product-options/values/{{product_option_value_id}}/stock"}},
+                {"name": "Remove Value", "request": {"method": "DELETE", "url": "{{base_url}}/product-options/values/{{product_option_value_id}}"}}
+            ]
+        },
+        {
+            "name": "7. Product Addons (5)",
+            "item": [
+                {"name": "Get Product Addons", "request": {"method": "GET", "url": "{{base_url}}/product-addons/product/{{product_id}}"}},
+                {"name": "Assign Addons", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"product_id\":1,\"addon_ids\":[1,2,3]}"}, "url": "{{base_url}}/product-addons/assign"}},
+                {"name": "Update Addon", "request": {"method": "PUT", "body": {"mode": "formdata", "formdata": [{"key": "sort_order", "value": "2"}]}, "url": "{{base_url}}/product-addons/product/{{product_id}}/addon/{{addon_id}}"}},
+                {"name": "Remove Addon", "request": {"method": "DELETE", "url": "{{base_url}}/product-addons/product/{{product_id}}/addon/{{addon_id}}"}},
+                {"name": "Reorder Addons", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"product_id\":1,\"addons\":[{\"addon_id\":1,\"sort_order\":0}]}"}, "url": "{{base_url}}/product-addons/reorder"}}
+            ]
+        }
+    ]
+}
+
+with open('Vendor_Complete.postman_collection.json', 'w', encoding='utf-8') as f:
+    json.dump(collection, f, indent=2, ensure_ascii=False)
+
+print("✅ Vendor_Complete.postman_collection.json created successfully!")
+print("📦 Total: 47 endpoints")
+print("🔑 store_id automatically set from authenticated vendor")
+print("📥 Import this file in Postman: File → Import")
