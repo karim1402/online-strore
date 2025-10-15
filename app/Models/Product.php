@@ -9,12 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'store_id',
@@ -181,20 +179,5 @@ class Product extends Model
     public function incrementSalesCount($quantity = 1)
     {
         $this->increment('sales_count', $quantity);
-    }
-
-    /**
-     * Configure activity logging options.
-     *
-     * @return LogOptions
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name_en', 'name_ar', 'description_en', 'description_ar', 'base_price', 'is_active', 'category_id'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}")
-            ->useLogName('product');
     }
 }

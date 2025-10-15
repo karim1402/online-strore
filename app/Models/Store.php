@@ -6,12 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Store extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
 
     /**
      * The table associated with the model.
@@ -250,20 +248,5 @@ class Store extends Model
     public function canProcessOrders(): bool
     {
         return $this->status === 'approved';
-    }
-
-    /**
-     * Configure activity logging options.
-     *
-     * @return LogOptions
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name_en', 'name_ar', 'description_en', 'description_ar', 'status', 'rejection_note', 'approved_at', 'approved_by'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Store {$eventName}")
-            ->useLogName('store');
     }
 }

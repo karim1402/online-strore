@@ -5,12 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Branch extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
 
     /**
      * The table associated with the model.
@@ -156,20 +154,5 @@ class Branch extends Model
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return $earthRadius * $c;
-    }
-
-    /**
-     * Configure activity logging options.
-     *
-     * @return LogOptions
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name_en', 'name_ar', 'address', 'phone', 'is_main', 'is_active', 'latitude', 'longitude'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Branch {$eventName}")
-            ->useLogName('branch');
     }
 }

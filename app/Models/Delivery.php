@@ -6,12 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Activitylog\LogOptions;
 
 class Delivery extends Authenticatable implements JWTSubject
 {
-    use HasFactory, Notifiable, LogsActivity;
+    use HasFactory, Notifiable;
 
     /**
      * The table associated with the model.
@@ -81,20 +79,5 @@ class Delivery extends Authenticatable implements JWTSubject
             'guard' => 'deliveries',
             'email' => $this->email,
         ];
-    }
-
-    /**
-     * Configure activity logging options.
-     *
-     * @return LogOptions
-     */
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'phone', 'vehicle_type', 'vehicle_number', 'status', 'availability'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
-            ->setDescriptionForEvent(fn(string $eventName) => "Delivery {$eventName}")
-            ->useLogName('delivery');
     }
 }
