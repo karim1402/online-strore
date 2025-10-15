@@ -166,6 +166,17 @@ class AuthController extends Controller
 
             DB::commit();
 
+            // Log the registration activity
+            activity('vendor')
+                ->causedBy($vendor)
+                ->performedOn($vendor)
+                ->withProperties([
+                    'store_id' => $store->id,
+                    'store_name' => $store->name_en,
+                    'ip_address' => $request->ip(),
+                ])
+                ->log('Vendor registered with new store');
+
             // Login vendor
             $token = Auth::guard('vendors')->login($vendor);
 
@@ -234,6 +245,16 @@ class AuthController extends Controller
             Auth::guard('vendors')->logout();
             return $this->errorResponse('errors.account_disabled', [], 403);
         }
+
+        // Log the login activity
+        activity('vendor')
+            ->causedBy($vendor)
+            ->performedOn($vendor)
+            ->withProperties([
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ])
+            ->log('Vendor logged in');
 
         // Get store logo only
         $store = $vendor->store;
@@ -350,6 +371,16 @@ class AuthController extends Controller
      */
     public function logout(): JsonResponse
     {
+        $vendor = Auth::guard('vendors')->user();
+        
+        // Log the logout activity
+        if ($vendor) {
+            activity('vendor')
+                ->causedBy($vendor)
+                ->performedOn($vendor)
+                ->log('Vendor logged out');
+        }
+        
         Auth::guard('vendors')->logout();
 
         return $this->successResponse(null, 'success.vendor_logged_out');
