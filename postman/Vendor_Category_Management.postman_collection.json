@@ -1,0 +1,676 @@
+{
+	"info": {
+		"_postman_id": "vendor-category-management-001",
+		"name": "Vendor Category Management",
+		"description": "API endpoints for vendor category management. Vendors can manage categories for their own store.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{vendor_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "vendor_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "category_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Vendor Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.access_token) {",
+									"        pm.collectionVariables.set('vendor_token', jsonData.data.access_token);",
+									"        console.log('Token saved:', jsonData.data.access_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "vendor@test.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"login"
+							]
+						},
+						"description": "Login as vendor to get authentication token"
+					},
+					"response": []
+				}
+			],
+			"description": "Vendor authentication endpoints"
+		},
+		{
+			"name": "Category Management",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "1",
+									"description": "Filter by active status (0 or 1)",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "pizza",
+									"description": "Search by name (English/Arabic)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all categories for the authenticated vendor's store with optional filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories/{{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories",
+								"{{category_id}}"
+							]
+						},
+						"description": "Get details of a specific category by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.collectionVariables.set('category_id', jsonData.data.id);",
+									"        console.log('Category ID saved:', jsonData.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_en",
+									"value": "Pizza",
+									"type": "text"
+								},
+								{
+									"key": "name_ar",
+									"value": "بيتزا",
+									"type": "text"
+								},
+								{
+									"key": "description_en",
+									"value": "Delicious pizzas with various toppings",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "بيتزا لذيذة مع مجموعة متنوعة من الإضافات",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"disabled": true
+								},
+								{
+									"key": "is_active",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "sort_order",
+									"value": "0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories"
+							]
+						},
+						"description": "Create a new category for the vendor's store"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category with Image",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_en",
+									"value": "Burgers",
+									"type": "text"
+								},
+								{
+									"key": "name_ar",
+									"value": "برجر",
+									"type": "text"
+								},
+								{
+									"key": "description_en",
+									"value": "Juicy burgers made fresh daily",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "برجر طازج يتم تحضيره يوميًا",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"description": "Select an image file (JPEG, PNG, WEBP, max 2MB)"
+								},
+								{
+									"key": "is_active",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "sort_order",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories"
+							]
+						},
+						"description": "Create a new category with image upload"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_en",
+									"value": "Gourmet Pizza",
+									"type": "text"
+								},
+								{
+									"key": "name_ar",
+									"value": "بيتزا فاخرة",
+									"type": "text"
+								},
+								{
+									"key": "description_en",
+									"value": "Premium pizzas with gourmet ingredients",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "بيتزا فاخرة مع مكونات راقية",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "sort_order",
+									"value": "0",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/categories/{{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories",
+								"{{category_id}}"
+							]
+						},
+						"description": "Update an existing category (all fields are optional)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category with Image",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_en",
+									"value": "Updated Category",
+									"type": "text"
+								},
+								{
+									"key": "name_ar",
+									"value": "فئة محدثة",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": [],
+									"description": "Upload new image (replaces old one)"
+								},
+								{
+									"key": "is_active",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/categories/{{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories",
+								"{{category_id}}"
+							]
+						},
+						"description": "Update category and replace image"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Category Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories/{{category_id}}/toggle-status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories",
+								"{{category_id}}",
+								"toggle-status"
+							]
+						},
+						"description": "Toggle category active status (active <-> inactive)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Sort Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "categories[0][id]",
+									"value": "1",
+									"type": "text",
+									"description": "Category ID"
+								},
+								{
+									"key": "categories[0][sort_order]",
+									"value": "0",
+									"type": "text",
+									"description": "Sort order"
+								},
+								{
+									"key": "categories[1][id]",
+									"value": "2",
+									"type": "text",
+									"description": "Category ID"
+								},
+								{
+									"key": "categories[1][sort_order]",
+									"value": "1",
+									"type": "text",
+									"description": "Sort order"
+								},
+								{
+									"key": "categories[2][id]",
+									"value": "3",
+									"type": "text",
+									"description": "Category ID"
+								},
+								{
+									"key": "categories[2][sort_order]",
+									"value": "2",
+									"type": "text",
+									"description": "Sort order"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/categories/update-sort-order",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories",
+								"update-sort-order"
+							]
+						},
+						"description": "Update sort order for multiple categories at once"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories/{{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories",
+								"{{category_id}}"
+							]
+						},
+						"description": "Delete a category and its associated image"
+					},
+					"response": []
+				}
+			],
+			"description": "Category CRUD operations for vendors"
+		},
+		{
+			"name": "Category Filters & Search",
+			"item": [
+				{
+					"name": "Get Active Categories Only",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories?is_active=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get only active categories"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inactive Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories?is_active=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Get only inactive categories"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories?search=pizza",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "pizza"
+								}
+							]
+						},
+						"description": "Search categories by name (English/Arabic)"
+					},
+					"response": []
+				},
+				{
+					"name": "Combined Filters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/categories?is_active=1&search=burger",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": "burger"
+								}
+							]
+						},
+						"description": "Combine multiple filters (active categories with search)"
+					},
+					"response": []
+				}
+			],
+			"description": "Examples of filtering and searching categories"
+		}
+	]
+}
