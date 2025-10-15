@@ -446,6 +446,17 @@ class StoreController extends Controller
                 'rejection_note' => null
             ]);
 
+            // Log the approval activity
+            activity('store')
+                ->causedBy($admin)
+                ->performedOn($store)
+                ->withProperties([
+                    'action' => 'approved',
+                    'admin_name' => $admin->name,
+                    'store_name' => $store->name_en,
+                ])
+                ->log('Store approved by admin');
+
             // Reload relationships
             $store->load(['vendors', 'mainCategories', 'branches']);
 
@@ -476,12 +487,26 @@ class StoreController extends Controller
             }
 
             // Reject the store
+            $admin = auth('admins')->user();
+            
             $store->update([
                 'status' => 'rejected',
                 'rejection_note' => $request->note,
                 'approved_at' => null,
                 'approved_by' => null
             ]);
+
+            // Log the rejection activity
+            activity('store')
+                ->causedBy($admin)
+                ->performedOn($store)
+                ->withProperties([
+                    'action' => 'rejected',
+                    'admin_name' => $admin->name,
+                    'store_name' => $store->name_en,
+                    'rejection_note' => $request->note,
+                ])
+                ->log('Store rejected by admin');
 
             // Reload relationships
             $store->load(['vendors', 'mainCategories', 'branches']);

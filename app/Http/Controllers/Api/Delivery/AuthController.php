@@ -55,6 +55,16 @@ class AuthController extends Controller
             'availability' => true,
         ]);
 
+        // Log the registration activity
+        activity('delivery')
+            ->causedBy($delivery)
+            ->performedOn($delivery)
+            ->withProperties([
+                'vehicle_type' => $request->vehicle_type,
+                'ip_address' => $request->ip(),
+            ])
+            ->log('Delivery user registered');
+
         $token = Auth::guard('deliveries')->login($delivery);
 
         return $this->successResponse([
@@ -93,6 +103,16 @@ class AuthController extends Controller
             return $this->errorResponse('errors.account_disabled', [], 403);
         }
 
+        // Log the login activity
+        activity('delivery')
+            ->causedBy($delivery)
+            ->performedOn($delivery)
+            ->withProperties([
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ])
+            ->log('Delivery user logged in');
+
         return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -116,6 +136,16 @@ class AuthController extends Controller
      */
     public function logout(): JsonResponse
     {
+        $delivery = Auth::guard('deliveries')->user();
+        
+        // Log the logout activity
+        if ($delivery) {
+            activity('delivery')
+                ->causedBy($delivery)
+                ->performedOn($delivery)
+                ->log('Delivery user logged out');
+        }
+        
         Auth::guard('deliveries')->logout();
 
         return $this->successResponse(null, 'success.delivery_logged_out');

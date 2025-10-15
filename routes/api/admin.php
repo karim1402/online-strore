@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Admin\OptionValueController;
 use App\Http\Controllers\Api\Admin\ProductOptionController;
 use App\Http\Controllers\Api\Admin\AddonController;
 use App\Http\Controllers\Api\Admin\ProductAddonController;
+use App\Http\Controllers\Api\Admin\ActivityLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -321,6 +322,20 @@ Route::prefix('admin')->group(function () {
             Route::middleware('permission:stores.delete,admins')->group(function () {
                 Route::delete('/product/{productId}/addon/{addonId}', 'removeAddon');
             });
+        });
+
+        // Activity Log routes (accessible to admins with appropriate permissions)
+        Route::controller(ActivityLogController::class)->prefix('activity-logs')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/stats', 'stats');
+            Route::get('/log-names', 'logNames');
+            Route::get('/event-types', 'eventTypes');
+            Route::get('/{id}', 'show');
+            Route::get('/model/{modelType}/{modelId}', 'forModel');
+            Route::get('/user/{userType}/{userId}', 'byUser');
+            
+            // Cleanup route (super_admin only)
+            Route::delete('/cleanup', 'cleanup')->middleware('role:super_admin,admins');
         });
 
         // Get roles list (accessible to all authenticated admins)

@@ -89,6 +89,20 @@ class AdminUserController extends Controller
                 $admin->assignRole($role);
             }
 
+            // Log the creation activity
+            $currentAdmin = auth('admins')->user();
+            activity('admin')
+                ->causedBy($currentAdmin)
+                ->performedOn($admin)
+                ->withProperties([
+                    'action' => 'created',
+                    'created_by' => $currentAdmin->name,
+                    'admin_name' => $admin->name,
+                    'admin_email' => $admin->email,
+                    'role' => $role->name ?? null,
+                ])
+                ->log('Admin user created');
+
             return $this->successResponse($admin->load('roles'), 'success.admin_user_created', [], 201);
         } catch (\Throwable $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -166,6 +180,20 @@ class AdminUserController extends Controller
     {
         try {
             $admin = Admin::findOrFail($id);
+            
+            // Log the deletion activity before deleting
+            $currentAdmin = auth('admins')->user();
+            activity('admin')
+                ->causedBy($currentAdmin)
+                ->performedOn($admin)
+                ->withProperties([
+                    'action' => 'deleted',
+                    'deleted_by' => $currentAdmin->name,
+                    'admin_name' => $admin->name,
+                    'admin_email' => $admin->email,
+                ])
+                ->log('Admin user deleted');
+            
             $admin->delete();
             return $this->successResponse(null, 'success.admin_user_deleted');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -182,7 +210,24 @@ class AdminUserController extends Controller
     {
         try {
             $admin = Admin::findOrFail($id);
-            $admin->update(['status' => !$admin->status]);
+            $oldStatus = $admin->status;
+            $newStatus = !$admin->status;
+            $admin->update(['status' => $newStatus]);
+            
+            // Log the status change activity
+            $currentAdmin = auth('admins')->user();
+            activity('admin')
+                ->causedBy($currentAdmin)
+                ->performedOn($admin)
+                ->withProperties([
+                    'action' => 'status_changed',
+                    'changed_by' => $currentAdmin->name,
+                    'admin_name' => $admin->name,
+                    'old_status' => $oldStatus ? 'active' : 'inactive',
+                    'new_status' => $newStatus ? 'active' : 'inactive',
+                ])
+                ->log('Admin user status toggled');
+            
             return $this->successResponse($admin->fresh(), 'success.admin_user_status_updated');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('errors.resource_not_found');
