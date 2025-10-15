@@ -1,0 +1,634 @@
+{
+	"info": {
+		"_postman_id": "vendor-branch-management-001",
+		"name": "Vendor Branch Management",
+		"description": "API endpoints for vendor branch management. Vendors can manage branches for their own store.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{vendor_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "vendor_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "branch_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Vendor Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.access_token) {",
+									"        pm.collectionVariables.set('vendor_token', jsonData.data.access_token);",
+									"        console.log('Token saved:', jsonData.data.access_token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "vendor@test.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"login"
+							]
+						},
+						"description": "Login as vendor to get authentication token"
+					},
+					"response": []
+				},
+				{
+					"name": "Vendor Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"profile"
+							]
+						},
+						"description": "Get vendor profile information"
+					},
+					"response": []
+				}
+			],
+			"description": "Vendor authentication endpoints"
+		},
+		{
+			"name": "Branch Management",
+			"item": [
+				{
+					"name": "Get All Branches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "1",
+									"description": "Filter by active status (0 or 1)",
+									"disabled": true
+								},
+								{
+									"key": "is_main",
+									"value": "1",
+									"description": "Filter by main branch (0 or 1)",
+									"disabled": true
+								},
+								{
+									"key": "search",
+									"value": "downtown",
+									"description": "Search by name or address",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get all branches for the authenticated vendor's store with optional filters"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Main Branch",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches/main",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches",
+								"main"
+							]
+						},
+						"description": "Get the main branch for the vendor's store"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branch by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches/{{branch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches",
+								"{{branch_id}}"
+							]
+						},
+						"description": "Get details of a specific branch by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.id) {",
+									"        pm.collectionVariables.set('branch_id', jsonData.data.id);",
+									"        console.log('Branch ID saved:', jsonData.data.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_en",
+									"value": "Downtown Branch",
+									"type": "text"
+								},
+								{
+									"key": "name_ar",
+									"value": "فرع وسط المدينة",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "123 Main Street, Downtown",
+									"type": "text"
+								},
+								{
+									"key": "latitude",
+									"value": "24.7136",
+									"type": "text"
+								},
+								{
+									"key": "longitude",
+									"value": "46.6753",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+966501234567",
+									"type": "text"
+								},
+								{
+									"key": "description_en",
+									"value": "Our main downtown location with full services",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "موقعنا الرئيسي في وسط المدينة مع جميع الخدمات",
+									"type": "text"
+								},
+								{
+									"key": "is_main",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/branches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches"
+							]
+						},
+						"description": "Create a new branch for the vendor's store"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Branch",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name_en",
+									"value": "Updated Downtown Branch",
+									"type": "text"
+								},
+								{
+									"key": "name_ar",
+									"value": "فرع وسط المدينة المحدث",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "123 Main Street, Suite 200, Downtown",
+									"type": "text"
+								},
+								{
+									"key": "latitude",
+									"value": "24.7140",
+									"type": "text"
+								},
+								{
+									"key": "longitude",
+									"value": "46.6755",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "+966501234568",
+									"type": "text"
+								},
+								{
+									"key": "description_en",
+									"value": "Updated description for downtown location",
+									"type": "text"
+								},
+								{
+									"key": "description_ar",
+									"value": "وصف محدث لموقع وسط المدينة",
+									"type": "text"
+								},
+								{
+									"key": "is_active",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/vendor/branches/{{branch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches",
+								"{{branch_id}}"
+							]
+						},
+						"description": "Update an existing branch (all fields are optional)"
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Branch Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches/{{branch_id}}/toggle-status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches",
+								"{{branch_id}}",
+								"toggle-status"
+							]
+						},
+						"description": "Toggle branch active status (active <-> inactive)"
+					},
+					"response": []
+				},
+				{
+					"name": "Set as Main Branch",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches/{{branch_id}}/set-main",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches",
+								"{{branch_id}}",
+								"set-main"
+							]
+						},
+						"description": "Set this branch as the main branch for the store"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Branch",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches/{{branch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches",
+								"{{branch_id}}"
+							]
+						},
+						"description": "Delete a branch (cannot delete the last branch or main branch without reassignment)"
+					},
+					"response": []
+				}
+			],
+			"description": "Branch CRUD operations for vendors"
+		},
+		{
+			"name": "Branch Filters & Search",
+			"item": [
+				{
+					"name": "Get Active Branches Only",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches?is_active=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get only active branches"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inactive Branches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches?is_active=0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "0"
+								}
+							]
+						},
+						"description": "Get only inactive branches"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Branches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches?search=downtown",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "downtown"
+								}
+							]
+						},
+						"description": "Search branches by name (English/Arabic) or address"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Main Branch Only",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches?is_main=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches"
+							],
+							"query": [
+								{
+									"key": "is_main",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Filter to show only the main branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Combined Filters",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/vendor/branches?is_active=1&search=branch",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"vendor",
+								"branches"
+							],
+							"query": [
+								{
+									"key": "is_active",
+									"value": "1"
+								},
+								{
+									"key": "search",
+									"value": "branch"
+								}
+							]
+						},
+						"description": "Combine multiple filters (active branches with search)"
+					},
+					"response": []
+				}
+			],
+			"description": "Examples of filtering and searching branches"
+		}
+	]
+}
