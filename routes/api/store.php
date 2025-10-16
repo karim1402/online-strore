@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Vendor\OptionValueController;
 use App\Http\Controllers\Api\Vendor\AddonController;
 use App\Http\Controllers\Api\Vendor\ProductOptionController;
 use App\Http\Controllers\Api\Vendor\ProductAddonController;
+use App\Http\Controllers\Api\Vendor\MainCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,11 @@ use App\Http\Controllers\Api\Vendor\ProductAddonController;
 */
 
 Route::prefix('vendor')->group(function () {
+    // Public routes (no authentication required)
+    Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
+        Route::get('/', 'getPublicMainCategories');
+    });
+
     // Authentication routes
     Route::controller(AuthController::class)->group(function () {
         Route::post('register', 'register');
