@@ -43,6 +43,15 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
+        // Log the registration activity
+        activity('user')
+            ->causedBy($user)
+            ->performedOn($user)
+            ->withProperties([
+                'ip_address' => $request->ip(),
+            ])
+            ->log('User registered');
+
         $token = Auth::guard('api')->login($user);
 
         return $this->successResponse([
@@ -75,6 +84,16 @@ class AuthController extends Controller
 
         $user = Auth::guard('api')->user();
 
+        // Log the login activity
+        activity('user')
+            ->causedBy($user)
+            ->performedOn($user)
+            ->withProperties([
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ])
+            ->log('User logged in');
+
         return $this->successResponse([
             'access_token' => $token,
             'token_type' => 'bearer',
@@ -98,6 +117,16 @@ class AuthController extends Controller
      */
     public function logout(): JsonResponse
     {
+        $user = Auth::guard('api')->user();
+        
+        // Log the logout activity
+        if ($user) {
+            activity('user')
+                ->causedBy($user)
+                ->performedOn($user)
+                ->log('User logged out');
+        }
+        
         Auth::guard('api')->logout();
 
         return $this->successResponse(null, 'success.user_logged_out');
