@@ -79,6 +79,7 @@ Route::prefix('vendor')->group(function () {
             Route::delete('/images/{id}', 'deleteImage');
             Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
             Route::post('/images/reorder', 'reorderImages');
+            Route::post('/reorder', 'reorderProducts');
         });
 
         // Option Group Management routes
