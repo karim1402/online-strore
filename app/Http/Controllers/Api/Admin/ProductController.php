@@ -125,9 +125,8 @@ class ProductController extends Controller
                 'option_groups.*.sort_order' => 'nullable|integer|min:0',
                 'option_groups.*.option_values' => 'nullable|array',
                 'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
-                'option_groups.*.option_values.*.price_type' => 'required_with:option_groups.*.option_values|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_type' => 'nullable|in:fixed,additional,percentage',
                 'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
-                'option_groups.*.option_values.*.stock_quantity' => 'nullable|integer|min:0',
                 'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
                 'addon_ids' => 'nullable|array',
                 'addon_ids.*' => 'integer|exists:addons,id',
@@ -219,9 +218,8 @@ class ProductController extends Controller
                                     ProductOptionValue::create([
                                         'product_option_id' => $productOption->id,
                                         'option_value_id' => $optionValue['option_value_id'],
-                                        'price_type' => $optionValue['price_type'],
+                                        'price_type' => 'fixed', // Always fixed
                                         'price_value' => $optionValue['price_value'],
-                                        'stock_quantity' => $optionValue['stock_quantity'] ?? 0,
                                         'is_available' => $optionValue['is_available'] ?? true,
                                     ]);
                                 }
@@ -276,9 +274,8 @@ class ProductController extends Controller
                 'option_groups.*.sort_order' => 'nullable|integer|min:0',
                 'option_groups.*.option_values' => 'nullable|array',
                 'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
-                'option_groups.*.option_values.*.price_type' => 'required_with:option_groups.*.option_values|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_type' => 'nullable|in:fixed,additional,percentage',
                 'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
-                'option_groups.*.option_values.*.stock_quantity' => 'nullable|integer|min:0',
                 'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
                 'addon_ids' => 'nullable|array',
                 'addon_ids.*' => 'integer|exists:addons,id',
@@ -381,9 +378,8 @@ class ProductController extends Controller
                                             'option_value_id' => $optionValue['option_value_id']
                                         ],
                                         [
-                                            'price_type' => $optionValue['price_type'],
+                                            'price_type' => 'fixed', // Always fixed
                                             'price_value' => $optionValue['price_value'],
-                                            'stock_quantity' => $optionValue['stock_quantity'] ?? 0,
                                             'is_available' => $optionValue['is_available'] ?? true,
                                         ]
                                     );
@@ -654,6 +650,38 @@ class ProductController extends Controller
             DB::commit();
 
             return $this->successResponse($newProduct, 'success.product_duplicated', [], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Reorder products (bulk update sort_order)
+     */
+    public function reorderProducts(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'products' => 'required|array',
+                'products.*.id' => 'required|integer|exists:products,id',
+                'products.*.sort_order' => 'required|integer|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            foreach ($request->products as $productData) {
+                Product::where('id', $productData['id'])
+                    ->update(['sort_order' => $productData['sort_order']]);
+            }
+
+            DB::commit();
+
+            return $this->successResponse(null, 'success.products_reordered');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->errorResponse('errors.server_error', [], 500);
