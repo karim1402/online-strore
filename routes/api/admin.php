@@ -208,6 +208,7 @@ Route::prefix('admin')->group(function () {
                 Route::delete('/images/{id}', 'deleteImage');
                 Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
                 Route::post('/images/reorder', 'reorderImages');
+                Route::post('/reorder', 'reorderProducts');
             });
             
             Route::middleware('permission:stores.delete,admins')->group(function () {
