@@ -119,6 +119,7 @@ class ProductController extends Controller
                 'metadata' => 'nullable|array',
                 'images' => 'nullable|array',
                 'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:2048',
+                'primary_image_index' => 'nullable|integer|min:0',
                 'option_groups' => 'nullable|array',
                 'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
                 'option_groups.*.is_required' => 'nullable|boolean',
@@ -170,16 +171,22 @@ class ProductController extends Controller
 
             // Handle image uploads
             if ($request->hasFile('images')) {
-                $isFirst = true;
-                foreach ($request->file('images') as $image) {
+                $primaryIndex = $request->filled('primary_image_index') ? $request->primary_image_index : 0;
+                $images = $request->file('images');
+                
+                // Validate primary_image_index is within range
+                if ($primaryIndex >= count($images)) {
+                    $primaryIndex = 0;
+                }
+                
+                foreach ($images as $index => $image) {
                     $imagePath = $image->store('products', 'public');
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $imagePath,
-                        'is_primary' => $isFirst,
-                        'sort_order' => $isFirst ? 0 : 1,
+                        'is_primary' => $index === $primaryIndex,
+                        'sort_order' => $index,
                     ]);
-                    $isFirst = false;
                 }
             }
 
