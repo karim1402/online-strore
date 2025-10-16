@@ -178,20 +178,24 @@ class ProductController extends Controller
 
             // Handle image uploads
             if ($request->hasFile('images')) {
-                $primaryIndex = $request->filled('primary_image_index') ? $request->primary_image_index : 0;
                 $images = $request->file('images');
+                $primaryImageIndex = $request->has('primary_image_index') ? (int)$request->primary_image_index : 0;
                 
                 // Validate primary_image_index is within range
-                if ($primaryIndex >= count($images)) {
-                    $primaryIndex = 0;
+                if ($primaryImageIndex < 0 || $primaryImageIndex >= count($images)) {
+                    $primaryImageIndex = 0;
                 }
                 
                 foreach ($images as $index => $image) {
                     $imagePath = $image->store('products', 'public');
+                    
+                    // Check if this image index matches the primary_image_index
+                    $isPrimary = ($index == $primaryImageIndex);
+                    
                     ProductImage::create([
                         'product_id' => $product->id,
                         'image_path' => $imagePath,
-                        'is_primary' => $index === $primaryIndex,
+                        'is_primary' => $isPrimary,
                         'sort_order' => $index,
                     ]);
                 }
