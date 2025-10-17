@@ -27,7 +27,7 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        
+
         try {
             $query = Product::with(['store:id,name_en,name_ar', 'category:id,name_en,name_ar', 'images']);
 
@@ -105,6 +105,24 @@ class ProductController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $addon_ids = $request->input('addon_ids');
+
+        if (is_string($addon_ids)) {
+            $decoded = json_decode($addon_ids, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $addon_ids = $decoded;
+            } else {
+                $addon_ids = explode(',', $addon_ids);
+            }
+        }
+
+        $addon_ids = array_map('intval', (array) $addon_ids);
+
+        $request->merge([
+            'addon_ids' => $addon_ids,
+        ]);
+
+        Storage::put('test.txt', json_encode($request->addon_ids));
         try {
             $validator = ValidationService::make($request->all(), [
                 'store_id' => 'required|integer|exists:stores,id',
