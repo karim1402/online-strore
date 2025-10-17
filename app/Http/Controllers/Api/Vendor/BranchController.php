@@ -99,7 +99,30 @@ class BranchController extends Controller
             $validator = ValidationService::make($request->all(), [
                 'name_en' => 'required|string|max:255',
                 'name_ar' => 'required|string|max:255',
-                'address' => 'required|string',
+                '
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                ' => 'required|string',
                 'latitude' => 'required|numeric|between:-90,90',
                 'longitude' => 'required|numeric|between:-180,180',
                 'phone' => 'nullable|string|max:20',
