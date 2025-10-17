@@ -329,7 +329,7 @@ class StoreController extends Controller
             $oldDocumentPath = $store->document;
 
             // Handle logo upload
-            if ($request->hasFile('logo')) {
+            if ($request->hasFile('logo') && $request->file('logo')->isValid()) {
                 $logoPath = $request->file('logo')->store('stores/logos', 'public');
                 $store->logo = $logoPath;
                 
@@ -340,7 +340,7 @@ class StoreController extends Controller
             }
 
             // Handle document upload
-            if ($request->hasFile('document')) {
+            if ($request->hasFile('document') && $request->file('document')->isValid()) {
                 $documentPath = $request->file('document')->store('stores/documents', 'public');
                 $store->document = $documentPath;
                 
