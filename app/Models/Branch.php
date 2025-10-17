@@ -37,6 +37,8 @@ class Branch extends Model
         'is_main',
         'is_active',
         'working_hours',
+        'opening_time',
+        'closing_time',
     ];
 
     /**
@@ -65,6 +67,44 @@ class Branch extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    /**
+     * Check if branch is currently open based on opening and closing times.
+     *
+     * @return bool
+     */
+    public function isCurrentlyOpen(): bool
+    {
+        if (!$this->is_active) {
+            return false;
+        }
+
+        if (is_null($this->opening_time) || is_null($this->closing_time)) {
+            return true; // If no times set, assume always open
+        }
+
+        $currentTime = now()->format('H:i:s');
+        return $currentTime >= $this->opening_time && $currentTime <= $this->closing_time;
+    }
+
+    /**
+     * Check if branch is open at a specific time.
+     *
+     * @param string $time Time in H:i or H:i:s format
+     * @return bool
+     */
+    public function isOpenAt(string $time): bool
+    {
+        if (!$this->is_active) {
+            return false;
+        }
+
+        if (is_null($this->opening_time) || is_null($this->closing_time)) {
+            return true;
+        }
+
+        return $time >= $this->opening_time && $time <= $this->closing_time;
     }
 
     /**
@@ -166,7 +206,7 @@ class Branch extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name_en', 'name_ar', 'address', 'phone', 'is_main', 'is_active', 'latitude', 'longitude'])
+            ->logOnly(['name_en', 'name_ar', 'address', 'phone', 'opening_time', 'closing_time', 'is_main', 'is_active', 'latitude', 'longitude'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "Branch {$eventName}")
