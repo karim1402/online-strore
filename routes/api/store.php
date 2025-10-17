@@ -11,6 +11,10 @@ use App\Http\Controllers\Api\Vendor\OptionValueController;
 use App\Http\Controllers\Api\Vendor\AddonController;
 use App\Http\Controllers\Api\Vendor\ProductOptionController;
 use App\Http\Controllers\Api\Vendor\ProductAddonController;
+<<<<<<< HEAD
+=======
+use App\Http\Controllers\Api\Vendor\MainCategoryController;
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +28,11 @@ use App\Http\Controllers\Api\Vendor\ProductAddonController;
 */
 
 Route::prefix('vendor')->group(function () {
+    // Public routes (no authentication required)
+    Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
+        Route::get('/', 'getPublicMainCategories');
+    });
+
     // Authentication routes
     Route::controller(AuthController::class)->group(function () {
         Route::post('register', 'register');
@@ -79,6 +88,10 @@ Route::prefix('vendor')->group(function () {
             Route::delete('/images/{id}', 'deleteImage');
             Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
             Route::post('/images/reorder', 'reorderImages');
+<<<<<<< HEAD
+=======
+            Route::post('/reorder', 'reorderProducts');
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
         });
 
         // Option Group Management routes

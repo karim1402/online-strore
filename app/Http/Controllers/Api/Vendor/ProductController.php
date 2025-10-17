@@ -132,15 +132,24 @@ class ProductController extends Controller
                 'metadata' => 'nullable|array',
                 'images' => 'nullable|array',
                 'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:2048',
+<<<<<<< HEAD
+=======
+                'primary_image_index' => 'nullable|integer|min:0',
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
                 'option_groups' => 'nullable|array',
                 'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
                 'option_groups.*.is_required' => 'nullable|boolean',
                 'option_groups.*.sort_order' => 'nullable|integer|min:0',
                 'option_groups.*.option_values' => 'nullable|array',
                 'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
+<<<<<<< HEAD
                 'option_groups.*.option_values.*.price_type' => 'required_with:option_groups.*.option_values|in:fixed,additional,percentage',
                 'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
                 'option_groups.*.option_values.*.stock_quantity' => 'nullable|integer|min:0',
+=======
+                'option_groups.*.option_values.*.price_type' => 'nullable|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
                 'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
                 'addon_ids' => 'nullable|array',
                 'addon_ids.*' => 'integer|exists:addons,id',
@@ -178,6 +187,7 @@ class ProductController extends Controller
 
             // Handle image uploads
             if ($request->hasFile('images')) {
+<<<<<<< HEAD
                 $isFirst = true;
                 foreach ($request->file('images') as $image) {
                     $imagePath = $image->store('products', 'public');
@@ -188,6 +198,28 @@ class ProductController extends Controller
                         'sort_order' => $isFirst ? 0 : 1,
                     ]);
                     $isFirst = false;
+=======
+                $images = $request->file('images');
+                $primaryImageIndex = $request->has('primary_image_index') ? (int)$request->primary_image_index : 0;
+                
+                // Validate primary_image_index is within range
+                if ($primaryImageIndex < 0 || $primaryImageIndex >= count($images)) {
+                    $primaryImageIndex = 0;
+                }
+                
+                foreach ($images as $index => $image) {
+                    $imagePath = $image->store('products', 'public');
+                    
+                    // Check if this image index matches the primary_image_index
+                    $isPrimary = ($index == $primaryImageIndex);
+                    
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $imagePath,
+                        'is_primary' => $isPrimary,
+                        'sort_order' => $index,
+                    ]);
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
                 }
             }
 
@@ -223,9 +255,14 @@ class ProductController extends Controller
                                     ProductOptionValue::create([
                                         'product_option_id' => $productOption->id,
                                         'option_value_id' => $optionValue['option_value_id'],
+<<<<<<< HEAD
                                         'price_type' => $optionValue['price_type'],
                                         'price_value' => $optionValue['price_value'],
                                         'stock_quantity' => $optionValue['stock_quantity'] ?? 0,
+=======
+                                        'price_type' => 'fixed', // Always fixed
+                                        'price_value' => $optionValue['price_value'],
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
                                         'is_available' => $optionValue['is_available'] ?? true,
                                     ]);
                                 }
@@ -287,9 +324,14 @@ class ProductController extends Controller
                 'option_groups.*.sort_order' => 'nullable|integer|min:0',
                 'option_groups.*.option_values' => 'nullable|array',
                 'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
+<<<<<<< HEAD
                 'option_groups.*.option_values.*.price_type' => 'required_with:option_groups.*.option_values|in:fixed,additional,percentage',
                 'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
                 'option_groups.*.option_values.*.stock_quantity' => 'nullable|integer|min:0',
+=======
+                'option_groups.*.option_values.*.price_type' => 'nullable|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
                 'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
                 'addon_ids' => 'nullable|array',
                 'addon_ids.*' => 'integer|exists:addons,id',
@@ -384,9 +426,14 @@ class ProductController extends Controller
                                             'option_value_id' => $optionValue['option_value_id']
                                         ],
                                         [
+<<<<<<< HEAD
                                             'price_type' => $optionValue['price_type'],
                                             'price_value' => $optionValue['price_value'],
                                             'stock_quantity' => $optionValue['stock_quantity'] ?? 0,
+=======
+                                            'price_type' => 'fixed', // Always fixed
+                                            'price_value' => $optionValue['price_value'],
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
                                             'is_available' => $optionValue['is_available'] ?? true,
                                         ]
                                     );
@@ -714,4 +761,48 @@ class ProductController extends Controller
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * Reorder products (bulk update sort_order) - vendor's store only
+     */
+    public function reorderProducts(Request $request): JsonResponse
+    {
+        try {
+            $vendor = auth('vendors')->user();
+            $storeId = $vendor->store?->id;
+
+            if (!$storeId) {
+                return $this->errorResponse('errors.store_not_found', [], 404);
+            }
+
+            $validator = ValidationService::make($request->all(), [
+                'products' => 'required|array',
+                'products.*.id' => 'required|integer|exists:products,id',
+                'products.*.sort_order' => 'required|integer|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            foreach ($request->products as $productData) {
+                // Verify product belongs to vendor's store
+                Product::where('id', $productData['id'])
+                    ->where('store_id', $storeId)
+                    ->update(['sort_order' => $productData['sort_order']]);
+            }
+
+            DB::commit();
+
+            return $this->successResponse(null, 'success.products_reordered');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+>>>>>>> 9764caf39021de1f065188b326b4cf6e75154aa0
 }

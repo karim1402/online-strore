@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Activitylog\Facades\LogActivity;
 
 class AuthController extends Controller
 {
@@ -51,6 +52,16 @@ class AuthController extends Controller
             Auth::guard('admins')->logout();
             return $this->errorResponse('errors.account_disabled', [], 403);
         }
+
+        // Log the login activity
+        activity('admin')
+            ->causedBy($admin)
+            ->performedOn($admin)
+            ->withProperties([
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+            ])
+            ->log('Admin logged in');
 
         // Get the primary role (first role) and its permissions
         $primaryRole = $admin->roles->first();
@@ -165,6 +176,16 @@ class AuthController extends Controller
      */
     public function logout(): JsonResponse
     {
+        $admin = Auth::guard('admins')->user();
+        
+        // Log the logout activity
+        if ($admin) {
+            activity('admin')
+                ->causedBy($admin)
+                ->performedOn($admin)
+                ->log('Admin logged out');
+        }
+        
         Auth::guard('admins')->logout();
 
         return $this->successResponse(null, 'success.admin_logged_out');
