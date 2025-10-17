@@ -5,6 +5,12 @@ use App\Http\Controllers\Api\Vendor\AuthController;
 use App\Http\Controllers\Api\Vendor\StoreController;
 use App\Http\Controllers\Api\Vendor\CategoryController;
 use App\Http\Controllers\Api\Vendor\BranchController;
+use App\Http\Controllers\Api\Vendor\ProductController;
+use App\Http\Controllers\Api\Vendor\OptionGroupController;
+use App\Http\Controllers\Api\Vendor\OptionValueController;
+use App\Http\Controllers\Api\Vendor\AddonController;
+use App\Http\Controllers\Api\Vendor\ProductOptionController;
+use App\Http\Controllers\Api\Vendor\ProductAddonController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +64,74 @@ Route::prefix('vendor')->group(function () {
             Route::delete('/{id}', 'destroy');
             Route::patch('/{id}/toggle-status', 'toggleStatus');
             Route::post('/update-sort-order', 'updateSortOrder');
+        });
+
+        // Product Management routes
+        Route::controller(ProductController::class)->prefix('products')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+            Route::post('/{id}/duplicate', 'duplicate');
+            Route::post('/{id}/images', 'uploadImages');
+            Route::delete('/images/{id}', 'deleteImage');
+            Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
+            Route::post('/images/reorder', 'reorderImages');
+        });
+
+        // Option Group Management routes
+        Route::controller(OptionGroupController::class)->prefix('option-groups')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/types', 'getTypes');
+            Route::get('/{id}', 'show');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+            Route::delete('/{id}', 'destroy');
+        });
+
+        // Option Value Management routes
+        Route::controller(OptionValueController::class)->prefix('option-values')->group(function () {
+            Route::get('/group/{groupId}', 'index');
+            Route::get('/{id}', 'show');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::post('/reorder', 'reorder');
+            Route::delete('/{id}', 'destroy');
+        });
+
+        // Addon Management routes
+        Route::controller(AddonController::class)->prefix('addons')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/categories', 'getCategories');
+            Route::get('/{id}', 'show');
+            Route::post('/', 'store');
+            Route::put('/{id}', 'update');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+            Route::delete('/{id}', 'destroy');
+        });
+
+        // Product Option Management routes (assign options to products)
+        Route::controller(ProductOptionController::class)->prefix('product-options')->group(function () {
+            Route::get('/product/{productId}', 'index');
+            Route::post('/assign-group', 'assignOptionGroup');
+            Route::put('/{id}', 'updateOptionGroup');
+            Route::delete('/{id}', 'removeOptionGroup');
+            Route::post('/assign-values', 'assignOptionValues');
+            Route::put('/values/{id}', 'updateOptionValue');
+            Route::patch('/values/{id}/stock', 'updateStock');
+            Route::delete('/values/{id}', 'removeOptionValue');
+        });
+
+        // Product Addon Management routes (assign addons to products)
+        Route::controller(ProductAddonController::class)->prefix('product-addons')->group(function () {
+            Route::get('/product/{productId}', 'index');
+            Route::post('/assign', 'assignAddons');
+            Route::put('/product/{productId}/addon/{addonId}', 'updateAddon');
+            Route::delete('/product/{productId}/addon/{addonId}', 'removeAddon');
+            Route::post('/reorder', 'reorderAddons');
         });
 
         // Add more vendor-specific routes here
