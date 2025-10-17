@@ -19,9 +19,10 @@ jobs:
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
 
-           server: '194.163.140.1'
-           username: 'mainmakdevdigita'
-           password: 'O76jRTHQAP=C'
+            server: ${{ secrets.SFTP_SERVER }}
+            username: ${{ secrets.SFTP_USERNAME }}
+            password: ${{ secrets.SFTP_PASSWORD }}
+
            server-dir: /public_html/
            exclude: |
              */.git
