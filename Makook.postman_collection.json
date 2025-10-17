@@ -1,0 +1,7560 @@
+{
+	"info": {
+		"_postman_id": "320195c8-737d-48d3-a784-4ea255dd236a",
+		"name": "Makook",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40750427",
+		"_collection_link": "https://digital-vibes-marketing-agency.postman.co/workspace/Team~c0197fc4-29ec-488b-895c-cd2cbc796e2c/collection/40750427-320195c8-737d-48d3-a784-4ea255dd236a?action=share&source=collection_link&creator=40750427"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"description": "ar or en",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "karim",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "karim@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "12345678",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{live}}user/register",
+									"host": [
+										"{{live}}user"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "karim@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "12345678",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}user/login",
+									"host": [
+										"{{local}}user"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "logout",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}user/logout",
+									"host": [
+										"{{local}}user"
+									],
+									"path": [
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "logout Copy",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{local}}user/dashboard",
+									"host": [
+										"{{local}}user"
+									],
+									"path": [
+										"dashboard"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User Address",
+					"item": [
+						{
+							"name": "Get All User Addresses",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses?search=&address_type=&is_default=",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "search",
+											"value": "",
+											"description": "Search in address_name, building_name, street_name, or landmark"
+										},
+										{
+											"key": "address_type",
+											"value": "",
+											"description": "Filter by address type: villa, apartment, or office"
+										},
+										{
+											"key": "is_default",
+											"value": "",
+											"description": "Filter by default status: true or false"
+										}
+									]
+								},
+								"description": "Retrieve all addresses for the authenticated user. Supports filtering by address type, default status, and searching across multiple fields."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Single Address",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses/{{address_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses",
+										"{{address_id}}"
+									]
+								},
+								"description": "Get details of a specific address by ID. Only returns addresses belonging to the authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "Get Default Address",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses/default",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses",
+										"default"
+									]
+								},
+								"description": "Get the default address for the authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Address - Apartment",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "address_name",
+											"value": "My Home",
+											"type": "text"
+										},
+										{
+											"key": "address_type",
+											"value": "apartment",
+											"type": "text"
+										},
+										{
+											"key": "building_name",
+											"value": "Tower A",
+											"type": "text"
+										},
+										{
+											"key": "apartment_number",
+											"value": "405",
+											"type": "text"
+										},
+										{
+											"key": "floor_number",
+											"value": "4",
+											"type": "text"
+										},
+										{
+											"key": "street_name",
+											"value": "Tahrir Street",
+											"type": "text"
+										},
+										{
+											"key": "landmark",
+											"value": "Near Cairo Tower",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+201234567890",
+											"type": "text"
+										},
+										{
+											"key": "latitude",
+											"value": "30.0444196",
+											"type": "text"
+										},
+										{
+											"key": "longitude",
+											"value": "31.2357116",
+											"type": "text"
+										},
+										{
+											"key": "is_default",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/user/addresses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									]
+								},
+								"description": "Create a new apartment address. If this is the user's first address, it will automatically be set as default."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Address - Villa",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "address_name",
+											"value": "Family Villa",
+											"type": "text"
+										},
+										{
+											"key": "address_type",
+											"value": "villa",
+											"type": "text"
+										},
+										{
+											"key": "building_name",
+											"value": "Villa 45",
+											"type": "text"
+										},
+										{
+											"key": "floor_number",
+											"value": "Ground Floor",
+											"type": "text"
+										},
+										{
+											"key": "street_name",
+											"value": "Palm Hills",
+											"type": "text"
+										},
+										{
+											"key": "landmark",
+											"value": "Near clubhouse",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+201234567890",
+											"type": "text"
+										},
+										{
+											"key": "latitude",
+											"value": "30.0120",
+											"type": "text"
+										},
+										{
+											"key": "longitude",
+											"value": "31.2080",
+											"type": "text"
+										},
+										{
+											"key": "is_default",
+											"value": "0",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/user/addresses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									]
+								},
+								"description": "Create a new villa address. Note that apartment_number is optional for villas."
+							},
+							"response": []
+						},
+						{
+							"name": "Create Address - Office",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "address_name",
+											"value": "Work Office",
+											"type": "text"
+										},
+										{
+											"key": "address_type",
+											"value": "office",
+											"type": "text"
+										},
+										{
+											"key": "building_name",
+											"value": "Smart Village B2",
+											"type": "text"
+										},
+										{
+											"key": "floor_number",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "street_name",
+											"value": "26th of July Corridor",
+											"type": "text"
+										},
+										{
+											"key": "landmark",
+											"value": "Next to Mall entrance",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+201234567890",
+											"type": "text"
+										},
+										{
+											"key": "latitude",
+											"value": "30.0700",
+											"type": "text"
+										},
+										{
+											"key": "longitude",
+											"value": "31.0200",
+											"type": "text"
+										},
+										{
+											"key": "is_default",
+											"value": "0",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/user/addresses",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									]
+								},
+								"description": "Create a new office address with business location details."
+							},
+							"response": []
+						},
+						{
+							"name": "Update Address",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "address_name",
+											"value": "Updated Home Address",
+											"type": "text"
+										},
+										{
+											"key": "building_name",
+											"value": "Tower B",
+											"type": "text"
+										},
+										{
+											"key": "apartment_number",
+											"value": "506",
+											"type": "text"
+										},
+										{
+											"key": "floor_number",
+											"value": "5",
+											"type": "text"
+										},
+										{
+											"key": "street_name",
+											"value": "Tahrir Street",
+											"type": "text"
+										},
+										{
+											"key": "landmark",
+											"value": "Near Cairo Tower",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+201234567890",
+											"type": "text"
+										},
+										{
+											"key": "latitude",
+											"value": "30.0444196",
+											"type": "text"
+										},
+										{
+											"key": "longitude",
+											"value": "31.2357116",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/user/addresses/{{address_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses",
+										"{{address_id}}"
+									]
+								},
+								"description": "Update an existing address. All fields are optional (use 'sometimes' validation)."
+							},
+							"response": []
+						},
+						{
+							"name": "Set Address as Default",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses/{{address_id}}/set-default",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses",
+										"{{address_id}}",
+										"set-default"
+									]
+								},
+								"description": "Set a specific address as the default address. All other addresses will be automatically unmarked as default."
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Address",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses/{{address_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses",
+										"{{address_id}}"
+									]
+								},
+								"description": "Delete an address. If the deleted address was the default, another active address will automatically be set as default."
+							},
+							"response": []
+						},
+						{
+							"name": "Search Addresses by Building",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses?search=Tower",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "search",
+											"value": "Tower"
+										}
+									]
+								},
+								"description": "Search addresses containing 'Tower' in address_name, building_name, street_name, or landmark."
+							},
+							"response": []
+						},
+						{
+							"name": "Filter by Address Type - Apartment",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses?address_type=apartment",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "address_type",
+											"value": "apartment"
+										}
+									]
+								},
+								"description": "Get only apartment addresses for the authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "Filter by Address Type - Villa",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses?address_type=villa",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "address_type",
+											"value": "villa"
+										}
+									]
+								},
+								"description": "Get only villa addresses for the authenticated user."
+							},
+							"response": []
+						},
+						{
+							"name": "Filter by Default Address",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/user/addresses?is_default=true",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"user",
+										"addresses"
+									],
+									"query": [
+										{
+											"key": "is_default",
+											"value": "true"
+										}
+									]
+								},
+								"description": "Get only default addresses (should return only one address)."
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "superadmin@test.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "password123",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/login",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "logout",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/logout",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"logout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/profile",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/profile",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "main categorys",
+					"item": [
+						{
+							"name": "index",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{live_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{live}}admin/main-categories?per_page=100",
+									"host": [
+										"{{live}}admin"
+									],
+									"path": [
+										"main-categories"
+									],
+									"query": [
+										{
+											"key": "per_page",
+											"value": "100",
+											"description": "intger"
+										},
+										{
+											"key": "search",
+											"value": "books",
+											"description": "string value ",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "0",
+											"description": "in 1 and 0",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{live_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{live}}admin/main-categories/22",
+									"host": [
+										"{{live}}admin"
+									],
+									"path": [
+										"main-categories",
+										"22"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "store",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{live_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name_en",
+											"value": "pitza12",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "بيتزا12",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"type": "file",
+											"src": "/C:/Users/Karim Moahmed/Downloads/download.jpeg"
+										},
+										{
+											"key": "status",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "sort_order",
+											"value": "30",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "test",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{live}}admin/main-categories",
+									"host": [
+										"{{live}}admin"
+									],
+									"path": [
+										"main-categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/main-categories/6?name_en=pitza21ewq&name_ar=بيتزا12ewqe&status=1&sort_order=30&description_ar=test&description_en=test",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"main-categories",
+										"6"
+									],
+									"query": [
+										{
+											"key": "name_en",
+											"value": "pitza21ewq"
+										},
+										{
+											"key": "name_ar",
+											"value": "بيتزا12ewqe"
+										},
+										{
+											"key": "status",
+											"value": "1"
+										},
+										{
+											"key": "sort_order",
+											"value": "30"
+										},
+										{
+											"key": "description_ar",
+											"value": "test"
+										},
+										{
+											"key": "description_en",
+											"value": "test"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "toggle status",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/main-categories/6/toggle-status",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"main-categories",
+										"6",
+										"toggle-status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/main-categories/6",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"main-categories",
+										"6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get active",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/main-categories/active",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"main-categories",
+										"active"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "admin users",
+					"item": [
+						{
+							"name": "store",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"description": "ar or en",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "karim",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "karim12@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "12345678",
+											"type": "text"
+										},
+										{
+											"key": "role_id",
+											"value": "2",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "01203994379",
+											"type": "text"
+										},
+										{
+											"key": "status",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/admin-users",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"admin-users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"description": "ar or en",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "karim",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "karim1@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "12345678",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "01203994378",
+											"type": "text",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "role_id",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/admin-users/5?password=12345678&status=1&role_id=1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"admin-users",
+										"5"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "karim",
+											"disabled": true
+										},
+										{
+											"key": "email",
+											"value": "karim1@gmail.com",
+											"disabled": true
+										},
+										{
+											"key": "password",
+											"value": "12345678"
+										},
+										{
+											"key": "phone",
+											"value": "01203994378",
+											"disabled": true
+										},
+										{
+											"key": "status",
+											"value": "1"
+										},
+										{
+											"key": "role_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "index",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/admin-users?per_page=4&search&status&role_id",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"admin-users"
+									],
+									"query": [
+										{
+											"key": "per_page",
+											"value": "4"
+										},
+										{
+											"key": "search",
+											"value": null
+										},
+										{
+											"key": "status",
+											"value": null
+										},
+										{
+											"key": "role_id",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/admin-users/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"admin-users",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/admin-users/2",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"admin-users",
+										"2"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "status toggle",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/admin-users/1/toggle-status",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"admin-users",
+										"1",
+										"toggle-status"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "roles",
+					"item": [
+						{
+							"name": "index",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/roles",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"roles"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/roles/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"roles",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "store",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "test",
+											"type": "text"
+										},
+										{
+											"key": "guard_name",
+											"value": "admins",
+											"type": "text"
+										},
+										{
+											"key": "permissions[0]",
+											"value": "admin-users.view",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/roles",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"roles"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "",
+											"type": "text"
+										},
+										{
+											"key": "permissions[0]",
+											"value": "",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/roles/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"roles",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{local}}admin/roles/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"roles",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get all permissions",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{local}}admin/roles/permissions",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"roles",
+										"permissions"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "roles list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{local}}admin/roles/list",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"roles",
+										"list"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "stores",
+					"item": [
+						{
+							"name": "index",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{live}}admin/stores",
+									"host": [
+										"{{live}}admin"
+									],
+									"path": [
+										"stores"
+									],
+									"query": [
+										{
+											"key": "status",
+											"value": "pending",
+											"description": "['pending', 'approved', 'rejected', 'suspended']",
+											"disabled": true
+										},
+										{
+											"key": "search",
+											"value": null,
+											"disabled": true
+										},
+										{
+											"key": "date_from",
+											"value": null,
+											"disabled": true
+										},
+										{
+											"key": "date_to",
+											"value": null,
+											"disabled": true
+										},
+										{
+											"key": "category_id",
+											"value": null,
+											"disabled": true
+										},
+										{
+											"key": "per_page",
+											"value": null,
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/stores/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"stores",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "approve",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/stores/1/approve",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"stores",
+										"1",
+										"approve"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "reject",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "note",
+											"value": "dwdwdwqdwdwqdwqdwqd",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/stores/1/reject",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"stores",
+										"1",
+										"reject"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "suspend",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "note",
+											"value": "dwdwdwqdwdwqdwqdwqd",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/stores/1/suspend",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"stores",
+										"1",
+										"suspend"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "store",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "main_category_ids[0]",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "name_en",
+											"value": "fefe",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "fewfewf",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "fewfew",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "ewfewfew",
+											"type": "text"
+										},
+										{
+											"key": "status",
+											"value": "approved",
+											"type": "text"
+										},
+										{
+											"key": "vendor_name",
+											"value": "kemo1q",
+											"type": "text"
+										},
+										{
+											"key": "vendor_email",
+											"value": "karim123@test.com",
+											"type": "text"
+										},
+										{
+											"key": "vendor_password",
+											"value": "123456789",
+											"type": "text"
+										},
+										{
+											"key": "vendor_phone",
+											"value": "01245954489",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][name_en]",
+											"value": " Main Branch",
+											"description": "pending,approved,rejected,suspended",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][name_ar]",
+											"value": " الفرع الرئيسي",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][address]",
+											"value": " 123 Main Street",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][latitude]",
+											"value": " 15.2585",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][longitude]",
+											"value": " 12.1515",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][phone]",
+											"value": " +966501234567",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][description_en]",
+											"value": " Main branch description",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][description_ar]",
+											"value": " وصف الفرع الرئيسي",
+											"type": "text"
+										},
+										{
+											"key": "logo",
+											"type": "file",
+											"src": "/C:/Users/Karim Moahmed/Downloads/download.png"
+										},
+										{
+											"key": "document",
+											"type": "file",
+											"src": "/C:/Users/Karim Moahmed/Downloads/screencapture-dvadsmanager-en-tutorials-2025-07-15-17_55_43.pdf"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/stores",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"stores"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/stores/1?main_category_ids[0]=1&name_en=fefe&name_ar=fewfewf&description_en=fewfew&description_ar=ewfewfew&address=ewfewfewf&latitude=15.18&longitude=11.544&status=approved&vendor_name=kemo1q&vendor_email=karim123@test.com&vendor_password=123456789&vendor_phone=01245954489",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"stores",
+										"1"
+									],
+									"query": [
+										{
+											"key": "main_category_ids[0]",
+											"value": "1"
+										},
+										{
+											"key": "name_en",
+											"value": "fefe"
+										},
+										{
+											"key": "name_ar",
+											"value": "fewfewf"
+										},
+										{
+											"key": "description_en",
+											"value": "fewfew"
+										},
+										{
+											"key": "description_ar",
+											"value": "ewfewfew"
+										},
+										{
+											"key": "address",
+											"value": "ewfewfewf"
+										},
+										{
+											"key": "latitude",
+											"value": "15.18"
+										},
+										{
+											"key": "longitude",
+											"value": "11.544"
+										},
+										{
+											"key": "status",
+											"value": "approved"
+										},
+										{
+											"key": "vendor_name",
+											"value": "kemo1q"
+										},
+										{
+											"key": "vendor_email",
+											"value": "karim123@test.com"
+										},
+										{
+											"key": "vendor_password",
+											"value": "123456789"
+										},
+										{
+											"key": "vendor_phone",
+											"value": "01245954489"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "branches",
+					"item": [
+						{
+							"name": "store branches",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/branches/store/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"branches",
+										"store",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/branches/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"branches",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "store",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "store_id",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "name_en",
+											"value": "Main Branch",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "الفرع الرئيسي",
+											"type": "text"
+										},
+										{
+											"key": "address",
+											"value": "123 King Fahd Road, Riyadh",
+											"type": "text"
+										},
+										{
+											"key": "latitude",
+											"value": "24.7136",
+											"type": "text"
+										},
+										{
+											"key": "longitude",
+											"value": "46.6753",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+966501234567",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "This is our main branch",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "هذا هو فرعنا الرئيسي",
+											"type": "text"
+										},
+										{
+											"key": "is_main",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "opening_time",
+											"value": " 08:30",
+											"type": "text"
+										},
+										{
+											"key": "closing_time",
+											"value": " 23:00",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/branches",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"branches"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/branches/1?name_en=Updated Branch Name&name_ar=اسم الفرع المحدث&address=456 Updated Street&latitude=24.7200&longitude=46.6800&phone=+966507654321&description_en=Updated description&description_ar=وصف محدث&is_main=0&is_active=1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"branches",
+										"1"
+									],
+									"query": [
+										{
+											"key": "name_en",
+											"value": "Updated Branch Name"
+										},
+										{
+											"key": "name_ar",
+											"value": "اسم الفرع المحدث"
+										},
+										{
+											"key": "address",
+											"value": "456 Updated Street"
+										},
+										{
+											"key": "latitude",
+											"value": "24.7200"
+										},
+										{
+											"key": "longitude",
+											"value": "46.6800"
+										},
+										{
+											"key": "phone",
+											"value": "+966507654321"
+										},
+										{
+											"key": "description_en",
+											"value": "Updated description"
+										},
+										{
+											"key": "description_ar",
+											"value": "وصف محدث"
+										},
+										{
+											"key": "is_main",
+											"value": "0"
+										},
+										{
+											"key": "is_active",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "toggle status",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/branches/1/toggle-status",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"branches",
+										"1",
+										"toggle-status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "set-main",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/branches/1/set-main",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"branches",
+										"1",
+										"set-main"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/branches/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"branches",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "store categories",
+					"item": [
+						{
+							"name": "store",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "store_id",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "name_en",
+											"value": "Main Dishes",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "الأطباق الرئيسية",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "All main course dishes",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "جميع الأطباق الرئيسية",
+											"type": "text"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "sort_order",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"type": "file",
+											"src": "/C:/Users/Karim Moahmed/Downloads/download.png"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}admin/categories",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"categories"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "store categories",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/categories/store/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"categories",
+										"store",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/categories/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{local}}admin/categories/1?store_id=1&name_en=Breakfast&name_ar=الإفطار&is_active=true&sort_order=1&description_en=All main course dishes&description_ar=جميع الأطباق الرئيسية&image",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"categories",
+										"1"
+									],
+									"query": [
+										{
+											"key": "store_id",
+											"value": "1"
+										},
+										{
+											"key": "name_en",
+											"value": "Breakfast"
+										},
+										{
+											"key": "name_ar",
+											"value": "الإفطار"
+										},
+										{
+											"key": "is_active",
+											"value": "true"
+										},
+										{
+											"key": "sort_order",
+											"value": "1"
+										},
+										{
+											"key": "description_en",
+											"value": "All main course dishes"
+										},
+										{
+											"key": "description_ar",
+											"value": "جميع الأطباق الرئيسية"
+										},
+										{
+											"key": "image",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "toggle-status",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{local}}admin/categories/1/toggle-status",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"categories",
+										"1",
+										"toggle-status"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{local}}admin/categories/1",
+									"host": [
+										"{{local}}admin"
+									],
+									"path": [
+										"categories",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "product system",
+					"item": [
+						{
+							"name": "1. Option Groups",
+							"item": [
+								{
+									"name": "Get All Option Groups",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/option-groups",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-groups"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Option Group",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name_en\": \"Size\",\n  \"name_ar\": \"الحجم\",\n  \"type\": \"size\",\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/option-groups",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-groups"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Option Group by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/option-groups/{{option_group_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Option Group",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name_en\": \"Size Updated\",\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/option-groups/{{option_group_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Option Group Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/option-groups/{{option_group_id}}/toggle-status",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Option Group",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/option-groups/{{option_group_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "2. Option Values",
+							"item": [
+								{
+									"name": "Get Option Values by Group",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/option-values/group/{{option_group_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-values",
+												"group",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Option Value - Small",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"option_group_id\": {{option_group_id}},\n  \"value_en\": \"Small\",\n  \"value_ar\": \"صغير\",\n  \"sort_order\": 1,\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/option-values",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Option Value - Medium",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"option_group_id\": {{option_group_id}},\n  \"value_en\": \"Medium\",\n  \"value_ar\": \"متوسط\",\n  \"sort_order\": 2,\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/option-values",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Option Value",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"value_en\": \"Large\",\n  \"value_ar\": \"كبير\"\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/option-values/{{option_value_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"option-values",
+												"{{option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "3. Products",
+							"item": [
+								{
+									"name": "Get All Products",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/products?store_id={{store_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products"
+											],
+											"query": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Product",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"store_id\": {{store_id}},\n  \"category_id\": {{category_id}},\n  \"name_en\": \"Margherita Pizza\",\n  \"name_ar\": \"بيتزا مارغريتا\",\n  \"description_en\": \"Classic Italian pizza\",\n  \"description_ar\": \"بيتزا إيطالية كلاسيكية\",\n  \"base_price\": 100.00,\n  \"is_active\": 1\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/products",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Product by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/products/{{product_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Product",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"name_en\": \"Updated Pizza\",\n  \"base_price\": 120.00\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/products/{{product_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Product Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/products/{{product_id}}/toggle-status",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Duplicate Product",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/products/{{product_id}}/duplicate",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"duplicate"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Product",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/products/{{product_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "4. Product Options",
+							"item": [
+								{
+									"name": "Get Product Options",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/product-options/product/{{product_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-options",
+												"product",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Option Group to Product",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"product_id\": {{product_id}},\n  \"option_group_id\": {{option_group_id}},\n  \"is_required\": true,\n  \"sort_order\": 1\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/product-options/assign-group",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-options",
+												"assign-group"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Option Values with Pricing",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"product_option_id\": {{product_option_id}},\n  \"option_values\": [\n    {\n      \"option_value_id\": 1,\n      \"price_type\": \"additional\",\n      \"price_value\": 0.00,\n      \"stock_quantity\": 100,\n      \"is_available\": true\n    },\n    {\n      \"option_value_id\": 2,\n      \"price_type\": \"additional\",\n      \"price_value\": 30.00,\n      \"stock_quantity\": 80,\n      \"is_available\": true\n    },\n    {\n      \"option_value_id\": 3,\n      \"price_type\": \"additional\",\n      \"price_value\": 50.00,\n      \"stock_quantity\": 60,\n      \"is_available\": true\n    }\n  ]\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/product-options/assign-values",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-options",
+												"assign-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Option Value Pricing",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"price_type\": \"additional\",\n  \"price_value\": 35.00,\n  \"stock_quantity\": 75\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/product-options/values/{{product_option_value_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Stock",
+									"request": {
+										"method": "PATCH",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"stock_quantity\": 150\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/product-options/values/{{product_option_value_id}}/stock",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}",
+												"stock"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Option Group from Product",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/product-options/{{product_option_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-options",
+												"{{product_option_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "5. Addons",
+							"item": [
+								{
+									"name": "Get All Addons",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/addons?store_id={{store_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"addons"
+											],
+											"query": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Addon - Extra Cheese",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"store_id\": {{store_id}},\n  \"name_en\": \"Extra Cheese\",\n  \"name_ar\": \"جبن إضافي\",\n  \"description_en\": \"Add extra cheese\",\n  \"description_ar\": \"أضف جبن إضافي\",\n  \"price\": 15.00,\n  \"addon_category\": \"extras\",\n  \"is_active\": true\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/addons",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"addons"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Addon",
+									"request": {
+										"method": "PUT",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"price\": 20.00\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/addons/{{addon_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Addon",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/addons/{{addon_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "6. Product Addons",
+							"item": [
+								{
+									"name": "Get Product Addons",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/product-addons/product/{{product_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Addons to Product",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n  \"product_id\": {{product_id}},\n  \"addon_ids\": [1, 2, 3]\n}"
+										},
+										"url": {
+											"raw": "{{local}}admin/product-addons/assign",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-addons",
+												"assign"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Addon from Product",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{local}}admin/product-addons/product/{{product_id}}/addon/{{addon_id}}",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}",
+												"addon",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "new product system",
+					"item": [
+						{
+							"name": "2. Option Groups",
+							"item": [
+								{
+									"name": "Get All",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Size",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===201){pm.environment.set('option_group_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name_en",
+													"value": "Size"
+												},
+												{
+													"key": "name_ar",
+													"value": "الحجم"
+												},
+												{
+													"key": "type",
+													"value": "size"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-groups",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Crust",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name_en",
+													"value": "Crust"
+												},
+												{
+													"key": "name_ar",
+													"value": "العجينة"
+												},
+												{
+													"key": "type",
+													"value": "crust"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-groups",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name_en",
+													"value": "Size Updated"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}/toggle-status",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Types",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/types",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"types"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "3. Option Values",
+							"item": [
+								{
+									"name": "Get by Group",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-values/group/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"group",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-values/{{option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"{{option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Small",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===201){pm.environment.set('option_value_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "option_group_id",
+													"value": "{{option_group_id}}"
+												},
+												{
+													"key": "value_en",
+													"value": "Small"
+												},
+												{
+													"key": "value_ar",
+													"value": "صغير"
+												},
+												{
+													"key": "sort_order",
+													"value": "1"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Medium",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "option_group_id",
+													"value": "{{option_group_id}}"
+												},
+												{
+													"key": "value_en",
+													"value": "Medium"
+												},
+												{
+													"key": "value_ar",
+													"value": "متوسط"
+												},
+												{
+													"key": "sort_order",
+													"value": "2"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Large",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "option_group_id",
+													"value": "{{option_group_id}}"
+												},
+												{
+													"key": "value_en",
+													"value": "Large"
+												},
+												{
+													"key": "value_ar",
+													"value": "كبير"
+												},
+												{
+													"key": "sort_order",
+													"value": "3"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "value_en",
+													"value": "Extra Large"
+												},
+												{
+													"key": "sort_order",
+													"value": "4"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values/{{option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"{{option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"values\":[{\"id\":1,\"sort_order\":0},{\"id\":2,\"sort_order\":1}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values/reorder",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-values/{{option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"{{option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "4. Addons",
+							"item": [
+								{
+									"name": "Get All",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons?store_id={{store_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons"
+											],
+											"query": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Extra Cheese",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===201){pm.environment.set('addon_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												},
+												{
+													"key": "name_en",
+													"value": "Extra Cheese"
+												},
+												{
+													"key": "name_ar",
+													"value": "جبن إضافي"
+												},
+												{
+													"key": "description_en",
+													"value": "Add extra cheese"
+												},
+												{
+													"key": "price",
+													"value": "15.00"
+												},
+												{
+													"key": "addon_category",
+													"value": "extras"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/addons",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Soft Drink",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												},
+												{
+													"key": "name_en",
+													"value": "Soft Drink"
+												},
+												{
+													"key": "name_ar",
+													"value": "مشروب غازي"
+												},
+												{
+													"key": "price",
+													"value": "10.00"
+												},
+												{
+													"key": "addon_category",
+													"value": "drinks"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/addons",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name_en",
+													"value": "Double Cheese"
+												},
+												{
+													"key": "price",
+													"value": "20.00"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}/toggle-status",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Categories",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/categories/{{store_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"categories",
+												"{{store_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "5. Products",
+							"item": [
+								{
+									"name": "Get All",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products?store_id={{store_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products"
+											],
+											"query": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Complete (Options + Values + Addons + Images)",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===201){pm.environment.set('product_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												},
+												{
+													"key": "category_id",
+													"value": "1"
+												},
+												{
+													"key": "name_en",
+													"value": "Supreme Pizza"
+												},
+												{
+													"key": "name_ar",
+													"value": "بيتزا سوبريم"
+												},
+												{
+													"key": "description_en",
+													"value": "Pizza with everything"
+												},
+												{
+													"key": "base_price",
+													"value": "120"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][option_group_id]",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][is_required]",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][option_values][0][option_value_id]",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][option_values][0][price_type]",
+													"value": "additional"
+												},
+												{
+													"key": "option_groups[0][option_values][0][price_value]",
+													"value": "0"
+												},
+												{
+													"key": "option_groups[0][option_values][0][stock_quantity]",
+													"value": "100"
+												},
+												{
+													"key": "option_groups[0][option_values][0][is_available]",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][option_values][1][option_value_id]",
+													"value": "2"
+												},
+												{
+													"key": "option_groups[0][option_values][1][price_type]",
+													"value": "additional"
+												},
+												{
+													"key": "option_groups[0][option_values][1][price_value]",
+													"value": "30"
+												},
+												{
+													"key": "option_groups[0][option_values][1][stock_quantity]",
+													"value": "80"
+												},
+												{
+													"key": "option_groups[0][option_values][2][option_value_id]",
+													"value": "3"
+												},
+												{
+													"key": "option_groups[0][option_values][2][price_type]",
+													"value": "additional"
+												},
+												{
+													"key": "option_groups[0][option_values][2][price_value]",
+													"value": "50"
+												},
+												{
+													"key": "option_groups[0][option_values][2][stock_quantity]",
+													"value": "60"
+												},
+												{
+													"key": "option_groups[1][option_group_id]",
+													"value": "2"
+												},
+												{
+													"key": "option_groups[1][is_required]",
+													"value": "0"
+												},
+												{
+													"key": "option_groups[1][option_values][0][option_value_id]",
+													"value": "4"
+												},
+												{
+													"key": "option_groups[1][option_values][0][price_type]",
+													"value": "additional"
+												},
+												{
+													"key": "option_groups[1][option_values][0][price_value]",
+													"value": "0"
+												},
+												{
+													"key": "option_groups[1][option_values][0][stock_quantity]",
+													"value": "100"
+												},
+												{
+													"key": "option_groups[1][option_values][1][option_value_id]",
+													"value": "5"
+												},
+												{
+													"key": "option_groups[1][option_values][1][price_type]",
+													"value": "additional"
+												},
+												{
+													"key": "option_groups[1][option_values][1][price_value]",
+													"value": "15"
+												},
+												{
+													"key": "option_groups[1][option_values][1][stock_quantity]",
+													"value": "100"
+												},
+												{
+													"key": "addon_ids",
+													"value": "[1]"
+												},
+												{
+													"key": "addon_ids[1]",
+													"value": "2",
+													"disabled": true
+												},
+												{
+													"key": "addon_ids[]",
+													"value": "3",
+													"disabled": true
+												},
+												{
+													"key": "images[]",
+													"type": "file",
+													"src": "postman-cloud:///1efd280f-eacd-4080-8ac6-ddcf3677e4fd"
+												},
+												{
+													"key": "images[]",
+													"type": "file",
+													"src": "postman-cloud:///1eff35fa-d472-4ba0-8a82-6ee221b27a9a"
+												},
+												{
+													"key": "primary_image_index",
+													"value": "0",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{local}}admin/products",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Simple with Addons",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "store_id",
+													"value": "{{store_id}}"
+												},
+												{
+													"key": "category_id",
+													"value": "1"
+												},
+												{
+													"key": "name_en",
+													"value": "Classic Burger"
+												},
+												{
+													"key": "name_ar",
+													"value": "برجر كلاسيك"
+												},
+												{
+													"key": "base_price",
+													"value": "75"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												},
+												{
+													"key": "addon_ids[]",
+													"value": "1"
+												},
+												{
+													"key": "addon_ids[]",
+													"value": "2"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/products",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Product",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "base_price",
+													"value": "150"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												},
+												{
+													"key": "addon_ids[]",
+													"value": "1"
+												},
+												{
+													"key": "addon_ids[]",
+													"value": "2"
+												},
+												{
+													"key": "addon_ids[]",
+													"value": "3"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}/toggle-status",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Duplicate",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}/duplicate",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"duplicate"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upload Images",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "images[]",
+													"type": "file",
+													"src": []
+												},
+												{
+													"key": "images[]",
+													"type": "file",
+													"src": []
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}/images",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"images"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Set Primary Image",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/images/{{image_id}}/set-primary",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"images",
+												"{{image_id}}",
+												"set-primary"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Images",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"images\":[{\"id\":1,\"sort_order\":0},{\"id\":2,\"sort_order\":1}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/products/images/reorder",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"images",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Image",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/images/{{image_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"images",
+												"{{image_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "products reorder",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "products[0][id]",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "products[0][sort_order]",
+													"value": "0",
+													"type": "text"
+												},
+												{
+													"key": "products[1][id]",
+													"value": "2",
+													"type": "text"
+												},
+												{
+													"key": "products[1][sort_order]",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "products[2][id]",
+													"value": "3",
+													"type": "text"
+												},
+												{
+													"key": "products[2][sort_order]",
+													"value": "2",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{local}}admin/products/reorder",
+											"host": [
+												"{{local}}admin"
+											],
+											"path": [
+												"products",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "6. Product Options (Old Method)",
+							"item": [
+								{
+									"name": "Get Product Options",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-options/product/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"product",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Option Group",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===200){pm.environment.set('product_option_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "product_id",
+													"value": "{{product_id}}"
+												},
+												{
+													"key": "option_group_id",
+													"value": "{{option_group_id}}"
+												},
+												{
+													"key": "is_required",
+													"value": "1"
+												},
+												{
+													"key": "sort_order",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/assign-group",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"assign-group"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Product Option",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "is_required",
+													"value": "0"
+												},
+												{
+													"key": "sort_order",
+													"value": "2"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/{{product_option_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"{{product_option_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Product Option",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-options/{{product_option_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"{{product_option_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Option Values",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===200&&pm.response.json().data.length>0){pm.environment.set('product_option_value_id',pm.response.json().data[0].id);}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"product_option_id\":{{product_option_id}},\"option_values\":[{\"option_value_id\":1,\"price_type\":\"additional\",\"price_value\":0,\"stock_quantity\":100,\"is_available\":true},{\"option_value_id\":2,\"price_type\":\"additional\",\"price_value\":30,\"stock_quantity\":80}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/assign-values",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"assign-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Value Pricing",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "price_type",
+													"value": "additional"
+												},
+												{
+													"key": "price_value",
+													"value": "35"
+												},
+												{
+													"key": "stock_quantity",
+													"value": "120"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Stock",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "stock_quantity",
+													"value": "150"
+												},
+												{
+													"key": "is_available",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}/stock",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}",
+												"stock"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Value",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Options",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"options\":[{\"id\":1,\"sort_order\":0},{\"id\":2,\"sort_order\":1}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/reorder",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "7. Product Addons",
+							"item": [
+								{
+									"name": "Get Product Addons",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-addons/product/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Addons",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"product_id\":{{product_id}},\"addon_ids\":[1,2,3]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/product-addons/assign",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"assign"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Product Addon",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "sort_order",
+													"value": "2"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-addons/product/{{product_id}}/addon/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}",
+												"addon",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Addon",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-addons/product/{{product_id}}/addon/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}",
+												"addon",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Addons",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"product_id\":{{product_id}},\"addons\":[{\"addon_id\":1,\"sort_order\":0},{\"addon_id\":2,\"sort_order\":1}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/product-addons/reorder",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "deliveries",
+			"item": [
+				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"description": "ar or en",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": "karim",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "karim@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "12345678",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}deliveries/register",
+									"host": [
+										"{{local}}deliveries"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "karim@gmail.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "12345678",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}deliveries/login",
+									"host": [
+										"{{local}}deliveries"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "logout",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}deliveries/logout",
+									"host": [
+										"{{local}}deliveries"
+									],
+									"path": [
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "vendor",
+			"item": [
+				{
+					"name": "auth",
+					"item": [
+						{
+							"name": "register",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name",
+											"value": " karim",
+											"type": "text"
+										},
+										{
+											"key": "email",
+											"value": "karim1@test.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": " 123456789",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": " +20120704865",
+											"type": "text"
+										},
+										{
+											"key": "main_category_ids[0]",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "name_en",
+											"value": " Test Store",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": " متجر تجريبي",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": " Test description",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": " وصف تجريبي",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][name_en]",
+											"value": " Main Branch",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][name_ar]",
+											"value": " الفرع الرئيسي",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][address]",
+											"value": " 123 Main Street",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][latitude]",
+											"value": " 15.2585",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][longitude]",
+											"value": " 12.1515",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][phone]",
+											"value": " +966501234567",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][description_en]",
+											"value": " Main branch description",
+											"type": "text"
+										},
+										{
+											"key": "branches[0][description_ar]",
+											"value": " وصف الفرع الرئيسي",
+											"type": "text"
+										},
+										{
+											"key": "logo",
+											"type": "file",
+											"src": "postman-cloud:///1eff35fa-d472-4ba0-8a82-6ee221b27a9a"
+										},
+										{
+											"key": "document",
+											"type": "file",
+											"src": "/C:/Users/Karim Moahmed/Downloads/screencapture-dvadsmanager-en-tutorials-2025-07-15-17_55_43.pdf"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}vendor/register",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "login",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "email",
+											"value": "karim@test.com",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456789",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}vendor/login",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "profile",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{local}}vendor/profile",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"profile"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update profile",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}vendor/profile?name=kemo",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"profile"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "kemo"
+										},
+										{
+											"key": "email",
+											"value": "karim12@test.com",
+											"disabled": true
+										},
+										{
+											"key": "phone",
+											"value": "0151484894",
+											"disabled": true
+										},
+										{
+											"key": "password",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "current_password",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "send otp",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "phone",
+											"value": "+201207048631",
+											"type": "text"
+										},
+										{
+											"key": "type",
+											"value": "vendor_registration",
+											"description": "vendor_registration,password_reset",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}vendor/otp/send?",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"otp",
+										"send"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "logout",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}vendor/logout",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"logout"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "store",
+					"item": [
+						{
+							"name": "show",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{local}}vendor/store",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"store"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{local}}vendor/store?main_category_ids&name_en&name_ar&description_en&description_ar&store_address&latitude&longitude&logo&document",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"store"
+									],
+									"query": [
+										{
+											"key": "main_category_ids",
+											"value": null
+										},
+										{
+											"key": "name_en",
+											"value": null
+										},
+										{
+											"key": "name_ar",
+											"value": null
+										},
+										{
+											"key": "description_en",
+											"value": null
+										},
+										{
+											"key": "description_ar",
+											"value": null
+										},
+										{
+											"key": "store_address",
+											"value": null
+										},
+										{
+											"key": "latitude",
+											"value": null
+										},
+										{
+											"key": "longitude",
+											"value": null
+										},
+										{
+											"key": "logo",
+											"value": null
+										},
+										{
+											"key": "document",
+											"value": null
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "main catgories",
+					"item": [
+						{
+							"name": "get",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{local_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept-Language",
+										"value": "ar",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{live}}vendor/main-categories",
+									"host": [
+										"{{live}}vendor"
+									],
+									"path": [
+										"main-categories"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Branch Management",
+					"item": [
+						{
+							"name": "Get All Branches",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/branches",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"branches"
+									],
+									"query": [
+										{
+											"key": "is_active",
+											"value": "1",
+											"description": "Filter by active status (0 or 1)",
+											"disabled": true
+										},
+										{
+											"key": "is_main",
+											"value": "1",
+											"description": "Filter by main branch (0 or 1)",
+											"disabled": true
+										},
+										{
+											"key": "search",
+											"value": "downtown",
+											"description": "Search by name or address",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Get all branches for the authenticated vendor's store with optional filters"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Main Branch",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/branches/main",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"branches",
+										"main"
+									]
+								},
+								"description": "Get the main branch for the vendor's store"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Branch by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/branches/{{branch_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"branches",
+										"{{branch_id}}"
+									]
+								},
+								"description": "Get details of a specific branch by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Branch",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    var jsonData = pm.response.json();",
+											"    if (jsonData.data && jsonData.data.id) {",
+											"        pm.collectionVariables.set('branch_id', jsonData.data.id);",
+											"        console.log('Branch ID saved:', jsonData.data.id);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name_en",
+											"value": "Downtown Branch",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "فرع وسط المدينة",
+											"type": "text"
+										},
+										{
+											"key": "address",
+											"value": "123 Main Street, Downtown",
+											"type": "text"
+										},
+										{
+											"key": "latitude",
+											"value": "24.7136",
+											"type": "text"
+										},
+										{
+											"key": "longitude",
+											"value": "46.6753",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+966501234567",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "Our main downtown location with full services",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "موقعنا الرئيسي في وسط المدينة مع جميع الخدمات",
+											"type": "text"
+										},
+										{
+											"key": "is_main",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "opening_time",
+											"value": " 08:30",
+											"type": "text"
+										},
+										{
+											"key": "closing_time",
+											"value": " 23:00",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}vendor/branches",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"branches"
+									]
+								},
+								"description": "Create a new branch for the vendor's store"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Branch",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name_en",
+											"value": "Updated Downtown Branch",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "فرع وسط المدينة المحدث",
+											"type": "text"
+										},
+										{
+											"key": "address",
+											"value": "123 Main Street, Suite 200, Downtown",
+											"type": "text"
+										},
+										{
+											"key": "latitude",
+											"value": "24.7140",
+											"type": "text"
+										},
+										{
+											"key": "longitude",
+											"value": "46.6755",
+											"type": "text"
+										},
+										{
+											"key": "phone",
+											"value": "+966501234568",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "Updated description for downtown location",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "وصف محدث لموقع وسط المدينة",
+											"type": "text"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/vendor/branches/{{branch_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"branches",
+										"{{branch_id}}"
+									]
+								},
+								"description": "Update an existing branch (all fields are optional)"
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Branch Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/branches/{{branch_id}}/toggle-status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"branches",
+										"{{branch_id}}",
+										"toggle-status"
+									]
+								},
+								"description": "Toggle branch active status (active <-> inactive)"
+							},
+							"response": []
+						},
+						{
+							"name": "Set as Main Branch",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/branches/{{branch_id}}/set-main",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"branches",
+										"{{branch_id}}",
+										"set-main"
+									]
+								},
+								"description": "Set this branch as the main branch for the store"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Branch",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/branches/{{branch_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"branches",
+										"{{branch_id}}"
+									]
+								},
+								"description": "Delete a branch (cannot delete the last branch or main branch without reassignment)"
+							},
+							"response": []
+						}
+					],
+					"description": "Branch CRUD operations for vendors"
+				},
+				{
+					"name": "Category Management",
+					"item": [
+						{
+							"name": "Get All Categories",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{local}}vendor/categories",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"categories"
+									],
+									"query": [
+										{
+											"key": "is_active",
+											"value": "1",
+											"description": "Filter by active status (0 or 1)",
+											"disabled": true
+										},
+										{
+											"key": "search",
+											"value": "pizza",
+											"description": "Search by name (English/Arabic)",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Get all categories for the authenticated vendor's store with optional filters"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Category by ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/categories/{{category_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"categories",
+										"{{category_id}}"
+									]
+								},
+								"description": "Get details of a specific category by ID"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Category",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 201) {",
+											"    var jsonData = pm.response.json();",
+											"    if (jsonData.data && jsonData.data.id) {",
+											"        pm.collectionVariables.set('category_id', jsonData.data.id);",
+											"        console.log('Category ID saved:', jsonData.data.id);",
+											"    }",
+											"}"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name_en",
+											"value": "Pizza",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "بيتزا",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "Delicious pizzas with various toppings",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "بيتزا لذيذة مع مجموعة متنوعة من الإضافات",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"type": "file",
+											"src": "postman-cloud:///1eff35fa-d472-4ba0-8a82-6ee221b27a9a"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "sort_order",
+											"value": "0",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}vendor/categories",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"categories"
+									]
+								},
+								"description": "Create a new category for the vendor's store"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Category with Image",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name_en",
+											"value": "Burgers",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "برجر",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "Juicy burgers made fresh daily",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "برجر طازج يتم تحضيره يوميًا",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"description": "Select an image file (JPEG, PNG, WEBP, max 2MB)",
+											"type": "file",
+											"src": []
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "sort_order",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/vendor/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"categories"
+									]
+								},
+								"description": "Create a new category with image upload"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name_en",
+											"value": "Gourmet Pizza",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "بيتزا فاخرة",
+											"type": "text"
+										},
+										{
+											"key": "description_en",
+											"value": "Premium pizzas with gourmet ingredients",
+											"type": "text"
+										},
+										{
+											"key": "description_ar",
+											"value": "بيتزا فاخرة مع مكونات راقية",
+											"type": "text"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										},
+										{
+											"key": "sort_order",
+											"value": "0",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{live}}/vendor/categories/{{category_id}}",
+									"host": [
+										"{{live}}"
+									],
+									"path": [
+										"vendor",
+										"categories",
+										"{{category_id}}"
+									]
+								},
+								"description": "Update an existing category (all fields are optional)"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Category with Image",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "name_en",
+											"value": "Updated Category",
+											"type": "text"
+										},
+										{
+											"key": "name_ar",
+											"value": "فئة محدثة",
+											"type": "text"
+										},
+										{
+											"key": "image",
+											"description": "Upload new image (replaces old one)",
+											"type": "file",
+											"src": "/C:/Users/Karim Moahmed/Downloads/download.png"
+										},
+										{
+											"key": "is_active",
+											"value": "1",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{local}}vendor/categories/{{category_id}}?name_en=Updated Category&name_ar=فئة محدثة&is_active=1",
+									"host": [
+										"{{local}}vendor"
+									],
+									"path": [
+										"categories",
+										"{{category_id}}"
+									],
+									"query": [
+										{
+											"key": "name_en",
+											"value": "Updated Category"
+										},
+										{
+											"key": "name_ar",
+											"value": "فئة محدثة"
+										},
+										{
+											"key": "is_active",
+											"value": "1"
+										}
+									]
+								},
+								"description": "Update category and replace image"
+							},
+							"response": []
+						},
+						{
+							"name": "Toggle Category Status",
+							"request": {
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/categories/{{category_id}}/toggle-status",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"categories",
+										"{{category_id}}",
+										"toggle-status"
+									]
+								},
+								"description": "Toggle category active status (active <-> inactive)"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Sort Order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "categories[0][id]",
+											"value": "1",
+											"description": "Category ID",
+											"type": "text"
+										},
+										{
+											"key": "categories[0][sort_order]",
+											"value": "0",
+											"description": "Sort order",
+											"type": "text"
+										},
+										{
+											"key": "categories[1][id]",
+											"value": "2",
+											"description": "Category ID",
+											"type": "text"
+										},
+										{
+											"key": "categories[1][sort_order]",
+											"value": "1",
+											"description": "Sort order",
+											"type": "text"
+										},
+										{
+											"key": "categories[2][id]",
+											"value": "3",
+											"description": "Category ID",
+											"type": "text"
+										},
+										{
+											"key": "categories[2][sort_order]",
+											"value": "2",
+											"description": "Sort order",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{base_url}}/vendor/categories/update-sort-order",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"categories",
+										"update-sort-order"
+									]
+								},
+								"description": "Update sort order for multiple categories at once"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Category",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/vendor/categories/{{category_id}}",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"vendor",
+										"categories",
+										"{{category_id}}"
+									]
+								},
+								"description": "Delete a category and its associated image"
+							},
+							"response": []
+						}
+					],
+					"description": "Category CRUD operations for vendors"
+				},
+				{
+					"name": "product system",
+					"item": [
+						{
+							"name": "2. Products (11)",
+							"item": [
+								{
+									"name": "Get All",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create Complete Product",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===201){pm.environment.set('product_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										},
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													""
+												],
+												"type": "text/javascript",
+												"packages": {},
+												"requests": {}
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "category_id",
+													"value": "1"
+												},
+												{
+													"key": "name_en",
+													"value": "Supreme Pizza"
+												},
+												{
+													"key": "name_ar",
+													"value": "بيتزا سوبريم"
+												},
+												{
+													"key": "base_price",
+													"value": "120"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][option_group_id]",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][is_required]",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][option_values][0][option_value_id]",
+													"value": "1"
+												},
+												{
+													"key": "option_groups[0][option_values][0][price_type]",
+													"value": "additional",
+													"disabled": true
+												},
+												{
+													"key": "option_groups[0][option_values][0][price_value]",
+													"value": "0"
+												},
+												{
+													"key": "option_groups[0][option_values][0][stock_quantity]",
+													"value": "100"
+												},
+												{
+													"key": "addon_ids[]",
+													"value": "1"
+												},
+												{
+													"key": "images[]",
+													"type": "file",
+													"src": "/C:/Users/Karim Moahmed/Downloads/download (1).png"
+												},
+												{
+													"key": "images[]",
+													"type": "file",
+													"src": "/C:/Users/Karim Moahmed/Downloads/download.png"
+												},
+												{
+													"key": "primary_image_index",
+													"value": "0",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/products",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "base_price",
+													"value": "150"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}/toggle-status",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Duplicate",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}/duplicate",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"duplicate"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Upload Images",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "images[]",
+													"type": "file",
+													"src": []
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/products/{{product_id}}/images",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"{{product_id}}",
+												"images"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Set Primary Image",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/images/{{image_id}}/set-primary",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"images",
+												"{{image_id}}",
+												"set-primary"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Images",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"images\":[{\"id\":1,\"sort_order\":0}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/products/images/reorder",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"images",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Image",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/products/images/{{image_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"products",
+												"images",
+												"{{image_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "products reorder",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "products[0][id]",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "products[0][sort_order]",
+													"value": "0",
+													"type": "text"
+												},
+												{
+													"key": "products[1][id]",
+													"value": "2",
+													"type": "text"
+												},
+												{
+													"key": "products[1][sort_order]",
+													"value": "1",
+													"type": "text"
+												},
+												{
+													"key": "products[2][id]",
+													"value": "3",
+													"type": "text"
+												},
+												{
+													"key": "products[2][sort_order]",
+													"value": "2",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{live}}vendor/products/reorder",
+											"host": [
+												"{{live}}vendor"
+											],
+											"path": [
+												"products",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "3. Option Groups (7)",
+							"item": [
+								{
+									"name": "Get All",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Types",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/types",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"types"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Size",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===201){pm.environment.set('option_group_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name_en",
+													"value": "Size"
+												},
+												{
+													"key": "name_ar",
+													"value": "الحجم"
+												},
+												{
+													"key": "type",
+													"value": "size"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-groups",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "name_en",
+													"value": "Size Updated"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}/toggle-status",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-groups/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-groups",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "4. Option Values (6)",
+							"item": [
+								{
+									"name": "Get by Group",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-values/group/{{option_group_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"group",
+												"{{option_group_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-values/{{option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"{{option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create - Small",
+									"event": [
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"if(pm.response.code===201){pm.environment.set('option_value_id',pm.response.json().data.id);}"
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "option_group_id",
+													"value": "{{option_group_id}}"
+												},
+												{
+													"key": "value_en",
+													"value": "Small"
+												},
+												{
+													"key": "value_ar",
+													"value": "صغير"
+												},
+												{
+													"key": "is_active",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "value_en",
+													"value": "Large"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values/{{option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"{{option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"values\":[{\"id\":1,\"sort_order\":0}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/option-values/reorder",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/option-values/{{option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"option-values",
+												"{{option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "5. Addons (7) - store_id AUTO-SET",
+							"item": [
+								{
+									"name": "Get All",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get by ID",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Categories",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/categories",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"categories"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "price",
+													"value": "20.00"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Toggle Status",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}/toggle-status",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}",
+												"toggle-status"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/addons/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"addons",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "6. Product Options (8)",
+							"item": [
+								{
+									"name": "Get Product Options",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-options/product/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"product",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Group",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "product_id",
+													"value": "{{product_id}}"
+												},
+												{
+													"key": "option_group_id",
+													"value": "{{option_group_id}}"
+												},
+												{
+													"key": "is_required",
+													"value": "1"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/assign-group",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"assign-group"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Group",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "is_required",
+													"value": "0"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/{{product_option_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"{{product_option_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Group",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-options/{{product_option_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"{{product_option_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Values",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"product_option_id\":1,\"option_values\":[{\"option_value_id\":1,\"price_type\":\"additional\",\"price_value\":0,\"stock_quantity\":100}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/assign-values",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"assign-values"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Value",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "price_value",
+													"value": "30"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Stock",
+									"request": {
+										"method": "PATCH",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "stock_quantity",
+													"value": "150"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}/stock",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}",
+												"stock"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Value",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-options/values/{{product_option_value_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-options",
+												"values",
+												"{{product_option_value_id}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "7. Product Addons (5)",
+							"item": [
+								{
+									"name": "Get Product Addons",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-addons/product/{{product_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Assign Addons",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"product_id\":1,\"addon_ids\":[1,2,3]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/product-addons/assign",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"assign"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Addon",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "formdata",
+											"formdata": [
+												{
+													"key": "sort_order",
+													"value": "2"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{base_url}}/product-addons/product/{{product_id}}/addon/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}",
+												"addon",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Remove Addon",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{base_url}}/product-addons/product/{{product_id}}/addon/{{addon_id}}",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"product",
+												"{{product_id}}",
+												"addon",
+												"{{addon_id}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Reorder Addons",
+									"request": {
+										"method": "POST",
+										"header": [
+											{
+												"key": "Content-Type",
+												"value": "application/json"
+											}
+										],
+										"body": {
+											"mode": "raw",
+											"raw": "{\"product_id\":1,\"addons\":[{\"addon_id\":1,\"sort_order\":0}]}"
+										},
+										"url": {
+											"raw": "{{base_url}}/product-addons/reorder",
+											"host": [
+												"{{base_url}}"
+											],
+											"path": [
+												"product-addons",
+												"reorder"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{local_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "local",
+			"value": ""
+		},
+		{
+			"key": "local_token",
+			"value": ""
+		},
+		{
+			"key": "live",
+			"value": ""
+		},
+		{
+			"key": "live_token",
+			"value": ""
+		},
+		{
+			"key": "category_id",
+			"value": ""
+		}
+	]
+}
