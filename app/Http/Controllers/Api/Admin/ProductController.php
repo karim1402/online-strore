@@ -27,6 +27,7 @@ class ProductController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        
         try {
             $query = Product::with(['store:id,name_en,name_ar', 'category:id,name_en,name_ar', 'images']);
 
