@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\AuthController;
+use App\Http\Controllers\Api\User\AddressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +27,7 @@ Route::prefix('user')->group(function () {
 
     // Protected user routes
     Route::middleware('auth:api')->group(function () {
-        // Add more user-specific routes here
+        // Dashboard
         Route::get('dashboard', function () {
             $user = auth('api')->user();
             $message = \App\Services\LocalizationService::getMessage('guards.user_dashboard');
@@ -39,6 +40,17 @@ Route::prefix('user')->group(function () {
                 ]
             ]);
         })->name('user.dashboard');
+
+        // Address Management Routes
+        Route::controller(AddressController::class)->prefix('addresses')->group(function () {
+            Route::get('/', 'index')->name('user.addresses.index');
+            Route::get('/default', 'getDefault')->name('user.addresses.default');
+            Route::post('/', 'store')->name('user.addresses.store');
+            Route::get('/{id}', 'show')->name('user.addresses.show');
+            Route::put('/{id}', 'update')->name('user.addresses.update');
+            Route::delete('/{id}', 'destroy')->name('user.addresses.destroy');
+            Route::patch('/{id}/set-default', 'setDefault')->name('user.addresses.setDefault');
+        });
     });
     
     // Test route without authentication
