@@ -160,18 +160,18 @@ Route::prefix('vendor')->group(function () {
             ]);
         });
         
-        Route::get('products', function () {
-            $vendor = auth('vendors')->user();
-            $message = \App\Services\LocalizationService::getMessage('guards.vendor_dashboard');
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => [
-                    'info' => 'Vendor Products',
-                    'store_id' => $vendor->store?->id
-                ],
-                'guard' => 'vendors'
-            ]);
-        });
+        // Route::get('products', function () {
+        //     $vendor = auth('vendors')->user();
+        //     $message = \App\Services\LocalizationService::getMessage('guards.vendor_dashboard');
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => $message,
+        //         'data' => [
+        //             'info' => 'Vendor Products',
+        //             'store_id' => $vendor->store?->id
+        //         ],
+        //         'guard' => 'vendors'
+        //     ]);
+        // });
     });
 });
