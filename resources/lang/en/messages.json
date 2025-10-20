@@ -106,7 +106,11 @@
         "exists": "The selected :attribute is invalid",
         "decimal": "The :attribute must be a valid decimal number",
         "array": "The :attribute must be an array",
-        "min_array": "The :attribute must have at least :min items"
+        "min_array": "The :attribute must have at least :min items",
+        "validation_failed": "Validation failed. Please check your input",
+        "location_required": "Location is required. Please provide latitude and longitude, or login to use your default address",
+        "default_address_required": "No default address found. Please provide latitude and longitude, or set a default address",
+        "address_coordinates_required": "Your default address does not have coordinates. Please provide latitude and longitude or update your address"
     },
     "attributes": {
         "name": "name",

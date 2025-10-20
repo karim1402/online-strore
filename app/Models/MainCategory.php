@@ -53,6 +53,14 @@ class MainCategory extends Model
     protected $appends = ['image_url'];
 
     /**
+     * Get the stores that belong to this main category.
+     */
+    public function stores()
+    {
+        return $this->belongsToMany(Store::class, 'main_category_store');
+    }
+
+    /**
      * Get the name attribute based on the current locale.
      *
      * @return string|null
