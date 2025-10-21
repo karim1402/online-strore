@@ -206,14 +206,17 @@ Route::prefix('admin')->group(function () {
             });
             
             Route::middleware('permission:stores.update,admins')->group(function () {
+                // Static routes MUST come before dynamic routes
+                Route::post('/reorder', 'reorderProducts');
+                Route::post('/images/reorder', 'reorderImages');
+                
+                // Dynamic routes with parameters
                 Route::put('/{id}', 'update');
                 Route::post('/{id}', 'update'); // POST alternative for file uploads
                 Route::patch('/{id}/toggle-status', 'toggleStatus');
                 Route::post('/{id}/images', 'uploadImages');
                 Route::delete('/images/{id}', 'deleteImage');
                 Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
-                Route::post('/images/reorder', 'reorderImages');
-                Route::post('/reorder', 'reorderProducts');
             });
             
             Route::middleware('permission:stores.delete,admins')->group(function () {
