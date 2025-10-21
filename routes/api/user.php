@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\AuthController;
 use App\Http\Controllers\Api\User\AddressController;
+use App\Http\Controllers\Api\User\StoreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,11 @@ Route::prefix('user')->group(function () {
             Route::delete('/{id}', 'destroy')->name('user.addresses.destroy');
             Route::patch('/{id}/set-default', 'setDefault')->name('user.addresses.setDefault');
         });
+    });
+
+    // Store routes (public, works for both guests and authenticated users)
+    Route::controller(StoreController::class)->prefix('stores')->group(function () {
+        Route::get('/by-category/{mainCategoryId}', 'getStoresByMainCategory')->name('user.stores.byCategory');
     });
     
     // Test route without authentication

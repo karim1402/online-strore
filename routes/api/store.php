@@ -79,6 +79,12 @@ Route::prefix('vendor')->group(function () {
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
             Route::post('/', 'store');
+            
+            // Static routes MUST come before dynamic routes
+            Route::post('/reorder', 'reorderProducts');
+            Route::post('/images/reorder', 'reorderImages');
+            
+            // Dynamic routes with parameters
             Route::put('/{id}', 'update');
             Route::post('/{id}', 'update'); // POST alternative for file uploads
             Route::delete('/{id}', 'destroy');
@@ -87,8 +93,6 @@ Route::prefix('vendor')->group(function () {
             Route::post('/{id}/images', 'uploadImages');
             Route::delete('/images/{id}', 'deleteImage');
             Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
-            Route::post('/images/reorder', 'reorderImages');
-            Route::post('/reorder', 'reorderProducts');
         });
 
         // Option Group Management routes

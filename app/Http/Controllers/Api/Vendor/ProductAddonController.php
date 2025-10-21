@@ -23,6 +23,7 @@ class ProductAddonController extends Controller
     {
         try {
             $vendor = auth('vendors')->user();
+         
             $storeId = $vendor->store?->id;
 
             if (!$storeId) {
