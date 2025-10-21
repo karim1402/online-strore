@@ -41,6 +41,7 @@ Route::prefix('vendor')->group(function () {
         Route::post('refresh', 'refresh')->middleware('auth:vendors');
         Route::get('profile', 'profile')->middleware('auth:vendors');
         Route::put('profile', 'updateProfile')->middleware('auth:vendors');
+        Route::post('profile', 'updateProfile')->middleware('auth:vendors'); // POST alternative for file uploads
     });
 
     // Protected vendor routes
@@ -49,7 +50,7 @@ Route::prefix('vendor')->group(function () {
         Route::controller(StoreController::class)->prefix('store')->group(function () {
             Route::get('/', 'show');
             Route::put('/', 'update');
-            // Route::post('/', 'update'); // For form-data with _method=PUT
+            Route::post('/', 'update'); // POST alternative for file uploads
         });
 
         // Branch management routes
@@ -70,6 +71,7 @@ Route::prefix('vendor')->group(function () {
             Route::get('/{id}', 'show');
             Route::post('/', 'store');
             Route::put('/{id}', 'update');
+            Route::post('/{id}', 'update'); // POST alternative for file uploads
             Route::delete('/{id}', 'destroy');
             Route::patch('/{id}/toggle-status', 'toggleStatus');
             Route::post('/update-sort-order', 'updateSortOrder');
@@ -81,6 +83,7 @@ Route::prefix('vendor')->group(function () {
             Route::get('/{id}', 'show');
             Route::post('/', 'store');
             Route::put('/{id}', 'update');
+            Route::post('/{id}', 'update'); // POST alternative for file uploads
             Route::delete('/{id}', 'destroy');
             Route::patch('/{id}/toggle-status', 'toggleStatus');
             Route::post('/{id}/duplicate', 'duplicate');
@@ -163,18 +166,18 @@ Route::prefix('vendor')->group(function () {
             ]);
         });
         
-        Route::get('products', function () {
-            $vendor = auth('vendors')->user();
-            $message = \App\Services\LocalizationService::getMessage('guards.vendor_dashboard');
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => [
-                    'info' => 'Vendor Products',
-                    'store_id' => $vendor->store?->id
-                ],
-                'guard' => 'vendors'
-            ]);
-        });
+        // Route::get('products', function () {
+        //     $vendor = auth('vendors')->user();
+        //     $message = \App\Services\LocalizationService::getMessage('guards.vendor_dashboard');
+        //     return response()->json([
+        //         'success' => true,
+        //         'message' => $message,
+        //         'data' => [
+        //             'info' => 'Vendor Products',
+        //             'store_id' => $vendor->store?->id
+        //         ],
+        //         'guard' => 'vendors'
+        //     ]);
+        // });
     });
 });

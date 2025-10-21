@@ -105,6 +105,8 @@ class BranchController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
+                'opening_time' => 'nullable|date_format:H:i',
+                'closing_time' => 'nullable|date_format:H:i',
                 'is_main' => 'nullable|boolean',
                 'is_active' => 'nullable|boolean',
             ]);
@@ -136,6 +138,8 @@ class BranchController extends Controller
                 'phone' => $request->phone,
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
+                'opening_time' => $request->opening_time,
+                'closing_time' => $request->closing_time,
                 'is_main' => $request->boolean('is_main', !$hasMainBranch),
                 'is_active' => $request->boolean('is_active', true),
             ]);
@@ -177,6 +181,8 @@ class BranchController extends Controller
                 'phone' => 'nullable|string|max:20',
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
+                'opening_time' => 'nullable|date_format:H:i',
+                'closing_time' => 'nullable|date_format:H:i',
                 'is_main' => 'nullable|boolean',
                 'is_active' => 'nullable|boolean',
             ]);
@@ -211,6 +217,12 @@ class BranchController extends Controller
             }
             if ($request->filled('description_ar')) {
                 $branch->description_ar = $request->description_ar;
+            }
+            if ($request->filled('opening_time')) {
+                $branch->opening_time = $request->opening_time;
+            }
+            if ($request->filled('closing_time')) {
+                $branch->closing_time = $request->closing_time;
             }
             if ($request->has('is_active')) {
                 $branch->is_active = $request->boolean('is_active');

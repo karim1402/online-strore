@@ -1,0 +1,629 @@
+{
+	"info": {
+		"_postman_id": "user-address-collection-001",
+		"name": "User Address Management API",
+		"description": "Complete API collection for user address management endpoints. Includes create, read, update, delete operations for user addresses with support for villa, apartment, and office types.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "address_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Get All User Addresses",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses?search=&address_type=&is_default=",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "",
+							"description": "Search in address_name, building_name, street_name, or landmark"
+						},
+						{
+							"key": "address_type",
+							"value": "",
+							"description": "Filter by address type: villa, apartment, or office"
+						},
+						{
+							"key": "is_default",
+							"value": "",
+							"description": "Filter by default status: true or false"
+						}
+					]
+				},
+				"description": "Retrieve all addresses for the authenticated user. Supports filtering by address type, default status, and searching across multiple fields."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Single Address",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses/{{address_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses",
+						"{{address_id}}"
+					]
+				},
+				"description": "Get details of a specific address by ID. Only returns addresses belonging to the authenticated user."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Default Address",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses/default",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses",
+						"default"
+					]
+				},
+				"description": "Get the default address for the authenticated user."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Address - Apartment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_name",
+							"value": "My Home",
+							"type": "text"
+						},
+						{
+							"key": "address_type",
+							"value": "apartment",
+							"type": "text"
+						},
+						{
+							"key": "building_name",
+							"value": "Tower A",
+							"type": "text"
+						},
+						{
+							"key": "apartment_number",
+							"value": "405",
+							"type": "text"
+						},
+						{
+							"key": "floor_number",
+							"value": "4",
+							"type": "text"
+						},
+						{
+							"key": "street_name",
+							"value": "Tahrir Street",
+							"type": "text"
+						},
+						{
+							"key": "landmark",
+							"value": "Near Cairo Tower",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "+201234567890",
+							"type": "text"
+						},
+						{
+							"key": "latitude",
+							"value": "30.0444196",
+							"type": "text"
+						},
+						{
+							"key": "longitude",
+							"value": "31.2357116",
+							"type": "text"
+						},
+						{
+							"key": "is_default",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/user/addresses",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					]
+				},
+				"description": "Create a new apartment address. If this is the user's first address, it will automatically be set as default."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Address - Villa",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_name",
+							"value": "Family Villa",
+							"type": "text"
+						},
+						{
+							"key": "address_type",
+							"value": "villa",
+							"type": "text"
+						},
+						{
+							"key": "building_name",
+							"value": "Villa 45",
+							"type": "text"
+						},
+						{
+							"key": "floor_number",
+							"value": "Ground Floor",
+							"type": "text"
+						},
+						{
+							"key": "street_name",
+							"value": "Palm Hills",
+							"type": "text"
+						},
+						{
+							"key": "landmark",
+							"value": "Near clubhouse",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "+201234567890",
+							"type": "text"
+						},
+						{
+							"key": "latitude",
+							"value": "30.0120",
+							"type": "text"
+						},
+						{
+							"key": "longitude",
+							"value": "31.2080",
+							"type": "text"
+						},
+						{
+							"key": "is_default",
+							"value": "0",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/user/addresses",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					]
+				},
+				"description": "Create a new villa address. Note that apartment_number is optional for villas."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Address - Office",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_name",
+							"value": "Work Office",
+							"type": "text"
+						},
+						{
+							"key": "address_type",
+							"value": "office",
+							"type": "text"
+						},
+						{
+							"key": "building_name",
+							"value": "Smart Village B2",
+							"type": "text"
+						},
+						{
+							"key": "floor_number",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "street_name",
+							"value": "26th of July Corridor",
+							"type": "text"
+						},
+						{
+							"key": "landmark",
+							"value": "Next to Mall entrance",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "+201234567890",
+							"type": "text"
+						},
+						{
+							"key": "latitude",
+							"value": "30.0700",
+							"type": "text"
+						},
+						{
+							"key": "longitude",
+							"value": "31.0200",
+							"type": "text"
+						},
+						{
+							"key": "is_default",
+							"value": "0",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/user/addresses",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					]
+				},
+				"description": "Create a new office address with business location details."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Address",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_name",
+							"value": "Updated Home Address",
+							"type": "text"
+						},
+						{
+							"key": "building_name",
+							"value": "Tower B",
+							"type": "text"
+						},
+						{
+							"key": "apartment_number",
+							"value": "506",
+							"type": "text"
+						},
+						{
+							"key": "floor_number",
+							"value": "5",
+							"type": "text"
+						},
+						{
+							"key": "street_name",
+							"value": "Tahrir Street",
+							"type": "text"
+						},
+						{
+							"key": "landmark",
+							"value": "Near Cairo Tower",
+							"type": "text"
+						},
+						{
+							"key": "phone",
+							"value": "+201234567890",
+							"type": "text"
+						},
+						{
+							"key": "latitude",
+							"value": "30.0444196",
+							"type": "text"
+						},
+						{
+							"key": "longitude",
+							"value": "31.2357116",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/user/addresses/{{address_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses",
+						"{{address_id}}"
+					]
+				},
+				"description": "Update an existing address. All fields are optional (use 'sometimes' validation)."
+			},
+			"response": []
+		},
+		{
+			"name": "Set Address as Default",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses/{{address_id}}/set-default",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses",
+						"{{address_id}}",
+						"set-default"
+					]
+				},
+				"description": "Set a specific address as the default address. All other addresses will be automatically unmarked as default."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Address",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses/{{address_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses",
+						"{{address_id}}"
+					]
+				},
+				"description": "Delete an address. If the deleted address was the default, another active address will automatically be set as default."
+			},
+			"response": []
+		},
+		{
+			"name": "Search Addresses by Building",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses?search=Tower",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "Tower"
+						}
+					]
+				},
+				"description": "Search addresses containing 'Tower' in address_name, building_name, street_name, or landmark."
+			},
+			"response": []
+		},
+		{
+			"name": "Filter by Address Type - Apartment",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses?address_type=apartment",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					],
+					"query": [
+						{
+							"key": "address_type",
+							"value": "apartment"
+						}
+					]
+				},
+				"description": "Get only apartment addresses for the authenticated user."
+			},
+			"response": []
+		},
+		{
+			"name": "Filter by Address Type - Villa",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses?address_type=villa",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					],
+					"query": [
+						{
+							"key": "address_type",
+							"value": "villa"
+						}
+					]
+				},
+				"description": "Get only villa addresses for the authenticated user."
+			},
+			"response": []
+		},
+		{
+			"name": "Filter by Default Address",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/user/addresses?is_default=true",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"user",
+						"addresses"
+					],
+					"query": [
+						{
+							"key": "is_default",
+							"value": "true"
+						}
+					]
+				},
+				"description": "Get only default addresses (should return only one address)."
+			},
+			"response": []
+		}
+	]
+}

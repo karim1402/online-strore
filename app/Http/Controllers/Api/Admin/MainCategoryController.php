@@ -138,7 +138,7 @@ class MainCategoryController extends Controller
             $data = $validator->validated();
 
             // Handle image upload
-            if ($request->hasFile('image')) {
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 // Delete old image if exists
                 if ($category->image && Storage::disk('public')->exists($category->image)) {
                     Storage::disk('public')->delete($category->image);

@@ -163,7 +163,7 @@ class CategoryController extends Controller
             DB::beginTransaction();
 
             // Handle image upload
-            if ($request->hasFile('image')) {
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 // Delete old image
                 if ($category->image && Storage::disk('public')->exists($category->image)) {
                     Storage::disk('public')->delete($category->image);
