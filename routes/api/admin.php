@@ -182,10 +182,13 @@ Route::prefix('admin')->group(function () {
             });
             
             Route::middleware('permission:stores.update,admins')->group(function () {
+                // Static routes MUST come before dynamic routes
+                Route::post('/update-sort-order', 'updateSortOrder');
+                
+                // Dynamic routes with parameters
                 Route::put('/{id}', 'update');
                 Route::post('/{id}', 'update'); // POST alternative for file uploads
                 Route::patch('/{id}/toggle-status', 'toggleStatus');
-                Route::post('/update-sort-order', 'updateSortOrder');
             });
             
             Route::middleware('permission:stores.delete,admins')->group(function () {

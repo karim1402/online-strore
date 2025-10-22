@@ -65,13 +65,17 @@ Route::prefix('vendor')->group(function () {
         // Category management routes
         Route::controller(CategoryController::class)->prefix('categories')->group(function () {
             Route::get('/', 'index');
+            
+            // Static routes MUST come before dynamic routes
+            Route::post('/update-sort-order', 'updateSortOrder');
+            
+            // Dynamic routes with parameters
             Route::get('/{id}', 'show');
             Route::post('/', 'store');
             Route::put('/{id}', 'update');
             Route::post('/{id}', 'update'); // POST alternative for file uploads
             Route::delete('/{id}', 'destroy');
             Route::patch('/{id}/toggle-status', 'toggleStatus');
-            Route::post('/update-sort-order', 'updateSortOrder');
         });
 
         // Product Management routes
