@@ -23,7 +23,7 @@ class ProductController extends Controller
     /**
      * Get all products for vendor's store
      */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         try {
             $vendor = auth('vendors')->user();
@@ -67,7 +67,7 @@ class ProductController extends Controller
 
             $products = $query->paginate($request->get('per_page', 15));
 
-         dd($productss);
+       
 
             return $this->successResponse($products, 'success.data_retrieved');
         } catch (\Exception $e) {
