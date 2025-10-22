@@ -28,7 +28,9 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $query = Category::with('products')
+            $query = Category::with(['products' => function ($query) {
+                    $query->orderBy('sort_order', 'asc');
+                }])
                 ->where('store_id', $vendor->store_id);
 
             // Filter by active status
@@ -67,7 +69,9 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $category = Category::with('products')
+            $category = Category::with(['products' => function ($query) {
+                    $query->orderBy('sort_order', 'asc');
+                }])
                 ->where('store_id', $vendor->store_id)
                 ->find($id);
 

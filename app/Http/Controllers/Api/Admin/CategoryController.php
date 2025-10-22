@@ -22,7 +22,12 @@ class CategoryController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Category::with(['store:id,name_en,name_ar', 'products']);
+            $query = Category::with([
+                'store:id,name_en,name_ar',
+                'products' => function ($query) {
+                    $query->orderBy('sort_order', 'asc');
+                }
+            ]);
 
             // Filter by store
             if ($request->filled('store_id')) {
@@ -59,7 +64,12 @@ class CategoryController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $category = Category::with(['store:id,name_en,name_ar', 'products'])->find($id);
+            $category = Category::with([
+                'store:id,name_en,name_ar',
+                'products' => function ($query) {
+                    $query->orderBy('sort_order', 'asc');
+                }
+            ])->find($id);
 
             if (!$category) {
                 return $this->errorResponse('errors.not_found', [], 404);
@@ -269,7 +279,9 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $categories = Category::with('products')
+            $categories = Category::with(['products' => function ($query) {
+                    $query->orderBy('sort_order', 'asc');
+                }])
                 ->where('store_id', $storeId)
                 ->orderBy('sort_order', 'asc')
                 ->orderBy('created_at', 'desc')
