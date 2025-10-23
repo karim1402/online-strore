@@ -28,4 +28,5 @@ jobs:
              */.git/**
              */node_modules/*
              */public/*
-             */vendor/*
+             */vendor/*-+6
+ 
