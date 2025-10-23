@@ -207,6 +207,9 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', 'store');
                 Route::post('/{id}/duplicate', 'duplicate');
             });
+              Route::middleware('permission:stores.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
             
             Route::middleware('permission:stores.update,admins')->group(function () {
                 // Static routes MUST come before dynamic routes
@@ -222,9 +225,7 @@ Route::prefix('admin')->group(function () {
                 Route::patch('/images/{id}/set-primary', 'setPrimaryImage');
             });
             
-            Route::middleware('permission:stores.delete,admins')->group(function () {
-                Route::delete('/{id}', 'destroy');
-            });
+          
         });
 
         // Option Group Management routes
