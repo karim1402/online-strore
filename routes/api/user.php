@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\AuthController;
 use App\Http\Controllers\Api\User\AddressController;
 use App\Http\Controllers\Api\User\StoreController;
+use App\Http\Controllers\Api\User\MainCategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -52,6 +53,12 @@ Route::prefix('user')->group(function () {
             Route::delete('/{id}', 'destroy')->name('user.addresses.destroy');
             Route::patch('/{id}/set-default', 'setDefault')->name('user.addresses.setDefault');
         });
+    });
+
+    // Main Category routes (public)
+    Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
+        Route::get('/', 'index')->name('user.mainCategories.index');
+        Route::get('/{id}', 'show')->name('user.mainCategories.show');
     });
 
     // Store routes (public, works for both guests and authenticated users)
