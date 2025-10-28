@@ -93,4 +93,66 @@ class LocalizationService
     {
         return App::getLocale() === 'ar';
     }
+
+    /**
+     * Transform localized fields based on current locale
+     * Converts name_en/name_ar to name, description_en/description_ar to description
+     * 
+     * @param array|object $data
+     * @param array $fields Fields to localize (e.g., ['name', 'description'])
+     * @return array
+     */
+    public static function localizeFields($data, array $fields = ['name', 'description']): array
+    {
+        $locale = App::getLocale();
+        $result = is_array($data) ? $data : (array) $data;
+        
+        foreach ($fields as $field) {
+            $localizedKey = "{$field}_{$locale}";
+            
+            // If the localized field exists, use it
+            if (array_key_exists($localizedKey, $result)) {
+                $result[$field] = $result[$localizedKey];
+            }
+            
+            // Remove all language-specific versions of this field
+            foreach (['en', 'ar'] as $lang) {
+                $key = "{$field}_{$lang}";
+                if (array_key_exists($key, $result)) {
+                    unset($result[$key]);
+                }
+            }
+        }
+        
+        return $result;
+    }
+
+    /**
+     * Transform nested localized data (e.g., for collections)
+     * 
+     * @param array $items
+     * @param array $fields Fields to localize
+     * @return array
+     */
+    public static function localizeCollection(array $items, array $fields = ['name', 'description']): array
+    {
+        return array_map(function ($item) use ($fields) {
+            if (is_array($item)) {
+                // Handle nested arrays (e.g., relationships)
+                foreach ($item as $key => $value) {
+                    if (is_array($value) && !empty($value)) {
+                        // Check if it's a single nested object or array of objects
+                        if (isset($value[0])) {
+                            // Array of objects
+                            $item[$key] = self::localizeCollection($value, $fields);
+                        } else {
+                            // Single nested object
+                            $item[$key] = self::localizeFields($value, $fields);
+                        }
+                    }
+                }
+            }
+            return self::localizeFields($item, $fields);
+        }, $items);
+    }
 }

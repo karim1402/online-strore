@@ -38,7 +38,7 @@ class AuthController extends Controller
             // Vendor fields
             'name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:vendors',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:8',
             'phone' => 'required|string|max:20',
             
             // Store fields

@@ -110,7 +110,8 @@
         "validation_failed": "Validation failed. Please check your input",
         "location_required": "Location is required. Please provide latitude and longitude, or login to use your default address",
         "default_address_required": "No default address found. Please provide latitude and longitude, or set a default address",
-        "address_coordinates_required": "Your default address does not have coordinates. Please provide latitude and longitude or update your address"
+        "address_coordinates_required": "Your default address does not have coordinates. Please provide latitude and longitude or update your address",
+        "address_selection_required": "You should select an address first"
     },
     "attributes": {
         "name": "name",

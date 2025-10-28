@@ -16,7 +16,7 @@ use App\Http\Controllers\Api\Admin\OptionValueController;
 use App\Http\Controllers\Api\Admin\ProductOptionController;
 use App\Http\Controllers\Api\Admin\AddonController;
 use App\Http\Controllers\Api\Admin\ProductAddonController;
-use App\Http\Controllers\Api\Admin\ActivityLogController;
+use App\Http\Controllers\Api\Admin\ActivityLogController; 
 
 /*
 |--------------------------------------------------------------------------
