@@ -57,6 +57,7 @@ Route::prefix('user')->group(function () {
     // Store routes (public, works for both guests and authenticated users)
     Route::controller(StoreController::class)->prefix('stores')->group(function () {
         Route::get('/by-category/{mainCategoryId}', 'getStoresByMainCategory')->name('user.stores.byCategory');
+        Route::get('/{storeId}/categories', 'getStoreCategoriesWithProducts')->name('user.stores.categories');
     });
     
     // Test route without authentication

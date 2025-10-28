@@ -50,6 +50,7 @@ class StoreController extends Controller
             'search' => 'nullable|string|max:255',
             'per_page' => 'nullable|integer|min:1|max:100',
             'radius' => 'nullable|numeric|min:0',
+            'address_id' => 'nullable|integer|exists:user_addresses,id',
         ]);
 
         if ($validator->fails()) {
@@ -142,11 +143,14 @@ class StoreController extends Controller
 
         $lastPage = ceil($total / $perPage);
 
+        // Localize store and branch data based on app locale
+        $localizedStores = LocalizationService::localizeCollection($paginatedStores, ['name', 'description', 'address']);
+
         return response()->json([
             'success' => true,
             'message' => LocalizationService::getMessage('success.data_retrieved'),
             'data' => [
-                'stores' => $paginatedStores,
+                'stores' => $localizedStores,
                 'pagination' => [
                     'current_page' => (int) $currentPage,
                     'per_page' => (int) $perPage,
@@ -165,7 +169,7 @@ class StoreController extends Controller
     }
 
     /**
-     * Get user location from request parameters or default address.
+     * Get user location from request parameters, specific address, or default address.
      *
      * @param Request $request
      * @return array
@@ -211,20 +215,31 @@ class StoreController extends Controller
             ];
         }
 
-        // Get user's default address
-        $defaultAddress = UserAddress::where('user_id', $user->id)
-            ->where('is_default', true)
-            ->first();
+        // Check if address_id is provided
+        $addressId = $request->input('address_id');
 
-        if (!$defaultAddress) {
+        if (!$addressId) {
             return [
                 'success' => false,
-                'message' => LocalizationService::getMessage('validation.default_address_required'),
+                'message' => LocalizationService::getMessage('validation.address_selection_required'),
                 'status' => 400,
             ];
         }
 
-        if (!$defaultAddress->latitude || !$defaultAddress->longitude) {
+        // Validate and get specific address
+        $address = UserAddress::where('id', $addressId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$address) {
+            return [
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Address']),
+                'status' => 404,
+            ];
+        }
+
+        if (!$address->latitude || !$address->longitude) {
             return [
                 'success' => false,
                 'message' => LocalizationService::getMessage('validation.address_coordinates_required'),
@@ -234,9 +249,113 @@ class StoreController extends Controller
 
         return [
             'success' => true,
-            'latitude' => (float) $defaultAddress->latitude,
-            'longitude' => (float) $defaultAddress->longitude,
-            'source' => 'default_address',
+            'latitude' => (float) $address->latitude,
+            'longitude' => (float) $address->longitude,
+            'source' => 'selected_address',
         ];
+    }
+
+    /**
+     * Get all categories with their products for a specific store.
+     *
+     * @param int $storeId
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getStoreCategoriesWithProducts($storeId, Request $request)
+    {
+        // Validate store exists and is approved
+        $store = Store::find($storeId);
+        
+        if (!$store) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.store_not_found'),
+            ], 404);
+        }
+
+        if (!$store->isApproved()) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.store_not_found'),
+            ], 404);
+        }
+
+        // Query only active categories with active products
+        $categories = $store->categories()
+            ->active()
+            ->with(['products' => function ($query) {
+                $query->active()
+                    ->with(['primaryImage', 'images'])
+                    ->orderBy('sort_order', 'asc')
+                    ->orderBy('name_en', 'asc');
+            }])
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('name_en', 'asc')
+            ->get();
+
+        // Transform the data
+        $categoriesData = $categories->map(function ($category) {
+            $productsData = $category->products->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name_en' => $product->name_en,
+                    'name_ar' => $product->name_ar,
+                    'description_en' => $product->description_en,
+                    'description_ar' => $product->description_ar,
+                    'base_price' => $product->base_price,
+                    'is_active' => $product->is_active,
+                    'view_count' => $product->view_count,
+                    'sales_count' => $product->sales_count,
+                    'sort_order' => $product->sort_order,
+                    'primary_image' => $product->primaryImage ? [
+                        'id' => $product->primaryImage->id,
+                        'image_url' => $product->primaryImage->image_url,
+                    ] : null,
+                    'images' => $product->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image_url' => $image->image_url,
+                            'is_primary' => $image->is_primary,
+                            'sort_order' => $image->sort_order,
+                        ];
+                    }),
+                ];
+            });
+
+            return [
+                'id' => $category->id,
+                'name_en' => $category->name_en,
+                'name_ar' => $category->name_ar,
+                'description_en' => $category->description_en,
+                'description_ar' => $category->description_ar,
+                'image_url' => $category->image_url,
+                'is_active' => $category->is_active,
+                'sort_order' => $category->sort_order,
+                'products_count' => $productsData->count(),
+                'products' => $productsData,
+            ];
+        });
+
+        // Localize the data
+        $localizedCategories = LocalizationService::localizeCollection($categoriesData->toArray(), ['name', 'description']);
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'store' => [
+                    'id' => $store->id,
+                    'name_en' => $store->name_en,
+                    'name_ar' => $store->name_ar,
+                    'description_en' => $store->description_en,
+                    'description_ar' => $store->description_ar,
+                    'logo_url' => $store->logo_url,
+                    'status' => $store->status,
+                ],
+                'categories' => $localizedCategories,
+                'total_categories' => $categoriesData->count(),
+            ],
+        ], 200);
     }
 }

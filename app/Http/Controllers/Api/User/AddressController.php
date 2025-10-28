@@ -154,7 +154,7 @@ class AddressController extends Controller
 
             DB::commit();
 
-            return $this->successResponse($address, 'success.data_created', 201);
+            return $this->successResponse($address, 'success.data_created',[] ,201);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->errorResponse('errors.server_error', [], 500);
