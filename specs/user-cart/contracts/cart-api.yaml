@@ -1,0 +1,516 @@
+openapi: 3.0.3
+info:
+  title: User Shopping Cart API
+  version: 1.0.0
+  description: Shopping cart management for authenticated users with single-store constraint
+
+servers:
+  - url: http://localhost:8000/api/user
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /cart:
+    get:
+      summary: Get user's cart
+      description: Retrieve the current user's cart with all items, options, addons, and calculated totals
+      tags:
+        - Cart
+      responses:
+        '200':
+          description: Cart retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '404':
+          description: Cart not found (empty cart)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    delete:
+      summary: Clear cart
+      description: Remove all items from the cart and delete the cart
+      tags:
+        - Cart
+      responses:
+        '200':
+          description: Cart cleared successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Cart not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /cart/items:
+    post:
+      summary: Add item to cart
+      description: Add a product with options and addons to cart. Returns conflict if product is from different store.
+      tags:
+        - Cart Items
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddItemRequest'
+      responses:
+        '201':
+          description: Item added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '409':
+          description: Store conflict - requires confirmation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreConflictResponse'
+        '422':
+          description: Validation error or stock unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /cart/items/{itemId}:
+    put:
+      summary: Update cart item quantity
+      description: Update the quantity of an existing cart item
+      tags:
+        - Cart Items
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Cart item ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateQuantityRequest'
+      responses:
+        '200':
+          description: Quantity updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '404':
+          description: Cart item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validation error or insufficient stock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    delete:
+      summary: Remove cart item
+      description: Remove an item from the cart. If last item, cart is deleted.
+      tags:
+        - Cart Items
+      parameters:
+        - name: itemId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Cart item ID
+      responses:
+        '200':
+          description: Item removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '204':
+          description: Last item removed, cart deleted
+        '404':
+          description: Cart item not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /cart/replace:
+    post:
+      summary: Confirm cart replacement
+      description: Confirm replacing cart when adding product from different store
+      tags:
+        - Cart
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddItemRequest'
+      responses:
+        '201':
+          description: Cart replaced successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AddItemRequest:
+      type: object
+      required:
+        - product_id
+        - quantity
+      properties:
+        product_id:
+          type: integer
+          example: 1
+          description: Product ID to add
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+          example: 2
+          description: Quantity to add
+        option_values:
+          type: array
+          items:
+            type: integer
+          example: [5, 8]
+          description: Array of product_option_value IDs
+        addons:
+          type: array
+          items:
+            type: object
+            required:
+              - addon_id
+            properties:
+              addon_id:
+                type: integer
+                example: 3
+              quantity:
+                type: integer
+                minimum: 1
+                default: 1
+                example: 1
+          description: Array of addons with quantities
+
+    UpdateQuantityRequest:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+          maximum: 99
+          example: 3
+          description: New quantity
+
+    CartResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Cart retrieved successfully"
+        data:
+          type: object
+          properties:
+            cart:
+              $ref: '#/components/schemas/Cart'
+
+    Cart:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        store:
+          $ref: '#/components/schemas/Store'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        subtotal:
+          type: string
+          example: "51.98"
+          description: Sum of all item totals
+        total:
+          type: string
+          example: "51.98"
+          description: Cart total (same as subtotal in v1)
+        item_count:
+          type: integer
+          example: 2
+          description: Total number of items in cart
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Store:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 5
+        name:
+          type: string
+          example: "Burger House"
+          description: Localized store name
+        description:
+          type: string
+          example: "Best burgers in town"
+          description: Localized store description
+        logo_url:
+          type: string
+          format: uri
+          example: "https://example.com/storage/stores/logo.jpg"
+        status:
+          type: string
+          enum: [approved, pending, rejected, suspended]
+          example: "approved"
+
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        product:
+          $ref: '#/components/schemas/Product'
+        quantity:
+          type: integer
+          example: 2
+        selected_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectedOption'
+        selected_addons:
+          type: array
+          items:
+            $ref: '#/components/schemas/SelectedAddon'
+        item_price:
+          type: string
+          example: "25.99"
+          description: Price per unit (base + options + addons)
+        item_total:
+          type: string
+          example: "51.98"
+          description: item_price × quantity
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Deluxe Burger"
+          description: Localized product name
+        description:
+          type: string
+          example: "A delicious burger"
+          description: Localized product description
+        base_price:
+          type: string
+          example: "15.99"
+        is_active:
+          type: boolean
+          example: true
+        primary_image:
+          type: object
+          nullable: true
+          properties:
+            id:
+              type: integer
+            image_url:
+              type: string
+              format: uri
+
+    SelectedOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 15
+          description: cart_item_option ID
+        option_group:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+              example: "Size"
+              description: Localized option group name
+        option_value:
+          type: object
+          properties:
+            id:
+              type: integer
+            value:
+              type: string
+              example: "Large"
+              description: Localized option value
+            price_type:
+              type: string
+              enum: [fixed, additional, percentage]
+            price_value:
+              type: string
+              example: "5.00"
+            calculated_price:
+              type: string
+              example: "20.99"
+
+    SelectedAddon:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 3
+          description: cart_item_addon ID
+        addon:
+          type: object
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+              example: "Extra Cheese"
+              description: Localized addon name
+            price:
+              type: string
+              example: "2.50"
+        quantity:
+          type: integer
+          example: 1
+        total_price:
+          type: string
+          example: "2.50"
+          description: addon.price × quantity
+
+    StoreConflictResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Cart contains items from a different store"
+        data:
+          type: object
+          properties:
+            current_store:
+              $ref: '#/components/schemas/Store'
+            new_store:
+              $ref: '#/components/schemas/Store'
+            requires_confirmation:
+              type: boolean
+              example: true
+            confirmation_endpoint:
+              type: string
+              example: "/api/user/cart/replace"
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "Operation completed successfully"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Resource not found"
+
+    ValidationErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Validation failed"
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            quantity: ["The quantity must be between 1 and 99"]
+            product_id: ["The selected product is invalid"]
+
+  responses:
+    UnauthorizedError:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            message: "Unauthenticated"

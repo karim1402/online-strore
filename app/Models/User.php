@@ -90,6 +90,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Get the cart for the user.
+     */
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
+    }
+
+    /**
      * Configure activity logging options.
      *
      * @return LogOptions
