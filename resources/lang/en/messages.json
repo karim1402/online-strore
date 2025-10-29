@@ -144,5 +144,15 @@
         "vendor_dashboard": "Vendor Dashboard",
         "admin_dashboard": "Admin Dashboard",
         "delivery_dashboard": "Delivery Dashboard"
+    },
+    "cart": {
+        "item_added": "Item added to cart successfully",
+        "quantity_updated": "Cart item quantity updated successfully",
+        "item_removed": "Item removed from cart successfully",
+        "cleared": "Cart cleared successfully",
+        "replaced": "Cart replaced successfully",
+        "store_conflict": "Cart contains items from a different store. Adding this item will clear your current cart.",
+        "limit_reached": "Cart limit reached",
+        "max_items": "Cart cannot contain more than 50 items"
     }
 }

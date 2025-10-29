@@ -1,0 +1,467 @@
+{
+	"info": {
+		"_postman_id": "cart-api-collection",
+		"name": "Cart API - User",
+		"description": "Complete cart management endpoints for authenticated users. All endpoints use form-data format.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{user_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/user",
+			"type": "string"
+		},
+		{
+			"key": "user_token",
+			"value": "YOUR_JWT_TOKEN_HERE",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Get Cart",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text",
+						"description": "Change to 'ar' for Arabic"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/cart",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart"
+					]
+				},
+				"description": "Retrieve the current user's cart with all items, options, addons, and calculated totals.\n\n**Response Codes:**\n- 200: Cart retrieved successfully\n- 404: Cart not found (empty cart)\n- 401: Unauthenticated"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Add Item to Cart (Simple)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "1",
+							"description": "Product ID (required)",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "2",
+							"description": "Quantity (1-99, required)",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/cart/items",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart",
+						"items"
+					]
+				},
+				"description": "Add a product to cart without options or addons.\n\n**Response Codes:**\n- 201: Item added successfully\n- 409: Store conflict (product from different store)\n- 422: Validation error\n- 404: Product not found or inactive"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Add Item with Options",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "1",
+							"description": "Product ID",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "2",
+							"description": "Quantity",
+							"type": "text"
+						},
+						{
+							"key": "option_values[0]",
+							"value": "5",
+							"description": "First option value ID (e.g., Size: Large)",
+							"type": "text"
+						},
+						{
+							"key": "option_values[1]",
+							"value": "8",
+							"description": "Second option value ID (e.g., Color: Red)",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/cart/items",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart",
+						"items"
+					]
+				},
+				"description": "Add a product with selected options (e.g., size, color).\n\n**Form-data format for arrays:**\n- option_values[0] = first option\n- option_values[1] = second option\n- etc."
+			},
+			"response": []
+		},
+		{
+			"name": "4. Add Item with Options & Addons",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "1",
+							"description": "Product ID",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "2",
+							"description": "Quantity",
+							"type": "text"
+						},
+						{
+							"key": "option_values[0]",
+							"value": "5",
+							"description": "Option value ID",
+							"type": "text"
+						},
+						{
+							"key": "option_values[1]",
+							"value": "8",
+							"description": "Option value ID",
+							"type": "text"
+						},
+						{
+							"key": "addons[0][addon_id]",
+							"value": "3",
+							"description": "First addon ID (e.g., Extra Cheese)",
+							"type": "text"
+						},
+						{
+							"key": "addons[0][quantity]",
+							"value": "1",
+							"description": "First addon quantity",
+							"type": "text"
+						},
+						{
+							"key": "addons[1][addon_id]",
+							"value": "5",
+							"description": "Second addon ID (e.g., Extra Sauce)",
+							"type": "text"
+						},
+						{
+							"key": "addons[1][quantity]",
+							"value": "2",
+							"description": "Second addon quantity",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/cart/items",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart",
+						"items"
+					]
+				},
+				"description": "Add a product with both options and addons.\n\n**Form-data format for nested arrays:**\n- addons[0][addon_id] = first addon ID\n- addons[0][quantity] = first addon quantity\n- addons[1][addon_id] = second addon ID\n- addons[1][quantity] = second addon quantity"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Update Item Quantity",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "quantity",
+							"value": "5",
+							"description": "New quantity (1-99)",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/cart/items/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart",
+						"items",
+						"1"
+					]
+				},
+				"description": "Update the quantity of an existing cart item.\n\n**URL Parameter:**\n- Replace '1' with the actual cart_item_id\n\n**Response Codes:**\n- 200: Quantity updated successfully\n- 404: Cart item not found\n- 422: Validation error"
+			},
+			"response": []
+		},
+		{
+			"name": "6. Remove Item from Cart",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/cart/items/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart",
+						"items",
+						"1"
+					]
+				},
+				"description": "Remove a specific item from the cart.\n\n**URL Parameter:**\n- Replace '1' with the actual cart_item_id\n\n**Response Codes:**\n- 200: Item removed, cart still has items\n- 204: Last item removed, cart deleted\n- 404: Cart item not found"
+			},
+			"response": []
+		},
+		{
+			"name": "7. Clear Cart",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/cart",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart"
+					]
+				},
+				"description": "Remove all items from the cart and delete the cart.\n\n**Response Codes:**\n- 200: Cart cleared successfully\n- 404: Cart not found"
+			},
+			"response": []
+		},
+		{
+			"name": "8. Replace Cart (Store Switch)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "10",
+							"description": "Product ID from different store",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "1",
+							"description": "Quantity",
+							"type": "text"
+						},
+						{
+							"key": "option_values[0]",
+							"value": "15",
+							"description": "Optional: Option value ID",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "addons[0][addon_id]",
+							"value": "7",
+							"description": "Optional: Addon ID",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "addons[0][quantity]",
+							"value": "1",
+							"description": "Optional: Addon quantity",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/cart/replace",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart",
+						"replace"
+					]
+				},
+				"description": "Confirm cart replacement when adding product from different store.\n\n**When to use:**\n1. Add item from Store A (cart created)\n2. Try to add item from Store B (get 409 Conflict)\n3. Call this endpoint to confirm replacement\n\n**Result:**\n- Old cart deleted\n- New cart created with Store B product\n\n**Response Codes:**\n- 201: Cart replaced successfully\n- 422: Validation error\n- 404: Product not found"
+			},
+			"response": []
+		},
+		{
+			"name": "Test: Store Conflict Flow",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "product_id",
+							"value": "10",
+							"description": "Product from DIFFERENT store",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "1",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/cart/items",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"cart",
+						"items"
+					]
+				},
+				"description": "**Test Scenario: Store Conflict**\n\nThis request should return 409 Conflict if you already have items from a different store.\n\n**Expected Response:**\n```json\n{\n  \"success\": false,\n  \"message\": \"Cart contains items from a different store...\",\n  \"data\": {\n    \"current_store\": {...},\n    \"new_store\": {...},\n    \"requires_confirmation\": true,\n    \"confirmation_endpoint\": \"/api/user/cart/replace\"\n  }\n}\n```\n\n**Next Step:**\nUse the \"Replace Cart\" endpoint to confirm."
+			},
+			"response": []
+		}
+	]
+}

@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\User\AddressController;
 use App\Http\Controllers\Api\User\StoreController;
 use App\Http\Controllers\Api\User\MainCategoryController;
 use App\Http\Controllers\Api\User\ProductController;
+use App\Http\Controllers\Api\User\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,6 +54,16 @@ Route::prefix('user')->group(function () {
             Route::put('/{id}', 'update')->name('user.addresses.update');
             Route::delete('/{id}', 'destroy')->name('user.addresses.destroy');
             Route::patch('/{id}/set-default', 'setDefault')->name('user.addresses.setDefault');
+        });
+
+        // Cart Management Routes
+        Route::controller(CartController::class)->prefix('cart')->group(function () {
+            Route::get('/', 'index')->name('user.cart.index');
+            Route::post('/items', 'addItem')->name('user.cart.addItem');
+            Route::put('/items/{itemId}', 'updateQuantity')->name('user.cart.updateQuantity');
+            Route::delete('/items/{itemId}', 'removeItem')->name('user.cart.removeItem');
+            Route::delete('/', 'clear')->name('user.cart.clear');
+            Route::post('/replace', 'replace')->name('user.cart.replace');
         });
     });
 
