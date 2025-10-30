@@ -83,7 +83,12 @@
         "only_approved_can_suspend": "يمكن إيقاف المتاجر المعتمدة فقط",
         "only_suspended_can_reactivate": "يمكن إعادة تفعيل المتاجر الموقوفة فقط",
         "cannot_delete_store_with_vendors": "لا يمكن حذف المتجر الذي يحتوي على موظفين نشطين. قم بإزالة الموظفين أولاً",
-        "store_update_failed": "فشل تحديث المتجر"
+        "store_update_failed": "فشل تحديث المتجر",
+        "cart_empty": "السلة فارغة",
+        "cart_validation_failed": "بعض العناصر في سلتك لم تعد متاحة",
+        "address_not_found": "العنوان المحدد غير موجود",
+        "order_not_found": "الطلب غير موجود",
+        "order_cannot_cancel": "لا يمكن إلغاء الطلب في الحالة الحالية"
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
@@ -154,5 +159,33 @@
         "store_conflict": "السلة تحتوي على عناصر من متجر مختلف. إضافة هذا العنصر سيمسح سلتك الحالية.",
         "limit_reached": "تم الوصول إلى حد السلة",
         "max_items": "لا يمكن أن تحتوي السلة على أكثر من 50 عنصراً"
+    },
+    "order": {
+        "placed_successfully": "تم تقديم الطلب بنجاح",
+        "pending_payment": "تم إنشاء الطلب. يرجى إكمال الدفع",
+        "already_placed": "تم تقديم الطلب بالفعل",
+        "list_retrieved": "تم استرجاع الطلبات بنجاح",
+        "retrieved_successfully": "تم استرجاع الطلب بنجاح",
+        "cancelled_successfully": "تم إلغاء الطلب بنجاح",
+        "status": {
+            "pending": "في انتظار التأكيد",
+            "pending_payment": "في انتظار الدفع",
+            "confirmed": "مؤكد",
+            "preparing": "قيد التحضير",
+            "ready": "جاهز",
+            "out_for_delivery": "في الطريق",
+            "delivered": "تم التوصيل",
+            "cancelled": "ملغى"
+        },
+        "payment_status": {
+            "pending": "قيد الانتظار",
+            "paid": "مدفوع",
+            "failed": "فشل",
+            "refunded": "مسترد"
+        },
+        "payment_method": {
+            "cash": "الدفع عند الاستلام",
+            "online": "الدفع الإلكتروني"
+        }
     }
 }

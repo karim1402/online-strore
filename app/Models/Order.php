@@ -1,0 +1,168 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
+use App\Services\LocalizationService;
+
+class Order extends Model
+{
+    use HasFactory, LogsActivity;
+
+    protected $fillable = [
+        'order_number',
+        'user_id',
+        'store_id',
+        'address_id',
+        'address_snapshot',
+        'payment_method',
+        'payment_status',
+        'payment_reference',
+        'order_status',
+        'subtotal',
+        'delivery_fee',
+        'tax',
+        'total',
+        'notes',
+    ];
+
+    protected $casts = [
+        'address_snapshot' => 'array',
+        'subtotal' => 'decimal:2',
+        'delivery_fee' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'total' => 'decimal:2',
+    ];
+
+    /**
+     * Activity log configuration
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['order_status', 'payment_status', 'payment_reference', 'notes'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn(string $eventName) => "Order {$eventName}");
+    }
+
+    /**
+     * Relationships
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
+
+    public function address()
+    {
+        return $this->belongsTo(UserAddress::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Computed attributes
+     */
+    public function getItemCountAttribute()
+    {
+        return $this->items->count();
+    }
+
+    public function getTotalItemsQuantityAttribute()
+    {
+        return $this->items->sum('quantity');
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        return LocalizationService::getMessage("order.status.{$this->order_status}");
+    }
+
+    public function getPaymentStatusLabelAttribute()
+    {
+        return LocalizationService::getMessage("order.payment_status.{$this->payment_status}");
+    }
+
+    public function getPaymentMethodLabelAttribute()
+    {
+        return LocalizationService::getMessage("order.payment_method.{$this->payment_method}");
+    }
+
+    /**
+     * Scopes
+     */
+    public function scopeByStatus($query, $status)
+    {
+        return $query->where('order_status', $status);
+    }
+
+    public function scopeByPaymentStatus($query, $status)
+    {
+        return $query->where('payment_status', $status);
+    }
+
+    public function scopeByUser($query, $userId)
+    {
+        return $query->where('user_id', $userId);
+    }
+
+    public function scopeByStore($query, $storeId)
+    {
+        return $query->where('store_id', $storeId);
+    }
+
+    public function scopeRecent($query)
+    {
+        return $query->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Helper methods
+     */
+    public function canBeCancelled()
+    {
+        return in_array($this->order_status, ['pending', 'pending_payment']);
+    }
+
+    public function isPending()
+    {
+        return $this->order_status === 'pending';
+    }
+
+    public function isPendingPayment()
+    {
+        return $this->order_status === 'pending_payment';
+    }
+
+    public function isConfirmed()
+    {
+        return $this->order_status === 'confirmed';
+    }
+
+    public function isDelivered()
+    {
+        return $this->order_status === 'delivered';
+    }
+
+    public function isCancelled()
+    {
+        return $this->order_status === 'cancelled';
+    }
+
+    public function isPaid()
+    {
+        return $this->payment_status === 'paid';
+    }
+}

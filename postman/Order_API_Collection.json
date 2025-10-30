@@ -1,0 +1,549 @@
+{
+	"info": {
+		"_postman_id": "order-api-collection",
+		"name": "Order API - User Checkout",
+		"description": "Complete order management and checkout endpoints for authenticated users. All endpoints use form-data format.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{user_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/user",
+			"type": "string"
+		},
+		{
+			"key": "user_token",
+			"value": "YOUR_JWT_TOKEN_HERE",
+			"type": "string"
+		},
+		{
+			"key": "order_id",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Checkout - Cash on Delivery",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text",
+						"description": "Change to 'ar' for Arabic"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_id",
+							"value": "1",
+							"description": "User's delivery address ID (required)",
+							"type": "text"
+						},
+						{
+							"key": "payment_method",
+							"value": "cash",
+							"description": "Payment method: cash or online (required)",
+							"type": "text"
+						},
+						{
+							"key": "notes",
+							"value": "Please call before delivery",
+							"description": "Optional order notes (max 500 chars)",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/checkout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"checkout"
+					]
+				},
+				"description": "Checkout cart with cash on delivery payment.\n\n**Prerequisites:**\n- User must be authenticated\n- Cart must have items\n- Address must belong to user\n\n**Response Codes:**\n- 201: Order created successfully, cart cleared\n- 404: Cart is empty\n- 422: Validation error\n- 500: Server error\n\n**Expected Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Order placed successfully\",\n  \"data\": {\n    \"order\": {\n      \"id\": 1,\n      \"order_number\": \"ORD-20251030-00001\",\n      \"status\": \"pending\",\n      \"payment_method\": \"cash\",\n      \"total\": \"160.00\"\n    }\n  }\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Checkout - Online Payment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_id",
+							"value": "1",
+							"description": "User's delivery address ID",
+							"type": "text"
+						},
+						{
+							"key": "payment_method",
+							"value": "online",
+							"description": "Online payment method",
+							"type": "text"
+						},
+						{
+							"key": "notes",
+							"value": "",
+							"description": "Optional notes",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/checkout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"checkout"
+					]
+				},
+				"description": "Checkout cart with online payment (placeholder).\n\n**Key Differences from Cash:**\n- Order status: `pending_payment` (not `pending`)\n- Cart is NOT cleared (preserved for retry)\n- Returns payment_reference and payment_url\n\n**Expected Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Order created. Please complete payment\",\n  \"data\": {\n    \"order\": {\n      \"id\": 2,\n      \"order_number\": \"ORD-20251030-00002\",\n      \"status\": \"pending_payment\",\n      \"payment_method\": \"online\",\n      \"payment_reference\": \"PAY-PLACEHOLDER-12345\",\n      \"payment_url\": \"https://payment.example.com/pay/12345\",\n      \"total\": \"160.00\"\n    }\n  }\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Get Order History",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/orders?page=1&per_page=15",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"orders"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"description": "Page number (default: 1)"
+						},
+						{
+							"key": "per_page",
+							"value": "15",
+							"description": "Items per page (default: 15, max: 100)"
+						},
+						{
+							"key": "status",
+							"value": "pending",
+							"description": "Filter by order status",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Get user's order history with pagination.\n\n**Query Parameters:**\n- `page`: Page number (optional)\n- `per_page`: Items per page (optional, max 100)\n- `status`: Filter by status (optional)\n\n**Valid Status Values:**\n- pending\n- pending_payment\n- confirmed\n- preparing\n- ready\n- out_for_delivery\n- delivered\n- cancelled\n\n**Response:**\n- Array of orders with basic info\n- Pagination metadata\n- Sorted by created_at DESC"
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get Order History - Filter by Status",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/orders?status=pending",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"orders"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "pending",
+							"description": "Filter by order status"
+						}
+					]
+				},
+				"description": "Get only pending orders.\n\n**Other Status Options:**\n- `pending_payment` - Awaiting payment\n- `confirmed` - Vendor confirmed\n- `preparing` - Being prepared\n- `ready` - Ready for delivery\n- `out_for_delivery` - With delivery person\n- `delivered` - Completed\n- `cancelled` - Cancelled"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get Single Order Details",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/orders/{{order_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"orders",
+						"{{order_id}}"
+					]
+				},
+				"description": "Get complete details of a specific order.\n\n**URL Parameter:**\n- Replace `{{order_id}}` with actual order ID\n\n**Response Includes:**\n- Complete order information\n- All items with product snapshots\n- Selected options and addons\n- Store details\n- Delivery address snapshot\n- Price breakdown\n- Status labels (localized)\n\n**Response Codes:**\n- 200: Order found\n- 404: Order not found or doesn't belong to user"
+			},
+			"response": []
+		},
+		{
+			"name": "6. Cancel Order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "reason",
+							"value": "Changed my mind",
+							"description": "Optional cancellation reason",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/orders/{{order_id}}/cancel",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"orders",
+						"{{order_id}}",
+						"cancel"
+					]
+				},
+				"description": "Cancel a pending order.\n\n**Cancellation Rules:**\n- ✅ Can cancel: `pending` or `pending_payment` status\n- ❌ Cannot cancel: `confirmed` or later statuses\n\n**URL Parameter:**\n- Replace `{{order_id}}` with actual order ID\n\n**Form Data:**\n- `reason`: Optional cancellation reason (max 500 chars)\n\n**Response Codes:**\n- 200: Order cancelled successfully\n- 400: Cannot cancel (wrong status)\n- 404: Order not found"
+			},
+			"response": []
+		},
+		{
+			"name": "7. Checkout - Without Notes",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_id",
+							"value": "1",
+							"description": "User's delivery address ID",
+							"type": "text"
+						},
+						{
+							"key": "payment_method",
+							"value": "cash",
+							"description": "Payment method",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/checkout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"checkout"
+					]
+				},
+				"description": "Checkout without order notes (notes field is optional)."
+			},
+			"response": []
+		},
+		{
+			"name": "8. Test: Checkout with Empty Cart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "payment_method",
+							"value": "cash",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/checkout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"checkout"
+					]
+				},
+				"description": "**Test Scenario: Empty Cart**\n\nThis should return 404 error if cart is empty.\n\n**Expected Response:**\n```json\n{\n  \"success\": false,\n  \"message\": \"Cart is empty\"\n}\n```\n\n**How to Test:**\n1. Clear your cart first (DELETE /cart)\n2. Try to checkout\n3. Should get 404 error"
+			},
+			"response": []
+		},
+		{
+			"name": "9. Test: Checkout with Invalid Address",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_id",
+							"value": "99999",
+							"description": "Non-existent address ID",
+							"type": "text"
+						},
+						{
+							"key": "payment_method",
+							"value": "cash",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/checkout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"checkout"
+					]
+				},
+				"description": "**Test Scenario: Invalid Address**\n\nShould return 422 validation error.\n\n**Expected Response:**\n```json\n{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": {\n    \"address_id\": [\"The selected address is invalid\"]\n  }\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "10. Test: Checkout with Invalid Payment Method",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "payment_method",
+							"value": "crypto",
+							"description": "Invalid payment method",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/checkout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"checkout"
+					]
+				},
+				"description": "**Test Scenario: Invalid Payment Method**\n\nOnly 'cash' and 'online' are valid.\n\n**Expected Response:**\n```json\n{\n  \"success\": false,\n  \"message\": \"Validation failed\",\n  \"errors\": {\n    \"payment_method\": [\"The selected payment method is invalid\"]\n  }\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "11. Test: Cancel Confirmed Order",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "reason",
+							"value": "Testing cancellation",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/orders/{{order_id}}/cancel",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"orders",
+						"{{order_id}}",
+						"cancel"
+					]
+				},
+				"description": "**Test Scenario: Cancel Confirmed Order**\n\nShould fail if order status is 'confirmed' or later.\n\n**Expected Response:**\n```json\n{\n  \"success\": false,\n  \"message\": \"Order cannot be cancelled in current status\"\n}\n```\n\n**Note:** Change order_id to a confirmed order to test this."
+			},
+			"response": []
+		},
+		{
+			"name": "12. Get Orders - Arabic Language",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "ar",
+						"type": "text",
+						"description": "Arabic language"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/orders",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"orders"
+					]
+				},
+				"description": "**Test Scenario: Arabic Localization**\n\nAll messages and labels should be in Arabic.\n\n**Expected:**\n- Status labels in Arabic\n- Store names in Arabic\n- Product names in Arabic\n- Success/error messages in Arabic"
+			},
+			"response": []
+		}
+	]
+}
