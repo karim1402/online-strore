@@ -62,17 +62,30 @@ class CartItem extends Model
      */
     public function getItemPriceAttribute()
     {
+        if (!$this->product) {
+            return '0.00';
+        }
+
         $price = $this->product->base_price;
 
         // Add option prices
         foreach ($this->options as $option) {
-                      $price += $option->optionValue->productOptionValue->calculatePrice($this->product->base_price);
-
+            if ($option->productOptionValue) {
+                $optionPrice = $option->productOptionValue->calculatePrice($this->product->base_price);
+                // For 'fixed' type, add the full price. For others, subtract base to get the difference
+                if ($option->productOptionValue->price_type === 'fixed') {
+                    $price += $optionPrice;
+                } else {
+                    $price += ($optionPrice - $this->product->base_price);
+                }
+            }
         }
 
         // Add addon prices
         foreach ($this->addons as $addon) {
-            $price += ($addon->addon->price * $addon->quantity);
+            if ($addon->addon) {
+                $price += ($addon->addon->price * $addon->quantity);
+            }
         }
 
         return number_format($price, 2, '.', '');
