@@ -108,26 +108,11 @@ class CartController extends Controller
         $cart = Cart::where('user_id', $user->id)->first();
 
         // Check for store conflict
-        if ($cart && $cart->store_id !== $product->store_id) {
-            return response()->json([
-                'success' => false,
-                'message' => LocalizationService::getMessage('cart.store_conflict'),
-                'data' => [
-                    'current_store' => [
-                        'id' => $cart->store->id,
-                        'name_en' => $cart->store->name_en,
-                        'name_ar' => $cart->store->name_ar,
-                    ],
-                    'new_store' => [
-                        'id' => $product->store->id,
-                        'name_en' => $product->store->name_en,
-                        'name_ar' => $product->store->name_ar,
-                    ],
-                    'requires_confirmation' => true,
-                    'confirmation_endpoint' => '/api/user/cart/replace',
-                ],
-            ], 409);
+         if ($cart && $cart->store_id !== $product->store_id) {
+            $cart->delete();
+            $cart = null;
         }
+
 
         DB::beginTransaction();
         try {
