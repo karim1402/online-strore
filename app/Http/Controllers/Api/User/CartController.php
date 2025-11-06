@@ -498,10 +498,10 @@ class CartController extends Controller
                         ] : null,
                     ],
                     'quantity' => $item->quantity,
-                    'selected_options' => $item->options->map(function ($option) {
+                    'selected_options' => $item->options->map(function ($option) use ($item) {
                         return [
                             'id' => $option->id,
-                          'option_group' => [
+                            'option_group' => [
                                 'id' => $option->productOptionValue->productOption->optionGroup->id,
                                 'name_en' => $option->productOptionValue->productOption->optionGroup->name_en,
                                 'name_ar' => $option->productOptionValue->productOption->optionGroup->name_ar,
