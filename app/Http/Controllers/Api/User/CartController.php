@@ -29,7 +29,7 @@ class CartController extends Controller
             'store:id,name_en,name_ar,description_en,description_ar,logo,status',
             'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
             'items.product.primaryImage',
-            'items.options.productOptionValue.optionGroup:id,name_en,name_ar',
+              'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
             'items.options.productOptionValue.optionValue:id,value_en,value_ar',
             'items.options.productOptionValue:id,product_option_id,option_value_id,price_type,price_value',
             'items.addons.addon:id,name_en,name_ar,description_en,description_ar,price,is_active'
