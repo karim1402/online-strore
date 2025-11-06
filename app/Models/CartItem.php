@@ -66,7 +66,8 @@ class CartItem extends Model
 
         // Add option prices
         foreach ($this->options as $option) {
-            $price += $option->optionValue->productOptionValue->calculatePrice($this->product->base_price);
+                      $price += $option->optionValue->productOptionValue->calculatePrice($this->product->base_price);
+
         }
 
         // Add addon prices
