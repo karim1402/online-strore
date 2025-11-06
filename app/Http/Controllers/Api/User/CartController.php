@@ -23,7 +23,7 @@ class CartController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         $cart = Cart::with([
             'store:id,name_en,name_ar,description_en,description_ar,logo,status',
@@ -65,7 +65,7 @@ class CartController extends Controller
      */
     public function addItem(Request $request)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         // Validation
         $validator = Validator::make($request->all(), [
@@ -222,7 +222,7 @@ class CartController extends Controller
      */
     public function updateQuantity(Request $request, $itemId)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         // Validation
         $validator = Validator::make($request->all(), [
@@ -285,7 +285,7 @@ class CartController extends Controller
      */
     public function removeItem($itemId)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         // Find cart item
         $cartItem = CartItem::whereHas('cart', function ($query) use ($user) {
@@ -345,7 +345,7 @@ class CartController extends Controller
      */
     public function clear()
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         $cart = Cart::where('user_id', $user->id)->first();
 
@@ -372,7 +372,7 @@ class CartController extends Controller
      */
     public function replace(Request $request)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         // Validation
         $validator = Validator::make($request->all(), [
