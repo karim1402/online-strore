@@ -39,7 +39,8 @@ class CartController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Cart']),
-            ], 404);
+                'data' => null
+            ], 400);
         }
 
         // Transform cart data
