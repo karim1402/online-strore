@@ -171,7 +171,7 @@ class CartController extends Controller
                 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
                 'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
                 'items.product.primaryImage',
-                'items.options.productOptionValue.optionGroup:id,name_en,name_ar',
+                'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
                 'items.options.productOptionValue:id,product_option_id,option_value_id,price_type,price_value',
                 'items.addons.addon:id,name_en,name_ar,description_en,description_ar,price,is_active'
@@ -240,11 +240,11 @@ class CartController extends Controller
 
         // Reload cart
         $cart = $cartItem->cart;
-        $cart->load([
+       $cart->load([
             'store:id,name_en,name_ar,description_en,description_ar,logo,status',
             'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
             'items.product.primaryImage',
-            'items.options.productOptionValue.optionGroup:id,name_en,name_ar',
+            'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
             'items.options.productOptionValue.optionValue:id,value_en,value_ar',
             'items.options.productOptionValue:id,product_option_id,option_value_id,price_type,price_value',
             'items.addons.addon:id,name_en,name_ar,description_en,description_ar,price,is_active'
@@ -305,7 +305,7 @@ class CartController extends Controller
             'store:id,name_en,name_ar,description_en,description_ar,logo,status',
             'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
             'items.product.primaryImage',
-            'items.options.productOptionValue.optionGroup:id,name_en,name_ar',
+            'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
             'items.options.productOptionValue.optionValue:id,value_en,value_ar',
             'items.options.productOptionValue:id,product_option_id,option_value_id,price_type,price_value',
             'items.addons.addon:id,name_en,name_ar,description_en,description_ar,price,is_active'
@@ -435,12 +435,11 @@ class CartController extends Controller
                 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
                 'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
                 'items.product.primaryImage',
-                'items.options.productOptionValue.optionGroup:id,name_en,name_ar',
+                'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
                 'items.options.productOptionValue:id,product_option_id,option_value_id,price_type,price_value',
                 'items.addons.addon:id,name_en,name_ar,description_en,description_ar,price,is_active'
             ]);
-
             // Transform and localize
             $cartData = $this->transformCart($cart);
             $localizedCart = LocalizationService::localizeCollection([$cartData], ['name', 'description', 'value'])[0];
@@ -502,10 +501,10 @@ class CartController extends Controller
                     'selected_options' => $item->options->map(function ($option) {
                         return [
                             'id' => $option->id,
-                            'option_group' => [
-                                'id' => $option->productOptionValue->optionGroup->id,
-                                'name_en' => $option->productOptionValue->optionGroup->name_en,
-                                'name_ar' => $option->productOptionValue->optionGroup->name_ar,
+                          'option_group' => [
+                                'id' => $option->productOptionValue->productOption->optionGroup->id,
+                                'name_en' => $option->productOptionValue->productOption->optionGroup->name_en,
+                                'name_ar' => $option->productOptionValue->productOption->optionGroup->name_ar,
                             ],
                             'option_value' => [
                                 'id' => $option->productOptionValue->optionValue->id,
