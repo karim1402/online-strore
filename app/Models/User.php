@@ -98,6 +98,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Get the orders for the user.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
      * Configure activity logging options.
      *
      * @return LogOptions

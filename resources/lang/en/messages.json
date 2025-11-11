@@ -83,7 +83,12 @@
         "only_approved_can_suspend": "Only approved stores can be suspended",
         "only_suspended_can_reactivate": "Only suspended stores can be reactivated",
         "cannot_delete_store_with_vendors": "Cannot delete store with active vendors. Remove vendors first",
-        "store_update_failed": "Failed to update store"
+        "store_update_failed": "Failed to update store",
+        "cart_empty": "Cart is empty",
+        "cart_validation_failed": "Some items in your cart are no longer available",
+        "address_not_found": "Selected address not found",
+        "order_not_found": "Order not found",
+        "order_cannot_cancel": "Order cannot be cancelled in current status"
     },
     "validation": {
         "required": "The :attribute field is required",
@@ -154,5 +159,33 @@
         "store_conflict": "Cart contains items from a different store. Adding this item will clear your current cart.",
         "limit_reached": "Cart limit reached",
         "max_items": "Cart cannot contain more than 50 items"
+    },
+    "order": {
+        "placed_successfully": "Order placed successfully",
+        "pending_payment": "Order created. Please complete payment",
+        "already_placed": "Order already placed",
+        "list_retrieved": "Orders retrieved successfully",
+        "retrieved_successfully": "Order retrieved successfully",
+        "cancelled_successfully": "Order cancelled successfully",
+        "status": {
+            "pending": "Pending Confirmation",
+            "pending_payment": "Pending Payment",
+            "confirmed": "Confirmed",
+            "preparing": "Preparing",
+            "ready": "Ready",
+            "out_for_delivery": "Out for Delivery",
+            "delivered": "Delivered",
+            "cancelled": "Cancelled"
+        },
+        "payment_status": {
+            "pending": "Pending",
+            "paid": "Paid",
+            "failed": "Failed",
+            "refunded": "Refunded"
+        },
+        "payment_method": {
+            "cash": "Cash on Delivery",
+            "online": "Online Payment"
+        }
     }
 }

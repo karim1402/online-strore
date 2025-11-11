@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\User\StoreController;
 use App\Http\Controllers\Api\User\MainCategoryController;
 use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\Api\User\CartController;
+use App\Http\Controllers\Api\User\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -64,6 +65,14 @@ Route::prefix('user')->group(function () {
             Route::delete('/items/{itemId}', 'removeItem')->name('user.cart.removeItem');
             Route::delete('/', 'clear')->name('user.cart.clear');
             Route::post('/replace', 'replace')->name('user.cart.replace');
+        });
+
+        // Order Management Routes
+        Route::post('checkout', [OrderController::class, 'checkout'])->name('user.checkout');
+        Route::controller(OrderController::class)->prefix('orders')->group(function () {
+            Route::get('/', 'index')->name('user.orders.index');
+            Route::get('/{orderId}', 'show')->name('user.orders.show');
+            Route::post('/{orderId}/cancel', 'cancel')->name('user.orders.cancel');
         });
     });
 
