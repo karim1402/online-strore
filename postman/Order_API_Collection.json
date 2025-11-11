@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "order-api-collection",
 		"name": "Order API - User Checkout",
-		"description": "Complete order management and checkout endpoints for authenticated users. All endpoints use form-data format.",
+		"description": "Complete order management and checkout endpoints for authenticated users.\n\n**Payment Flow:**\n- All requests use form-data format\n- Cash payments: Basic fields only (address_id, payment_method, notes)\n- Online payments: Include payment gateway fields as flat form-data\n\n**New Features:**\n- Single-step checkout with payment details\n- Payment records stored in separate payments table\n- Cart deletion based on payment success\n- Boolean fields: Use 1 for true, 0 for false\n- Legacy confirm-payment endpoint still available",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"auth": {
@@ -87,7 +87,7 @@
 			"response": []
 		},
 		{
-			"name": "2. Checkout - Online Payment",
+			"name": "2. Checkout - Online Payment (Success)",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -108,21 +108,98 @@
 						{
 							"key": "address_id",
 							"value": "1",
-							"description": "User's delivery address ID",
 							"type": "text"
 						},
 						{
 							"key": "payment_method",
 							"value": "online",
-							"description": "Online payment method",
 							"type": "text"
 						},
 						{
 							"key": "notes",
-							"value": "",
-							"description": "Optional notes",
+							"value": "Please deliver between 2-4 PM",
+							"type": "text"
+						},
+						{
+							"key": "transaction_id",
+							"value": "367786330",
 							"type": "text",
-							"disabled": true
+							"description": "Payment gateway transaction ID"
+						},
+						{
+							"key": "gateway_order_id",
+							"value": "415312014",
+							"type": "text",
+							"description": "Payment gateway's order ID"
+						},
+						{
+							"key": "amount_cents",
+							"value": "10000",
+							"type": "text",
+							"description": "Amount in cents (10000 = 100.00 EGP)"
+						},
+						{
+							"key": "currency",
+							"value": "EGP",
+							"type": "text"
+						},
+						{
+							"key": "success",
+							"value": "1",
+							"type": "text",
+							"description": "1 for success, 0 for failure"
+						},
+						{
+							"key": "is_3d_secure",
+							"value": "1",
+							"type": "text",
+							"description": "1 if 3D Secure, 0 otherwise"
+						},
+						{
+							"key": "card_type",
+							"value": "MasterCard",
+							"type": "text"
+						},
+						{
+							"key": "card_pan",
+							"value": "2346",
+							"type": "text",
+							"description": "Last 4 digits of card"
+						},
+						{
+							"key": "gateway_response",
+							"value": "Approved",
+							"type": "text"
+						},
+						{
+							"key": "txn_response_code",
+							"value": "APPROVED",
+							"type": "text"
+						},
+						{
+							"key": "integration_id",
+							"value": "5385685",
+							"type": "text"
+						},
+						{
+							"key": "hmac",
+							"value": "bef21618f8d41ae654bf...",
+							"type": "text"
+						},
+						{
+							"key": "payment_created_at",
+							"value": "2025-11-10T14:50:32.722525",
+							"type": "text"
+						},
+						{
+							"key": "merchant_commission",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "accept_fees",
+							"value": "0",
+							"type": "text"
 						}
 					]
 				},
@@ -135,7 +212,132 @@
 						"checkout"
 					]
 				},
-				"description": "Checkout cart with online payment (placeholder).\n\n**Key Differences from Cash:**\n- Order status: `pending_payment` (not `pending`)\n- Cart is NOT cleared (preserved for retry)\n- Returns payment_reference and payment_url\n\n**Expected Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Order created. Please complete payment\",\n  \"data\": {\n    \"order\": {\n      \"id\": 2,\n      \"order_number\": \"ORD-20251030-00002\",\n      \"status\": \"pending_payment\",\n      \"payment_method\": \"online\",\n      \"payment_reference\": \"PAY-PLACEHOLDER-12345\",\n      \"payment_url\": \"https://payment.example.com/pay/12345\",\n      \"total\": \"160.00\"\n    }\n  }\n}\n```"
+				"description": "Checkout with successful online payment.\n\n**Payment Flow:**\n1. User completes payment at gateway\n2. Gateway returns payment details\n3. Submit checkout with payment_details\n4. Order created + Payment processed in single transaction\n\n**Result:**\n- Order status: `confirmed`\n- Payment status: `paid`\n- Payment record created in payments table\n- Cart deleted\n\n**Expected Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Payment confirmed successfully\",\n  \"data\": {\n    \"order\": {\n      \"id\": 2,\n      \"order_number\": \"ORD-20251111-00002\",\n      \"status\": \"confirmed\",\n      \"payment_method\": \"online\",\n      \"payment_status\": \"paid\",\n      \"payment_reference\": \"367786330\",\n      \"total\": \"100.00\"\n    }\n  }\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "2b. Checkout - Online Payment (Failed)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "address_id",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "payment_method",
+							"value": "online",
+							"type": "text"
+						},
+						{
+							"key": "notes",
+							"value": "Please deliver between 2-4 PM",
+							"type": "text"
+						},
+						{
+							"key": "transaction_id",
+							"value": "367786331",
+							"type": "text"
+						},
+						{
+							"key": "gateway_order_id",
+							"value": "415312015",
+							"type": "text"
+						},
+						{
+							"key": "amount_cents",
+							"value": "10000",
+							"type": "text"
+						},
+						{
+							"key": "currency",
+							"value": "EGP",
+							"type": "text"
+						},
+						{
+							"key": "success",
+							"value": "0",
+							"type": "text",
+							"description": "0 for failed payment"
+						},
+						{
+							"key": "is_3d_secure",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "card_type",
+							"value": "MasterCard",
+							"type": "text"
+						},
+						{
+							"key": "card_pan",
+							"value": "2346",
+							"type": "text"
+						},
+						{
+							"key": "gateway_response",
+							"value": "Declined",
+							"type": "text"
+						},
+						{
+							"key": "txn_response_code",
+							"value": "DECLINED",
+							"type": "text"
+						},
+						{
+							"key": "integration_id",
+							"value": "5385685",
+							"type": "text"
+						},
+						{
+							"key": "hmac",
+							"value": "bef21618f8d41ae654bf...",
+							"type": "text"
+						},
+						{
+							"key": "payment_created_at",
+							"value": "2025-11-10T14:50:32.722525",
+							"type": "text"
+						},
+						{
+							"key": "merchant_commission",
+							"value": "0",
+							"type": "text"
+						},
+						{
+							"key": "accept_fees",
+							"value": "0",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/checkout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"checkout"
+					]
+				},
+				"description": "Checkout with failed online payment.\n\n**Result:**\n- Order status: `pending_payment`\n- Payment status: `failed`\n- Payment record created in payments table\n- Cart NOT deleted (user can retry)\n\n**Expected Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Payment failed\",\n  \"data\": {\n    \"order\": {\n      \"id\": 3,\n      \"order_number\": \"ORD-20251111-00003\",\n      \"status\": \"pending_payment\",\n      \"payment_method\": \"online\",\n      \"payment_status\": \"failed\",\n      \"payment_reference\": null,\n      \"total\": \"100.00\"\n    }\n  }\n}\n```"
 			},
 			"response": []
 		},
@@ -291,6 +493,51 @@
 					]
 				},
 				"description": "Cancel a pending order.\n\n**Cancellation Rules:**\n- ✅ Can cancel: `pending` or `pending_payment` status\n- ❌ Cannot cancel: `confirmed` or later statuses\n\n**URL Parameter:**\n- Replace `{{order_id}}` with actual order ID\n\n**Form Data:**\n- `reason`: Optional cancellation reason (max 500 chars)\n\n**Response Codes:**\n- 200: Order cancelled successfully\n- 400: Cannot cancel (wrong status)\n- 404: Order not found"
+			},
+			"response": []
+		},
+		{
+			"name": "6b. Confirm Payment (Legacy)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "en",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"transaction_id\": \"367786330\",\n  \"order_id\": \"415312014\",\n  \"amount_cents\": 10000,\n  \"currency\": \"EGP\",\n  \"success\": true,\n  \"is_3d_secure\": true,\n  \"card_type\": \"MasterCard\",\n  \"card_pan\": \"2346\",\n  \"gateway_response\": \"Approved\",\n  \"txn_response_code\": \"APPROVED\",\n  \"integration_id\": 5385685,\n  \"hmac\": \"bef21618f8d41ae654bf...\",\n  \"created_at\": \"2025-11-10T14:50:32.722525\",\n  \"merchant_commission\": 0,\n  \"accept_fees\": 0\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/orders/{{order_id}}/confirm-payment",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"orders",
+						"{{order_id}}",
+						"confirm-payment"
+					]
+				},
+				"description": "**Legacy endpoint** for confirming payment after order creation.\n\n**Note:** This endpoint is optional. Payment details can now be sent directly with the checkout endpoint. This remains available for:\n- Backward compatibility\n- Async payment confirmations\n- Webhook-based updates\n- Two-step payment flows\n\n**Prerequisites:**\n- Order must exist with `pending_payment` status\n- Order must have `online` payment method\n\n**Expected Response:**\n```json\n{\n  \"success\": true,\n  \"message\": \"Payment confirmed successfully\",\n  \"data\": {\n    \"order\": {\n      \"id\": 1,\n      \"order_number\": \"ORD-20251111-00001\",\n      \"status\": \"confirmed\",\n      \"payment_status\": \"paid\"\n    }\n  }\n}\n```"
 			},
 			"response": []
 		},
