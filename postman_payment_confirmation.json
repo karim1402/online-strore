@@ -1,0 +1,192 @@
+{
+  "info": {
+    "name": "Order Payment Confirmation",
+    "description": "Endpoint to confirm online payment for orders",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Confirm Payment (Success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}",
+            "description": "User authentication token"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en",
+            "description": "Language preference (en or ar)"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transaction_id\": \"367786330\",\n  \"order_id\": \"415312014\",\n  \"amount_cents\": 10000,\n  \"currency\": \"EGP\",\n  \"success\": true,\n  \"is_3d_secure\": true,\n  \"card_type\": \"MasterCard\",\n  \"card_pan\": \"2346\",\n  \"gateway_response\": \"Approved\",\n  \"txn_response_code\": \"APPROVED\",\n  \"integration_id\": 5385685,\n  \"hmac\": \"bef21618f8d41ae654bf...\",\n  \"created_at\": \"2025-11-10T14:50:32.722525\",\n  \"merchant_commission\": 0,\n  \"accept_fees\": 0\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/user/orders/{{order_id}}/confirm-payment",
+          "host": ["{{base_url}}"],
+          "path": ["api", "user", "orders", "{{order_id}}", "confirm-payment"]
+        },
+        "description": "Confirms a successful online payment for an order. This will:\n- Store the payment data in the order\n- Update payment status to 'paid'\n- Update order status to 'confirmed'\n- Delete the user's cart\n- Update payment reference with transaction ID"
+      },
+      "response": []
+    },
+    {
+      "name": "Confirm Payment (Failed)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}",
+            "description": "User authentication token"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en",
+            "description": "Language preference (en or ar)"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transaction_id\": \"367786331\",\n  \"order_id\": \"415312015\",\n  \"amount_cents\": 10000,\n  \"currency\": \"EGP\",\n  \"success\": false,\n  \"is_3d_secure\": true,\n  \"card_type\": \"MasterCard\",\n  \"card_pan\": \"2346\",\n  \"gateway_response\": \"Declined\",\n  \"txn_response_code\": \"DECLINED\",\n  \"integration_id\": 5385685,\n  \"hmac\": \"bef21618f8d41ae654bf...\",\n  \"created_at\": \"2025-11-10T14:50:32.722525\",\n  \"merchant_commission\": 0,\n  \"accept_fees\": 0\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/user/orders/{{order_id}}/confirm-payment",
+          "host": ["{{base_url}}"],
+          "path": ["api", "user", "orders", "{{order_id}}", "confirm-payment"]
+        },
+        "description": "Confirms a failed online payment for an order. This will:\n- Store the payment data in the order\n- Update payment status to 'failed'\n- Keep the cart intact (not deleted)\n- Order status remains 'pending_payment'"
+      },
+      "response": []
+    },
+    {
+      "name": "Checkout with Online Payment (Success)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}",
+            "description": "User authentication token"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en",
+            "description": "Language preference (en or ar)"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"address_id\": 1,\n  \"payment_method\": \"online\",\n  \"notes\": \"Please deliver between 2-4 PM\",\n  \"payment_details\": {\n    \"transaction_id\": \"367786330\",\n    \"order_id\": \"415312014\",\n    \"amount_cents\": 10000,\n    \"currency\": \"EGP\",\n    \"success\": true,\n    \"is_3d_secure\": true,\n    \"card_type\": \"MasterCard\",\n    \"card_pan\": \"2346\",\n    \"gateway_response\": \"Approved\",\n    \"txn_response_code\": \"APPROVED\",\n    \"integration_id\": 5385685,\n    \"hmac\": \"bef21618f8d41ae654bf...\",\n    \"created_at\": \"2025-11-10T14:50:32.722525\",\n    \"merchant_commission\": 0,\n    \"accept_fees\": 0\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/user/checkout",
+          "host": ["{{base_url}}"],
+          "path": ["api", "user", "checkout"]
+        },
+        "description": "Creates an order with online payment and processes payment immediately. Payment details are included in the request. If payment is successful, cart is deleted and order is confirmed."
+      },
+      "response": []
+    },
+    {
+      "name": "Checkout with Online Payment (Failed)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}",
+            "description": "User authentication token"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en",
+            "description": "Language preference (en or ar)"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"address_id\": 1,\n  \"payment_method\": \"online\",\n  \"notes\": \"Please deliver between 2-4 PM\",\n  \"payment_details\": {\n    \"transaction_id\": \"367786331\",\n    \"order_id\": \"415312015\",\n    \"amount_cents\": 10000,\n    \"currency\": \"EGP\",\n    \"success\": false,\n    \"is_3d_secure\": true,\n    \"card_type\": \"MasterCard\",\n    \"card_pan\": \"2346\",\n    \"gateway_response\": \"Declined\",\n    \"txn_response_code\": \"DECLINED\",\n    \"integration_id\": 5385685,\n    \"hmac\": \"bef21618f8d41ae654bf...\",\n    \"created_at\": \"2025-11-10T14:50:32.722525\",\n    \"merchant_commission\": 0,\n    \"accept_fees\": 0\n  }\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/user/checkout",
+          "host": ["{{base_url}}"],
+          "path": ["api", "user", "checkout"]
+        },
+        "description": "Creates an order with online payment that fails. Payment details are included with success=false. Cart is NOT deleted so user can retry."
+      },
+      "response": []
+    },
+    {
+      "name": "Checkout with Cash Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{user_token}}",
+            "description": "User authentication token"
+          },
+          {
+            "key": "Accept-Language",
+            "value": "en",
+            "description": "Language preference (en or ar)"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"address_id\": 1,\n  \"payment_method\": \"cash\",\n  \"notes\": \"Please deliver between 2-4 PM\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/user/checkout",
+          "host": ["{{base_url}}"],
+          "path": ["api", "user", "checkout"]
+        },
+        "description": "Creates an order with cash payment. Cart is deleted immediately."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "user_token",
+      "value": "your_jwt_token_here",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "1",
+      "type": "string",
+      "description": "The order ID returned from checkout endpoint"
+    }
+  ]
+}

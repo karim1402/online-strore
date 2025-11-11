@@ -9,6 +9,7 @@ use App\Models\OrderItemOption;
 use App\Models\OrderItemAddon;
 use App\Models\Cart;
 use App\Models\UserAddress;
+use App\Models\Payment;
 use App\Services\LocalizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,13 +22,29 @@ class OrderController extends Controller
      */
     public function checkout(Request $request)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         // Validation
         $validator = Validator::make($request->all(), [
             'address_id' => 'required|exists:user_addresses,id',
             'payment_method' => 'required|in:cash,online',
             'notes' => 'nullable|string|max:500',
+            // Payment details (flat fields, required if payment_method is online)
+            'transaction_id' => 'required_if:payment_method,online|string',
+            'gateway_order_id' => 'required_if:payment_method,online|string',
+            'amount_cents' => 'required_if:payment_method,online|integer',
+            'currency' => 'nullable|string',
+            'success' => 'required_if:payment_method,online|in:0,1,true,false',
+            'is_3d_secure' => 'nullable|in:0,1,true,false',
+            'card_type' => 'nullable|string',
+            'card_pan' => 'nullable|string',
+            'gateway_response' => 'nullable|string',
+            'txn_response_code' => 'nullable|string',
+            'integration_id' => 'nullable|integer',
+            'hmac' => 'nullable|string',
+            'payment_created_at' => 'nullable|string',
+            'merchant_commission' => 'nullable|numeric',
+            'accept_fees' => 'nullable|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -98,7 +115,7 @@ class OrderController extends Controller
 
             // Calculate totals
             $subtotal = $this->calculateSubtotal($cart);
-            $deliveryFee = 10.00; // Placeholder
+            $deliveryFee = 0.00; // Placeholder
             $tax = 0.00; // Placeholder
             $total = $subtotal + $deliveryFee + $tax;
 
@@ -220,8 +237,67 @@ class OrderController extends Controller
                 }
             }
 
-            // Clear cart for cash orders only
-            if ($request->payment_method === 'cash') {
+            // Process online payment if payment details provided
+            if ($request->payment_method === 'online' && $request->has('transaction_id')) {
+                // Convert string boolean to actual boolean
+                $success = filter_var($request->success, FILTER_VALIDATE_BOOLEAN);
+                $is3dSecure = filter_var($request->is_3d_secure ?? false, FILTER_VALIDATE_BOOLEAN);
+                
+                // Create payment record
+                $payment = Payment::create([
+                    'order_id' => $order->id,
+                    'transaction_id' => $request->transaction_id,
+                    'gateway_order_id' => $request->gateway_order_id ?? null,
+                    'amount_cents' => $request->amount_cents,
+                    'currency' => $request->currency ?? 'EGP',
+                    'success' => $success,
+                    'status' => $success ? 'completed' : 'failed',
+                    'is_3d_secure' => $is3dSecure,
+                    'card_type' => $request->card_type ?? null,
+                    'card_pan' => $request->card_pan ?? null,
+                    'gateway_response' => $request->gateway_response ?? null,
+                    'txn_response_code' => $request->txn_response_code ?? null,
+                    'integration_id' => $request->integration_id ?? null,
+                    'hmac' => $request->hmac ?? null,
+                    'merchant_commission' => $request->merchant_commission ?? 0,
+                    'accept_fees' => $request->accept_fees ?? 0,
+                    'payment_created_at' => $request->payment_created_at ?? null,
+                    'raw_response' => $request->only([
+                        'transaction_id', 'gateway_order_id', 'amount_cents', 'currency',
+                        'success', 'is_3d_secure', 'card_type', 'card_pan',
+                        'gateway_response', 'txn_response_code', 'integration_id',
+                        'hmac', 'payment_created_at', 'merchant_commission', 'accept_fees'
+                    ]),
+                ]);
+
+                // Update order based on payment success
+                if ($success) {
+                    $order->payment_status = 'paid';
+                    $order->order_status = 'confirmed';
+                    $order->payment_reference = $request->transaction_id;
+                    $order->save();
+                } else {
+                    $order->payment_status = 'failed';
+                    $order->save();
+                }
+
+                // Log payment activity
+                activity()
+                    ->performedOn($payment)
+                    ->causedBy($user)
+                    ->withProperties([
+                        'order_id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'transaction_id' => $request->transaction_id,
+                        'success' => $success,
+                        'amount_cents' => $request->amount_cents,
+                    ])
+                    ->log('Payment processed during checkout');
+            }
+
+            // Clear cart for cash orders OR successful online payments
+            if ($request->payment_method === 'cash' || 
+                ($request->payment_method === 'online' && $request->has('transaction_id') && filter_var($request->success, FILTER_VALIDATE_BOOLEAN))) {
                 $cart->items()->delete();
                 $cart->delete();
             }
@@ -245,14 +321,16 @@ class OrderController extends Controller
                 'order' => $this->transformOrder($order->load(['items.options', 'items.addons'])),
             ];
 
-            // Add payment URL for online payment
-            if ($request->payment_method === 'online') {
-                $response['order']['payment_url'] = "https://payment.example.com/pay/{$paymentReference}";
+            // Determine message based on payment method and status
+            if ($request->payment_method === 'cash') {
+                $message = LocalizationService::getMessage('order.placed_successfully');
+            } elseif ($request->has('transaction_id') && filter_var($request->success, FILTER_VALIDATE_BOOLEAN)) {
+                $message = LocalizationService::getMessage('order.payment_confirmed');
+            } elseif ($request->has('transaction_id')) {
+                $message = LocalizationService::getMessage('order.payment_failed');
+            } else {
+                $message = LocalizationService::getMessage('order.pending_payment');
             }
-
-            $message = $request->payment_method === 'cash' 
-                ? LocalizationService::getMessage('order.placed_successfully')
-                : LocalizationService::getMessage('order.pending_payment');
 
             return response()->json([
                 'success' => true,
@@ -276,7 +354,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         $query = Order::where('user_id', $user->id)
             ->with(['store', 'items'])
@@ -315,7 +393,7 @@ class OrderController extends Controller
      */
     public function show($orderId)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
@@ -343,7 +421,7 @@ class OrderController extends Controller
      */
     public function cancel(Request $request, $orderId)
     {
-        $user = auth('users')->user();
+        $user = auth('api')->user();
 
         $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
@@ -379,6 +457,150 @@ class OrderController extends Controller
             'success' => true,
             'message' => LocalizationService::getMessage('order.cancelled_successfully'),
         ], 200);
+    }
+
+    /**
+     * Confirm payment for online orders
+     */
+    public function confirmPayment(Request $request, $orderId)
+    {
+        $user = auth('api')->user();
+
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'transaction_id' => 'required|string',
+            'order_id' => 'required|string',
+            'amount_cents' => 'required|integer',
+            'currency' => 'required|string',
+            'success' => 'required|boolean',
+            'is_3d_secure' => 'nullable|boolean',
+            'card_type' => 'nullable|string',
+            'card_pan' => 'nullable|string',
+            'gateway_response' => 'nullable|string',
+            'txn_response_code' => 'nullable|string',
+            'integration_id' => 'nullable|integer',
+            'hmac' => 'nullable|string',
+            'created_at' => 'nullable|string',
+            'merchant_commission' => 'nullable|numeric',
+            'accept_fees' => 'nullable|numeric',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.validation_failed'),
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Find order
+        $order = Order::where('id', $orderId)
+            ->where('user_id', $user->id)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.order_not_found'),
+            ], 404);
+        }
+
+        // Verify order is pending payment
+        if ($order->payment_method !== 'online') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order payment method is not online',
+            ], 400);
+        }
+
+        if ($order->payment_status === 'paid') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order has already been paid',
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Create payment record
+            $payment = Payment::create([
+                'order_id' => $order->id,
+                'transaction_id' => $request->transaction_id,
+                'gateway_order_id' => $request->order_id,
+                'amount_cents' => $request->amount_cents,
+                'currency' => $request->currency ?? 'EGP',
+                'success' => $request->success,
+                'status' => $request->success ? 'completed' : 'failed',
+                'is_3d_secure' => $request->is_3d_secure ?? false,
+                'card_type' => $request->card_type,
+                'card_pan' => $request->card_pan,
+                'gateway_response' => $request->gateway_response,
+                'txn_response_code' => $request->txn_response_code,
+                'integration_id' => $request->integration_id,
+                'hmac' => $request->hmac,
+                'merchant_commission' => $request->merchant_commission ?? 0,
+                'accept_fees' => $request->accept_fees ?? 0,
+                'payment_created_at' => $request->created_at,
+                'raw_response' => $request->all(),
+            ]);
+            
+            // Update order payment status based on success flag
+            if ($request->success) {
+                $order->payment_status = 'paid';
+                $order->order_status = 'confirmed';
+                $order->payment_reference = $request->transaction_id;
+            } else {
+                $order->payment_status = 'failed';
+            }
+
+            $order->save();
+
+            // Delete cart only after successful payment
+            if ($request->success) {
+                $cart = $user->cart()->first();
+                if ($cart) {
+                    $cart->items()->delete();
+                    $cart->delete();
+                }
+            }
+
+            // Log activity
+            activity()
+                ->performedOn($payment)
+                ->causedBy($user)
+                ->withProperties([
+                    'order_id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'transaction_id' => $request->transaction_id,
+                    'success' => $request->success,
+                    'amount_cents' => $request->amount_cents,
+                ])
+                ->log('Payment confirmation received');
+
+            DB::commit();
+
+            $message = $request->success 
+                ? LocalizationService::getMessage('order.payment_confirmed')
+                : LocalizationService::getMessage('order.payment_failed');
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => [
+                    'order' => $this->transformOrderDetail($order->load(['store', 'items.options', 'items.addons'])),
+                ],
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.server_error'),
+                'error' => config('app.debug') ? $e->getMessage() : null,
+            ], 500);
+        }
     }
 
     /**

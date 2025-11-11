@@ -73,6 +73,7 @@ Route::prefix('user')->group(function () {
             Route::get('/', 'index')->name('user.orders.index');
             Route::get('/{orderId}', 'show')->name('user.orders.show');
             Route::post('/{orderId}/cancel', 'cancel')->name('user.orders.cancel');
+            Route::post('/{orderId}/confirm-payment', 'confirmPayment')->name('user.orders.confirmPayment');
         });
     });
 
