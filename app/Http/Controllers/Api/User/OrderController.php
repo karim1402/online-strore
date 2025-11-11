@@ -556,14 +556,14 @@ class OrderController extends Controller
 
             $order->save();
 
-            // Delete cart only after successful payment
-            if ($request->success) {
+          
+        
                 $cart = $user->cart()->first();
                 if ($cart) {
                     $cart->items()->delete();
                     $cart->delete();
                 }
-            }
+            
 
             // Log activity
             activity()
@@ -665,12 +665,12 @@ class OrderController extends Controller
      */
     private function calculateItemPrice($cartItem)
     {
-        $basePrice = $cartItem->product->price;
+        $basePrice = $cartItem->product->base_price;
 
         // Add option prices
         foreach ($cartItem->options as $option) {
             $basePrice += $this->calculateOptionPrice(
-                $cartItem->product->price,
+                $cartItem->product->base_price,
                 $option->productOptionValue
             );
         }
@@ -720,6 +720,8 @@ class OrderController extends Controller
             'id' => $order->id,
             'order_number' => $order->order_number,
             'status' => $order->order_status,
+            'simple_status' => $order->simple_status,
+            'simple_status_label' => $order->simple_status_label,
             'payment_method' => $order->payment_method,
             'payment_status' => $order->payment_status,
             'payment_reference' => $order->payment_reference,
@@ -749,6 +751,8 @@ class OrderController extends Controller
             ],
             'status' => $order->order_status,
             'status_label' => $order->status_label,
+            'simple_status' => $order->simple_status,
+            'simple_status_label' => $order->simple_status_label,
             'payment_method' => $order->payment_method,
             'total' => number_format($order->total, 2),
             'items_count' => $order->items->count(),
@@ -803,6 +807,8 @@ class OrderController extends Controller
             }),
             'status' => $order->order_status,
             'status_label' => $order->status_label,
+            'simple_status' => $order->simple_status,
+            'simple_status_label' => $order->simple_status_label,
             'payment_method' => $order->payment_method,
             'payment_status' => $order->payment_status,
             'payment_reference' => $order->payment_reference,
