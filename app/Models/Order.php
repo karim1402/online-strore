@@ -22,6 +22,7 @@ class Order extends Model
         'payment_status',
         'payment_reference',
         'order_status',
+        'simple_status',
         'subtotal',
         'delivery_fee',
         'tax',
@@ -174,5 +175,33 @@ class Order extends Model
     public function isPaid()
     {
         return $this->payment_status === 'paid';
+    }
+
+    /**
+     * Simple Status Helper Methods
+     */
+    public function isInProgress()
+    {
+        return $this->simple_status === 'in_progress';
+    }
+
+    public function isInDelivery()
+    {
+        return $this->simple_status === 'in_delivery';
+    }
+
+    public function isSimpleCancelled()
+    {
+        return $this->simple_status === 'cancelled';
+    }
+
+    public function isSimpleDelivered()
+    {
+        return $this->simple_status === 'delivered';
+    }
+
+    public function getSimpleStatusLabelAttribute()
+    {
+        return LocalizationService::getMessage("order.simple_status.{$this->simple_status}");
     }
 }
