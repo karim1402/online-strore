@@ -154,6 +154,7 @@ class OrderController extends Controller
                 'payment_status' => $paymentStatus,
                 'payment_reference' => $paymentReference,
                 'order_status' => $orderStatus,
+                'simple_status' => 'in_progress',
                 'subtotal' => $subtotal,
                 'delivery_fee' => $deliveryFee,
                 'tax' => $tax,
