@@ -154,6 +154,7 @@ class OrderController extends Controller
                 'payment_status' => $paymentStatus,
                 'payment_reference' => $paymentReference,
                 'order_status' => $orderStatus,
+                'simple_status' => 'in_progress',
                 'subtotal' => $subtotal,
                 'delivery_fee' => $deliveryFee,
                 'tax' => $tax,
@@ -360,9 +361,9 @@ class OrderController extends Controller
             ->with(['store', 'items'])
             ->orderBy('created_at', 'desc');
 
-        // Filter by status
+        // Filter by simple status
         if ($request->has('status')) {
-            $query->where('order_status', $request->status);
+            $query->where('simple_status', $request->status);
         }
 
         // Pagination
