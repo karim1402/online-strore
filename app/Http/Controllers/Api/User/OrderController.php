@@ -361,9 +361,9 @@ class OrderController extends Controller
             ->with(['store', 'items'])
             ->orderBy('created_at', 'desc');
 
-        // Filter by status
+        // Filter by simple status
         if ($request->has('status')) {
-            $query->where('order_status', $request->status);
+            $query->where('simple_status', $request->status);
         }
 
         // Pagination
