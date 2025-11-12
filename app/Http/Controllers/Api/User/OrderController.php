@@ -442,7 +442,7 @@ class OrderController extends Controller
             ], 400);
         }
 
-        $order->order_status = 'cancelled';
+        $order->simple_status  = 'cancelled';
         $order->save();
 
         // Log activity
