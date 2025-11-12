@@ -144,7 +144,7 @@ class Order extends Model
      */
     public function canBeCancelled()
     {
-        return in_array($this->order_status, ['pending', 'pending_payment']);
+        return $this->simple_status === 'in_progress';
     }
 
     public function isPending()
