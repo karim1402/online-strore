@@ -37,7 +37,7 @@ class CartController extends Controller
 
         if (!$cart) {
             return response()->json([
-                'success' => false,
+                'success' => true,
                 'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Cart']),
                 'data' => []
             ], 200);
