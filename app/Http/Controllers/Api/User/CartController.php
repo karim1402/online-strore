@@ -124,43 +124,66 @@ class CartController extends Controller
                 ]);
             }
 
-            // Check cart item limit
-            if ($cart->items()->count() >= 50) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => LocalizationService::getMessage('cart.limit_reached'),
-                    'errors' => [
-                        'cart' => [LocalizationService::getMessage('cart.max_items')],
-                    ],
-                ], 422);
-            }
-
-            // Create cart item
-            $cartItem = CartItem::create([
-                'cart_id' => $cart->id,
-                'product_id' => $product->id,
-                'quantity' => $request->quantity,
-            ]);
-
-            // Add options
-            if ($request->has('option_values') && is_array($request->option_values)) {
-                foreach ($request->option_values as $optionValueId) {
-                    CartItemOption::create([
-                        'cart_item_id' => $cartItem->id,
-                        'product_option_value_id' => $optionValueId,
-                    ]);
+            // Check for existing cart item with same product, options, and addons
+            $existingItem = $this->findExistingCartItem($cart, $product->id, $request->option_values ?? [], $request->addons ?? []);
+            
+            if ($existingItem) {
+                // Update quantity of existing item
+                $newQuantity = $existingItem->quantity + $request->quantity;
+                
+                // Check if new quantity exceeds maximum
+                if ($newQuantity > 99) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => LocalizationService::getMessage('cart.quantity_limit_exceeded'),
+                        'errors' => [
+                            'quantity' => [LocalizationService::getMessage('cart.max_quantity_per_item')],
+                        ],
+                    ], 422);
                 }
-            }
+                
+                $existingItem->update(['quantity' => $newQuantity]);
+                $cartItem = $existingItem;
+            } else {
+                // Check cart item limit for new items only
+                if ($cart->items()->count() >= 50) {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => LocalizationService::getMessage('cart.limit_reached'),
+                        'errors' => [
+                            'cart' => [LocalizationService::getMessage('cart.max_items')],
+                        ],
+                    ], 422);
+                }
 
-            // Add addons
-            if ($request->has('addons') && is_array($request->addons)) {
-                foreach ($request->addons as $addon) {
-                    CartItemAddon::create([
-                        'cart_item_id' => $cartItem->id,
-                        'addon_id' => $addon['addon_id'],
-                        'quantity' => $addon['quantity'] ?? 1,
-                    ]);
+                // Create new cart item
+                $cartItem = CartItem::create([
+                    'cart_id' => $cart->id,
+                    'product_id' => $product->id,
+                    'quantity' => $request->quantity,
+                ]);
+
+                // Add options
+                if ($request->has('option_values') && is_array($request->option_values)) {
+                    foreach ($request->option_values as $optionValueId) {
+                        CartItemOption::create([
+                            'cart_item_id' => $cartItem->id,
+                            'product_option_value_id' => $optionValueId,
+                        ]);
+                    }
+                }
+
+                // Add addons
+                if ($request->has('addons') && is_array($request->addons)) {
+                    foreach ($request->addons as $addon) {
+                        CartItemAddon::create([
+                            'cart_item_id' => $cartItem->id,
+                            'addon_id' => $addon['addon_id'],
+                            'quantity' => $addon['quantity'] ?? 1,
+                        ]);
+                    }
                 }
             }
 
@@ -181,9 +204,13 @@ class CartController extends Controller
             $cartData = $this->transformCart($cart);
             $localizedCart = LocalizationService::localizeCollection([$cartData], ['name', 'description', 'value'])[0];
 
+            $message = $existingItem ? 
+                LocalizationService::getMessage('cart.quantity_updated') : 
+                LocalizationService::getMessage('cart.item_added');
+            
             return response()->json([
                 'success' => true,
-                'message' => LocalizationService::getMessage('cart.item_added'),
+                'message' => $message,
                 'data' => [
                     'cart' => $localizedCart,
                 ],
@@ -460,6 +487,51 @@ class CartController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Find existing cart item with same product, options, and addons
+     *
+     * @param Cart $cart
+     * @param int $productId
+     * @param array $optionValues
+     * @param array $addons
+     * @return CartItem|null
+     */
+    private function findExistingCartItem(Cart $cart, $productId, array $optionValues = [], array $addons = [])
+    {
+        $cartItems = $cart->items()->with(['options', 'addons'])->where('product_id', $productId)->get();
+        
+        foreach ($cartItems as $item) {
+            // Check if options match
+            $itemOptionValues = $item->options->pluck('product_option_value_id')->sort()->values()->toArray();
+            $requestOptionValues = collect($optionValues)->sort()->values()->toArray();
+            
+            if ($itemOptionValues !== $requestOptionValues) {
+                continue;
+            }
+            
+            // Check if addons match
+            $itemAddons = $item->addons->map(function ($addon) {
+                return [
+                    'addon_id' => $addon->addon_id,
+                    'quantity' => $addon->quantity
+                ];
+            })->sortBy('addon_id')->values()->toArray();
+            
+            $requestAddons = collect($addons)->map(function ($addon) {
+                return [
+                    'addon_id' => $addon['addon_id'],
+                    'quantity' => $addon['quantity'] ?? 1
+                ];
+            })->sortBy('addon_id')->values()->toArray();
+            
+            if ($itemAddons === $requestAddons) {
+                return $item;
+            }
+        }
+        
+        return null;
     }
 
     /**
