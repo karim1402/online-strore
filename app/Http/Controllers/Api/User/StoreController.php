@@ -9,6 +9,7 @@ use App\Models\UserAddress;
 use App\Services\LocalizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class StoreController extends Controller
 {
