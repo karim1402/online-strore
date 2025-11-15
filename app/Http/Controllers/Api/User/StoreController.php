@@ -21,6 +21,8 @@ class StoreController extends Controller
      */
     public function getStoresByMainCategory($mainCategoryId, Request $request)
     {
+       //log the request and mainCategoryId
+       Log::info('getStoresByMainCategory', ['mainCategoryId' => $mainCategoryId, 'request' => $request->all()]);
         // Validate main category exists
         $mainCategory = MainCategory::find($mainCategoryId);
         if (!$mainCategory) {
