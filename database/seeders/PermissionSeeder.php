@@ -39,6 +39,12 @@ class PermissionSeeder extends Seeder
             ['name' => 'settings.view', 'category' => 'System Settings'],
             ['name' => 'settings.update', 'category' => 'System Settings'],
             ['name' => 'system.maintenance', 'category' => 'System Settings'],
+            
+            // Delivery User Management
+            ['name' => 'delivery-users.view', 'category' => 'Delivery User Management'],
+            ['name' => 'delivery-users.create', 'category' => 'Delivery User Management'],
+            ['name' => 'delivery-users.update', 'category' => 'Delivery User Management'],
+            ['name' => 'delivery-users.delete', 'category' => 'Delivery User Management'],
         ];
 
         foreach ($adminPermissions as $permission) {
