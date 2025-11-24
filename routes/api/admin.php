@@ -16,7 +16,8 @@ use App\Http\Controllers\Api\Admin\OptionValueController;
 use App\Http\Controllers\Api\Admin\ProductOptionController;
 use App\Http\Controllers\Api\Admin\AddonController;
 use App\Http\Controllers\Api\Admin\ProductAddonController;
-use App\Http\Controllers\Api\Admin\ActivityLogController; 
+use App\Http\Controllers\Api\Admin\ActivityLogController;
+use App\Http\Controllers\Api\Admin\DeliveryUserController; 
 
 /*
 |--------------------------------------------------------------------------
@@ -112,6 +113,27 @@ Route::prefix('admin')->group(function () {
             });
             
             Route::middleware('permission:admin-users.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
+        // Delivery Users CRUD routes (permission-based)
+        Route::controller(DeliveryUserController::class)->prefix('delivery-users')->group(function () {
+            Route::middleware('permission:delivery-users.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:delivery-users.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:delivery-users.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:delivery-users.delete,admins')->group(function () {
                 Route::delete('/{id}', 'destroy');
             });
         });

@@ -51,7 +51,13 @@
         "store_status_updated": "Store status updated successfully",
         "store_deleted": "Store deleted successfully",
         "store_fetched": "Store details retrieved successfully",
-        "store_updated": "Store updated successfully"
+        "store_updated": "Store updated successfully",
+        "delivery_users_retrieved": "Delivery users retrieved successfully",
+        "delivery_user_created": "Delivery user created successfully",
+        "delivery_user_retrieved": "Delivery user retrieved successfully",
+        "delivery_user_updated": "Delivery user updated successfully",
+        "delivery_user_deleted": "Delivery user deleted successfully",
+        "delivery_user_status_updated": "Delivery user status updated successfully"
     },
     "errors": {
         "validation_failed": "Validation failed",

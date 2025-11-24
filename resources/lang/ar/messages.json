@@ -51,7 +51,13 @@
         "store_status_updated": "تم تحديث حالة المتجر بنجاح",
         "store_deleted": "تم حذف المتجر بنجاح",
         "store_fetched": "تم استرجاع تفاصيل المتجر بنجاح",
-        "store_updated": "تم تحديث المتجر بنجاح"
+        "store_updated": "تم تحديث المتجر بنجاح",
+        "delivery_users_retrieved": "تم جلب مستخدمي التوصيل بنجاح",
+        "delivery_user_created": "تم إنشاء مستخدم التوصيل بنجاح",
+        "delivery_user_retrieved": "تم جلب مستخدم التوصيل بنجاح",
+        "delivery_user_updated": "تم تحديث مستخدم التوصيل بنجاح",
+        "delivery_user_deleted": "تم حذف مستخدم التوصيل بنجاح",
+        "delivery_user_status_updated": "تم تحديث حالة مستخدم التوصيل بنجاح"
     },
     "errors": {
         "validation_failed": "فشل التحقق من صحة البيانات",
