@@ -185,6 +185,11 @@ class Order extends Model
         return $this->simple_status === 'in_progress';
     }
 
+    public function isReadyToPick()
+    {
+        return $this->simple_status === 'ready_to_pick';
+    }
+
     public function isInDelivery()
     {
         return $this->simple_status === 'in_delivery';

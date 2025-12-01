@@ -183,6 +183,13 @@
             "delivered": "Delivered",
             "cancelled": "Cancelled"
         },
+        "simple_status": {
+            "in_progress": "In progress",
+            "ready_to_pick": "Ready to pick",
+            "in_delivery": "In delivery",
+            "delivered": "Delivered",
+            "cancelled": "Cancelled"
+        },
         "payment_status": {
             "pending": "Pending",
             "paid": "Paid",
