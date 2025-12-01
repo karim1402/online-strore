@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\Vendor\AddonController;
 use App\Http\Controllers\Api\Vendor\ProductOptionController;
 use App\Http\Controllers\Api\Vendor\ProductAddonController;
 use App\Http\Controllers\Api\Vendor\MainCategoryController;
+use App\Http\Controllers\Api\Vendor\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -150,6 +151,12 @@ Route::prefix('vendor')->group(function () {
             Route::put('/product/{productId}/addon/{addonId}', 'updateAddon');
             Route::delete('/product/{productId}/addon/{addonId}', 'removeAddon');
             Route::post('/reorder', 'reorderAddons');
+        });
+
+        Route::controller(OrderController::class)->prefix('orders')->group(function () {
+            Route::get('/', 'index');
+            Route::patch('/{id}/ready-to-pick', 'markReadyToPick');
+            Route::get('/{id}', 'show');
         });
 
         // Add more vendor-specific routes here

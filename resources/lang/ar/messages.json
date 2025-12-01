@@ -183,6 +183,13 @@
             "delivered": "تم التوصيل",
             "cancelled": "ملغى"
         },
+        "simple_status": {
+            "in_progress": "قيد التنفيذ",
+            "ready_to_pick": "جاهز للاستلام",
+            "in_delivery": "قيد التوصيل",
+            "delivered": "تم التوصيل",
+            "cancelled": "ملغى"
+        },
         "payment_status": {
             "pending": "قيد الانتظار",
             "paid": "مدفوع",

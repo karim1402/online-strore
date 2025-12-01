@@ -1,0 +1,240 @@
+{
+  "info": {
+    "name": "Makook Vendor API",
+    "_postman_id": "00000000-0000-0000-0000-000000000000",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api"
+    },
+    {
+      "key": "vendor_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Vendor Auth",
+      "item": [
+        {
+          "name": "Vendor Login (form-data)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "email",
+                  "value": "vendor@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "password",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/vendor/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendor",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vendor Profile (me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendor_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendor/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendor",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vendor Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendor_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{base_url}}/vendor/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendor",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Vendor Orders",
+      "item": [
+        {
+          "name": "List Orders (filter by simple_status)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendor_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendor/orders?status=in_progress",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendor",
+                "orders"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "in_progress",
+                  "description": "simple_status: in_progress | ready_to_pick | in_delivery | delivered | cancelled"
+                },
+                {
+                  "key": "payment_status",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Order",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendor_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/vendor/orders/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendor",
+                "orders",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Order as ready_to_pick",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{vendor_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{base_url}}/vendor/orders/1/ready-to-pick",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "vendor",
+                "orders",
+                "1",
+                "ready-to-pick"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
