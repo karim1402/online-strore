@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Delivery\AuthController;
+use App\Http\Controllers\Api\Delivery\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,14 +38,11 @@ Route::prefix('delivery')->group(function () {
             ]);
         });
         
-        Route::get('orders', function () {
-            $message = \App\Services\LocalizationService::getMessage('guards.delivery_dashboard');
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => ['info' => 'Delivery Orders'],
-                'guard' => 'deliveries'
-            ]);
+        Route::controller(OrderController::class)->prefix('orders')->group(function () {
+            Route::get('available', 'available');
+            Route::get('{id}', 'show');
+            Route::post('{id}/pick', 'pick');
+            Route::post('{id}/deliver', 'deliver');
         });
         
         Route::post('update-availability', function () {
