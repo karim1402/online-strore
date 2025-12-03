@@ -156,6 +156,7 @@ Route::prefix('vendor')->group(function () {
         Route::controller(OrderController::class)->prefix('orders')->group(function () {
             Route::get('/', 'index');
             Route::patch('/{id}/ready-to-pick', 'markReadyToPick');
+            Route::patch('/{id}/cancel', 'cancel');
             Route::get('/{id}', 'show');
         });
 

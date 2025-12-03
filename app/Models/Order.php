@@ -16,6 +16,7 @@ class Order extends Model
         'order_number',
         'user_id',
         'store_id',
+        'delivery_id',
         'address_id',
         'address_snapshot',
         'payment_method',
@@ -61,6 +62,11 @@ class Order extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function delivery()
+    {
+        return $this->belongsTo(Delivery::class);
     }
 
     public function address()

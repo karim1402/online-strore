@@ -109,4 +109,36 @@ class OrderController extends Controller
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
+
+    public function cancel($id): JsonResponse
+    {
+        try {
+            $vendor = Auth::guard('vendors')->user();
+
+            if (!$vendor || !$vendor->store_id) {
+                return $this->errorResponse('errors.store_not_found', [], 404);
+            }
+
+            $order = Order::where('store_id', $vendor->store_id)
+                ->whereNull('delivery_id')
+                ->find($id);
+
+            if (!$order) {
+                return $this->errorResponse('errors.order_not_found', [], 404);
+            }
+
+            if (!in_array($order->simple_status, ['in_progress', 'ready_to_pick'])) {
+                return $this->errorResponse('errors.order_cannot_cancel', [], 400);
+            }
+
+            $order->simple_status = 'cancelled';
+            $order->save();
+
+            $order->load(['user', 'store', 'items.options', 'items.addons']);
+
+            return $this->successResponse($order, 'order.cancelled_successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
 }
