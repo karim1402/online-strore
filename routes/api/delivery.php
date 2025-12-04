@@ -43,6 +43,7 @@ Route::prefix('delivery')->group(function () {
             Route::get('available', 'available');
             Route::get('{id}', 'show');
             Route::post('{id}/pick', 'pick');
+            Route::post('{id}/start-delivery', 'startDelivery');
             Route::post('{id}/deliver', 'deliver');
         });
         
