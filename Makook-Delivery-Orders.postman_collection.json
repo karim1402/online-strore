@@ -1,0 +1,158 @@
+{
+  "info": {
+    "name": "Makook Delivery Orders API",
+    "_postman_id": "00000000-0000-0000-0000-000000000001",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api"
+    },
+    {
+      "key": "delivery_token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Delivery Orders",
+      "item": [
+        {
+          "name": "List available orders (ready_to_pick)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{delivery_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/delivery/orders/available",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "delivery",
+                "orders",
+                "available"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "15",
+                  "disabled": true,
+                  "description": "Optional: items per page (max 100)"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show available order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{delivery_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/delivery/orders/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "delivery",
+                "orders",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Pick order (assign to this delivery)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{delivery_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{base_url}}/delivery/orders/1/pick",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "delivery",
+                "orders",
+                "1",
+                "pick"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark order as delivered",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{delivery_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{base_url}}/delivery/orders/1/deliver",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "delivery",
+                "orders",
+                "1",
+                "deliver"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

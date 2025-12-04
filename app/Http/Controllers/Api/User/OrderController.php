@@ -143,11 +143,16 @@ class OrderController extends Controller
                 'longitude' => $address->longitude,
             ];
 
+            // Find nearest branch for the store based on delivery address
+            $nearestBranch = $this->getNearestBranchForAddress($cart->store_id, $address);
+            $branchId = $nearestBranch ? $nearestBranch->id : null;
+
             // Create order
             $order = Order::create([
                 'order_number' => $orderNumber,
                 'user_id' => $user->id,
                 'store_id' => $cart->store_id,
+                'branch_id' => $branchId,
                 'address_id' => $address->id,
                 'address_snapshot' => $addressSnapshot,
                 'payment_method' => $request->payment_method,
@@ -710,6 +715,43 @@ class OrderController extends Controller
         $sequence = $lastOrder ? ((int)substr($lastOrder->order_number, -5)) + 1 : 1;
 
         return sprintf('ORD-%s-%05d', $date, $sequence);
+    }
+
+    /**
+     * Helper: Get nearest branch for a given address
+     */
+    private function getNearestBranchForAddress($storeId, $address)
+    {
+        // Validate address has coordinates
+        if (!$address->latitude || !$address->longitude) {
+            return null;
+        }
+
+        // Get all active branches for the store with valid coordinates
+        $branches = \App\Models\Branch::where('store_id', $storeId)
+            ->where('is_active', true)
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get();
+
+        if ($branches->isEmpty()) {
+            return null;
+        }
+
+        // Find the closest branch
+        $closestBranch = null;
+        $minDistance = PHP_FLOAT_MAX;
+
+        foreach ($branches as $branch) {
+            $distance = $branch->getDistanceFrom($address->latitude, $address->longitude);
+            
+            if ($distance < $minDistance) {
+                $minDistance = $distance;
+                $closestBranch = $branch;
+            }
+        }
+
+        return $closestBranch;
     }
 
     /**
