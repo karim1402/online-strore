@@ -119,6 +119,45 @@ class OrderController extends Controller
             }
 
             $order->delivery_id = $delivery->id;
+            // $order->simple_status = 'in_delivery';
+            $order->save();
+
+            $order->load(['store', 'branch', 'user', 'items.options', 'items.addons', 'delivery']);
+
+            return $this->successResponse($order, 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    public function startDelivery($id, Request $request): JsonResponse
+    {
+        try {
+            $delivery = auth('deliveries')->user();
+
+            $order = Order::where('delivery_id', $delivery->id)
+                ->where('simple_status', 'ready_to_pick')
+                ->find($id);
+
+            if (!$order) {
+                return $this->errorResponse('errors.order_not_found', [], 404);
+            }
+
+            // Validate image if provided
+            if ($request->hasFile('order_pickup_image')) {
+                $request->validate([
+                    'order_pickup_image' => 'required|image|mimes:jpeg,png,jpg|max:5120', // 5MB max
+                ]);
+
+                // Store the image
+                $image = $request->file('order_pickup_image');
+                $imageName = 'pickup_' . $order->order_number . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $imagePath = $image->storeAs('orders/pickup', $imageName, 'public');
+
+                // Save image path to order
+                $order->order_pickup_image = $imagePath;
+            }
+
             $order->simple_status = 'in_delivery';
             $order->save();
 

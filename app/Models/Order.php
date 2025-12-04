@@ -30,6 +30,7 @@ class Order extends Model
         'tax',
         'total',
         'notes',
+        'order_pickup_image',
     ];
 
     protected $casts = [
