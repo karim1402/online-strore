@@ -39,6 +39,7 @@ Route::prefix('delivery')->group(function () {
         });
         
         Route::controller(OrderController::class)->prefix('orders')->group(function () {
+            Route::get('/', 'index');
             Route::get('available', 'available');
             Route::get('{id}', 'show');
             Route::post('{id}/pick', 'pick');

@@ -13,6 +13,53 @@ class OrderController extends Controller
     use ApiResponse;
 
     /**
+     * Get all orders assigned to the delivery person with pagination and filters
+     */
+    public function index(Request $request): JsonResponse
+    {
+        try {
+            $delivery = auth('deliveries')->user();
+
+            $query = Order::with(['store', 'branch', 'user', 'items'])
+                ->where('delivery_id', $delivery->id)
+                ->orderBy('created_at', 'desc');
+
+            // Filter by simple status
+            if ($request->filled('status')) {
+                $query->where('simple_status', $request->status);
+            }
+
+            // Filter by payment status
+            // if ($request->filled('payment_status')) {
+            //     $query->where('payment_status', $request->payment_status);
+            // }
+
+            // Search by order number
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('order_number', 'like', "%{$search}%");
+                });
+            }
+
+            // Pagination
+            $perPage = (int) $request->get('per_page', 15);
+            if ($perPage <= 0) {
+                $perPage = 15;
+            }
+            if ($perPage > 100) {
+                $perPage = 100;
+            }
+
+            $orders = $query->paginate($perPage);
+
+            return $this->successResponse($orders, 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
      * Get all unassigned orders that are ready to pick
      * (delivery_id IS NULL and simple_status = 'ready_to_pick').
      */
