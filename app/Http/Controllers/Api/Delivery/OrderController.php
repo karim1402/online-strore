@@ -19,7 +19,7 @@ class OrderController extends Controller
     public function available(Request $request): JsonResponse
     {
         try {
-            $query = Order::with(['store', 'user', 'items'])
+            $query = Order::with(['store', 'branch', 'user', 'items'])
                 ->whereNull('delivery_id')
                 ->where('simple_status', 'ready_to_pick')
                 ->orderBy('created_at', 'desc');
@@ -43,7 +43,7 @@ class OrderController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $order = Order::with(['store', 'user', 'items.options', 'items.addons'])
+            $order = Order::with(['store', 'branch', 'user', 'items.options', 'items.addons'])
                 ->whereNull('delivery_id')
                 ->where('simple_status', 'ready_to_pick')
                 ->find($id);
@@ -75,7 +75,7 @@ class OrderController extends Controller
             $order->simple_status = 'in_delivery';
             $order->save();
 
-            $order->load(['store', 'user', 'items.options', 'items.addons', 'delivery']);
+            $order->load(['store', 'branch', 'user', 'items.options', 'items.addons', 'delivery']);
 
             return $this->successResponse($order, 'success.data_retrieved');
         } catch (\Exception $e) {
@@ -99,7 +99,7 @@ class OrderController extends Controller
             $order->simple_status = 'delivered';
             $order->save();
 
-            $order->load(['store', 'user', 'items.options', 'items.addons', 'delivery']);
+            $order->load(['store', 'branch', 'user', 'items.options', 'items.addons', 'delivery']);
 
             return $this->successResponse($order, 'success.data_retrieved');
         } catch (\Exception $e) {
