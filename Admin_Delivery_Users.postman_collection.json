@@ -224,6 +224,18 @@
                                     "value": "true",
                                     "description": "Availability (optional, boolean, default: true)",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "shift_start_time",
+                                    "value": "09:00",
+                                    "description": "Shift start time (optional, format: HH:MM or HH:MM:SS)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "shift_end_time",
+                                    "value": "17:00",
+                                    "description": "Shift end time (optional, format: HH:MM or HH:MM:SS)",
+                                    "type": "text"
                                 }
                             ]
                         },
@@ -238,7 +250,7 @@
                                 "delivery-users"
                             ]
                         },
-                        "description": "Create a new delivery user.\n\n**Permission Required:** `delivery-users.create`\n\n**Required Fields:**\n- name\n- email (must be unique)\n- password\n- phone\n\n**Optional Fields:**\n- vehicle_type\n- vehicle_number\n- license_number\n- address\n- status (boolean)\n- availability (boolean)"
+                        "description": "Create a new delivery user.\n\n**Permission Required:** `delivery-users.create`\n\n**Required Fields:**\n- name\n- email (must be unique)\n- password\n- phone\n\n**Optional Fields:**\n- vehicle_type\n- vehicle_number\n- license_number\n- address\n- status (boolean)\n- availability (boolean)\n- shift_start_time (HH:MM or HH:MM:SS format)\n- shift_end_time (HH:MM or HH:MM:SS format)"
                     },
                     "response": []
                 },
@@ -377,6 +389,20 @@
                                     "key": "availability",
                                     "value": "false",
                                     "description": "Availability (optional, boolean)",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "shift_start_time",
+                                    "value": "08:00",
+                                    "description": "Shift start time (optional, format: HH:MM or HH:MM:SS)",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "shift_end_time",
+                                    "value": "16:00",
+                                    "description": "Shift end time (optional, format: HH:MM or HH:MM:SS)",
                                     "type": "text",
                                     "disabled": true
                                 }

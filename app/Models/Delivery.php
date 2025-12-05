@@ -36,6 +36,8 @@ class Delivery extends Authenticatable implements JWTSubject
         'address',
         'status',
         'availability',
+        'shift_start_time',
+        'shift_end_time',
     ];
 
     /**
@@ -91,7 +93,7 @@ class Delivery extends Authenticatable implements JWTSubject
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'phone', 'vehicle_type', 'vehicle_number', 'status', 'availability'])
+            ->logOnly(['name', 'email', 'phone', 'vehicle_type', 'vehicle_number', 'status', 'availability', 'shift_start_time', 'shift_end_time'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "Delivery {$eventName}")

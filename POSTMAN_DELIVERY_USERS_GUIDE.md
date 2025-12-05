@@ -78,6 +78,8 @@ Before using the collection, set up these environment variables:
    - `address`: "123 Main Street" (optional)
    - `status`: "true" (optional)
    - `availability`: "true" (optional)
+   - `shift_start_time`: "09:00" (optional, format: HH:MM or HH:MM:SS)
+   - `shift_end_time`: "17:00" (optional, format: HH:MM or HH:MM:SS)
 3. Send the request
 4. ✅ User created successfully
 
@@ -136,6 +138,8 @@ Body (form-data):
   address: 123 Main Street
   status: true
   availability: true
+  shift_start_time: 09:00
+  shift_end_time: 17:00
 ```
 
 ### Updating a User (PUT)
@@ -203,6 +207,8 @@ All responses follow this format:
     "address": "123 Main Street",
     "status": true,
     "availability": true,
+    "shift_start_time": "09:00:00",
+    "shift_end_time": "17:00:00",
     "created_at": "2024-01-01T00:00:00.000000Z",
     "updated_at": "2024-01-01T00:00:00.000000Z"
   }

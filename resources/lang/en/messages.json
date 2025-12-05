@@ -138,6 +138,8 @@
         "license_number": "license number",
         "availability": "availability",
         "status": "status",
+        "shift_start_time": "shift start time",
+        "shift_end_time": "shift end time",
         "name_en": "English name",
         "name_ar": "Arabic name",
         "description_en": "English description",
