@@ -73,6 +73,8 @@ class DeliveryUserController extends Controller
                 'address' => 'nullable|string',
                 'status' => 'boolean',
                 'availability' => 'boolean',
+                'shift_start_time' => 'nullable|date_format:H:i:s,H:i',
+                'shift_end_time' => 'nullable|date_format:H:i:s,H:i',
             ]);
 
             if ($validator->fails()) {
@@ -137,6 +139,8 @@ class DeliveryUserController extends Controller
                 'address' => 'nullable|string',
                 'status' => 'boolean',
                 'availability' => 'boolean',
+                'shift_start_time' => 'nullable|date_format:H:i:s,H:i',
+                'shift_end_time' => 'nullable|date_format:H:i:s,H:i',
             ]);
 
             if ($validator->fails()) {
