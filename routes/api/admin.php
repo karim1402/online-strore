@@ -404,5 +404,11 @@ Route::prefix('admin')->group(function () {
                 Route::post('/{userId}/roles/sync', 'syncRoles');
             });
         });
+
+        // Order Management routes
+        Route::controller(\App\Http\Controllers\Api\Admin\OrderController::class)->prefix('orders')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+        });
     });
 });

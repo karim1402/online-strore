@@ -1,0 +1,132 @@
+{
+    "info": {
+        "_postman_id": "admin-orders-collection",
+        "name": "Admin Orders API",
+        "description": "Admin endpoints for managing orders.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{admin_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api/admin",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "YOUR_ADMIN_TOKEN_HERE",
+            "type": "string"
+        },
+        {
+            "key": "order_id",
+            "value": "1",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. List Orders",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept-Language",
+                        "value": "en",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/orders?page=1&per_page=15",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "orders"
+                    ],
+                    "query": [
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "description": "Page number (default: 1)"
+                        },
+                        {
+                            "key": "per_page",
+                            "value": "15",
+                            "description": "Items per page (default: 15, max: 100)"
+                        },
+                        {
+                            "key": "store_id",
+                            "value": "",
+                            "description": "Filter by store ID (optional)",
+                            "disabled": true
+                        },
+                        {
+                            "key": "status",
+                            "value": "pending",
+                            "description": "Filter by order status (optional)",
+                            "disabled": true
+                        },
+                        {
+                            "key": "payment_status",
+                            "value": "paid",
+                            "description": "Filter by payment status (optional)",
+                            "disabled": true
+                        },
+                        {
+                            "key": "search",
+                            "value": "",
+                            "description": "Search by order number (optional)",
+                            "disabled": true
+                        }
+                    ]
+                },
+                "description": "Get list of orders with pagination and filtering options."
+            },
+            "response": []
+        },
+        {
+            "name": "2. Show Order",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept-Language",
+                        "value": "en",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/orders/{{order_id}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "orders",
+                        "{{order_id}}"
+                    ]
+                },
+                "description": "Get details of a specific order."
+            },
+            "response": []
+        }
+    ]
+}
