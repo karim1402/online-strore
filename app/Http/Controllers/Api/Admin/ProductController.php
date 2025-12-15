@@ -320,7 +320,7 @@ class ProductController extends Controller
             // Verify category belongs to product's store if changing category
             if ($request->filled('category_id')) {
                 $category = Category::where('id', $request->category_id)
-                    ->where('store_id', $product->store_id)
+                    ->where('store_id', $request->store_id)
                     ->first();
                 
                 if (!$category) {

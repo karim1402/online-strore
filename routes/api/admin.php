@@ -142,6 +142,7 @@ Route::prefix('admin')->group(function () {
         Route::controller(StoreController::class)->prefix('stores')->group(function () {
             Route::middleware('permission:stores.view,admins')->group(function () {
                 Route::get('/', 'index');
+                Route::get('/all', 'getAll');
                 Route::get('/pending', 'getPendingStores');
                 Route::get('/{id}', 'show');
             });
