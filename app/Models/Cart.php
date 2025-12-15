@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Cart extends Model
 {
-    use LogsActivity, SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'user_id',
