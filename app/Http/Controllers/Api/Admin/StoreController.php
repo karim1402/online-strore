@@ -103,11 +103,7 @@ class StoreController extends Controller
             $stores = Store::with(['vendors', 'mainCategories', 'branches'])
                 ->orderBy('created_at', 'desc')
                 ->get();
-
-            return $this->successResponse([
-                'count' => $stores->count(),
-                'stores' => $stores
-            ], 'success.data_retrieved');
+            return $this->successResponse($stores, 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
