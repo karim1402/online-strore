@@ -95,6 +95,25 @@ class StoreController extends Controller
     }
 
     /**
+     * Get all stores without pagination or filters
+     */
+    public function getAll(): JsonResponse
+    {
+        try {
+            $stores = Store::with(['vendors', 'mainCategories', 'branches'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            return $this->successResponse([
+                'count' => $stores->count(),
+                'stores' => $stores
+            ], 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
      * Create a new store with optional vendor
      */
     public function store(Request $request): JsonResponse
