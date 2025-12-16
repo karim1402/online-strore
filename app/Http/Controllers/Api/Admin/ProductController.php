@@ -136,7 +136,7 @@ class ProductController extends Controller
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
                 'metadata' => 'nullable|array',
-                'images' => 'nullable|array',
+                'images' => 'required|array',
                 'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:2048',
                 'primary_image_index' => 'nullable|integer|min:0',
                 'option_groups' => 'nullable|array',
