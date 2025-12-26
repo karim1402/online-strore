@@ -41,6 +41,7 @@ Route::prefix('delivery')->group(function () {
         Route::controller(OrderController::class)->prefix('orders')->group(function () {
             Route::get('/', 'index');
             Route::get('available', 'available');
+            Route::get('pending-cash-handover', 'pendingCashHandover');
             Route::get('{id}', 'show');
             Route::post('{id}/pick', 'pick');
             Route::post('{id}/start-delivery', 'startDelivery');
