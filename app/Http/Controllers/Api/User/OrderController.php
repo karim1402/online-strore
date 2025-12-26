@@ -165,6 +165,7 @@ class OrderController extends Controller
                 'tax' => $tax,
                 'total' => $total,
                 'notes' => $request->notes,
+                'is_cash_handed_over' => $request->payment_method === 'online',
             ]);
 
             // Copy cart items to order items

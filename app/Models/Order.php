@@ -32,6 +32,7 @@ class Order extends Model
         'total',
         'notes',
         'order_pickup_image',
+        'is_cash_handed_over',
     ];
 
     protected $casts = [
@@ -40,6 +41,7 @@ class Order extends Model
         'delivery_fee' => 'decimal:2',
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
+        'is_cash_handed_over' => 'boolean',
     ];
 
     /**

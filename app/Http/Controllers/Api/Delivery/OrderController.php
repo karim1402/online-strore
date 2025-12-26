@@ -193,5 +193,23 @@ class OrderController extends Controller
         }
     }
 
-    
+    /**
+     * Get the total amount of cash that has not been handed over by the delivery person
+     */
+    public function pendingCashHandover(Request $request): JsonResponse
+    {
+        try {
+            $delivery = auth('deliveries')->user();
+
+            $totalAmount = Order::where('delivery_id', $delivery->id)
+                ->where('is_cash_handed_over', false)
+                ->sum('total');
+
+            return $this->successResponse([
+                'total_amount' => (float) $totalAmount
+            ], 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
 }
