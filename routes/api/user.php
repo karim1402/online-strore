@@ -74,6 +74,7 @@ Route::prefix('user')->group(function () {
             Route::get('/{orderId}', 'show')->name('user.orders.show');
             Route::post('/{orderId}/cancel', 'cancel')->name('user.orders.cancel');
             Route::post('/{orderId}/confirm-payment', 'confirmPayment')->name('user.orders.confirmPayment');
+            Route::post('/{orderId}/chat', [\App\Http\Controllers\Api\User\ChatController::class, 'sendMessage'])->name('user.orders.chat');
         });
     });
 
