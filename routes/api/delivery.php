@@ -46,6 +46,7 @@ Route::prefix('delivery')->group(function () {
             Route::post('{id}/pick', 'pick');
             Route::post('{id}/start-delivery', 'startDelivery');
             Route::post('{id}/deliver', 'deliver');
+            Route::post('{id}/chat', [\App\Http\Controllers\Api\Delivery\ChatController::class, 'sendMessage']);
         });
         
         Route::post('update-availability', function () {
