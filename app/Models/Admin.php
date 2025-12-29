@@ -40,6 +40,7 @@ class Admin extends Authenticatable implements JWTSubject
         'password',
         'phone',
         'status',
+        'fcm_token',
     ];
 
     /**
@@ -50,6 +51,7 @@ class Admin extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'fcm_token',
     ];
 
     /**

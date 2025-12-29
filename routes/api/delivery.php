@@ -23,6 +23,7 @@ Route::prefix('delivery')->group(function () {
         Route::post('logout', 'logout')->middleware('auth:deliveries');
         Route::post('refresh', 'refresh')->middleware('auth:deliveries');
         Route::get('profile', 'profile')->middleware('auth:deliveries');
+        Route::post('fcm-token', 'updateFcmToken')->middleware('auth:deliveries');
     });
 
     // Protected delivery routes

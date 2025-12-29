@@ -57,7 +57,8 @@
         "delivery_user_retrieved": "Delivery user retrieved successfully",
         "delivery_user_updated": "Delivery user updated successfully",
         "delivery_user_deleted": "Delivery user deleted successfully",
-        "delivery_user_status_updated": "Delivery user status updated successfully"
+        "delivery_user_status_updated": "Delivery user status updated successfully",
+        "fcm_token_updated": "FCM token updated successfully"
     },
     "errors": {
         "validation_failed": "Validation failed",

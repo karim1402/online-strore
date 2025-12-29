@@ -149,4 +149,23 @@ class AuthController extends Controller
             'expires_in' => 3600 // 1 hour
         ], 'success.token_refreshed');
     }
+
+    /**
+     * Update FCM token for push notifications
+     */
+    public function updateFcmToken(Request $request): JsonResponse
+    {
+        $validator = ValidationService::make($request->all(), [
+            'fcm_token' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorWithFirstMessage($validator);
+        }
+
+        $user = Auth::guard('api')->user();
+        $user->update(['fcm_token' => $request->fcm_token]);
+
+        return $this->successResponse(null, 'success.fcm_token_updated');
+    }
 }

@@ -57,7 +57,8 @@
         "delivery_user_retrieved": "تم جلب مستخدم التوصيل بنجاح",
         "delivery_user_updated": "تم تحديث مستخدم التوصيل بنجاح",
         "delivery_user_deleted": "تم حذف مستخدم التوصيل بنجاح",
-        "delivery_user_status_updated": "تم تحديث حالة مستخدم التوصيل بنجاح"
+        "delivery_user_status_updated": "تم تحديث حالة مستخدم التوصيل بنجاح",
+        "fcm_token_updated": "تم تحديث رمز FCM بنجاح"
     },
     "errors": {
         "validation_failed": "فشل التحقق من صحة البيانات",
