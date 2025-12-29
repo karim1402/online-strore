@@ -59,13 +59,20 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Get all unassigned orders that are ready to pick
-     * (delivery_id IS NULL and simple_status = 'ready_to_pick').
-     */
     public function available(Request $request): JsonResponse
     {
         try {
+            $delivery = auth('deliveries')->user();
+
+            // If delivery person already has an active order, they shouldn't see available orders
+            $activeOrder = Order::where('delivery_id', $delivery->id)
+                ->whereIn('simple_status', ['ready_to_pick', 'in_delivery'])
+                ->first();
+
+            if ($activeOrder) {
+                return $this->successResponse(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15), 'success.data_retrieved');
+            }
+
             $query = Order::with(['store', 'branch', 'user', 'items'])
                 ->whereNull('delivery_id')
                 ->where('simple_status', 'ready_to_pick')
@@ -109,6 +116,11 @@ class OrderController extends Controller
     {
         try {
             $delivery = auth('deliveries')->user();
+
+            // Check if delivery person is available
+            if (!$delivery->availability) {
+                return $this->errorResponse('errors.delivery_not_available', [], 400);
+            }
 
             // Check if delivery person already has an active order
             $activeOrder = Order::where('delivery_id', $delivery->id)
