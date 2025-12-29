@@ -62,6 +62,7 @@ Route::prefix('user')->group(function () {
             Route::get('/', 'index')->name('user.cart.index');
             Route::post('/items', 'addItem')->name('user.cart.addItem');
             Route::put('/items/{itemId}', 'updateQuantity')->name('user.cart.updateQuantity');
+            Route::patch('/items/{itemId}', 'updateItem')->name('user.cart.updateItem');
             Route::delete('/items/{itemId}', 'removeItem')->name('user.cart.removeItem');
             Route::delete('/', 'clear')->name('user.cart.clear');
             Route::post('/replace', 'replace')->name('user.cart.replace');

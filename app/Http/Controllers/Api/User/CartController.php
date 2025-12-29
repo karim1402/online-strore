@@ -291,6 +291,120 @@ class CartController extends Controller
     }
 
     /**
+     * Update cart item (options, addons, quantity)
+     *
+     * @param Request $request
+     * @param int $itemId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateItem(Request $request, $itemId)
+    {
+        $user = auth('api')->user();
+
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'quantity' => 'nullable|integer|min:1|max:99',
+            'option_values' => 'nullable|array',
+            'option_values.*' => 'exists:product_option_values,id',
+            'addons' => 'nullable|array',
+            'addons.*.addon_id' => 'required|exists:addons,id',
+            'addons.*.quantity' => 'nullable|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.validation_failed'),
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Find cart item
+        $cartItem = CartItem::with(['options', 'addons', 'product'])
+            ->whereHas('cart', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            })->find($itemId);
+
+        if (!$cartItem) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Cart item']),
+            ], 404);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Update quantity if provided
+            if ($request->has('quantity')) {
+                $cartItem->update(['quantity' => $request->quantity]);
+            }
+
+            // Update options if provided
+            if ($request->has('option_values')) {
+                // Delete existing options
+                $cartItem->options()->forceDelete();
+
+                // Add new options
+                foreach ($request->option_values as $optionValueId) {
+                    CartItemOption::create([
+                        'cart_item_id' => $cartItem->id,
+                        'product_option_value_id' => $optionValueId,
+                    ]);
+                }
+            }
+
+            // Update addons if provided
+            if ($request->has('addons')) {
+                // Delete existing addons
+                $cartItem->addons()->forceDelete();
+
+                // Add new addons
+                foreach ($request->addons as $addon) {
+                    CartItemAddon::create([
+                        'cart_item_id' => $cartItem->id,
+                        'addon_id' => $addon['addon_id'],
+                        'quantity' => $addon['quantity'] ?? 1,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            // Reload cart
+            $cart = $cartItem->cart;
+            $cart->load([
+                'store:id,name_en,name_ar,description_en,description_ar,logo,status',
+                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
+                'items.product.primaryImage',
+                'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
+                'items.options.productOptionValue.optionValue:id,value_en,value_ar',
+                'items.options.productOptionValue:id,product_option_id,option_value_id,price_type,price_value',
+                'items.addons.addon:id,name_en,name_ar,description_en,description_ar,price,is_active'
+            ]);
+
+            // Transform and localize
+            $cartData = $this->transformCart($cart);
+            $localizedCart = LocalizationService::localizeCollection([$cartData], ['name', 'description', 'value'])[0];
+
+            return response()->json([
+                'success' => true,
+                'message' => LocalizationService::getMessage('cart.item_updated'),
+                'data' => [
+                    'cart' => $localizedCart,
+                ],
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.server_error'),
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Remove item from cart
      *
      * @param int $itemId
