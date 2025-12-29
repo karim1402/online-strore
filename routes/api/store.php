@@ -40,6 +40,7 @@ Route::prefix('vendor')->group(function () {
         Route::get('profile', 'profile')->middleware('auth:vendors');
         Route::put('profile', 'updateProfile')->middleware('auth:vendors');
         Route::post('profile', 'updateProfile')->middleware('auth:vendors'); // POST alternative for file uploads
+        Route::post('fcm-token', 'updateFcmToken')->middleware('auth:vendors');
     });
 
     // Protected vendor routes

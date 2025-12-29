@@ -1,0 +1,249 @@
+{
+    "info": {
+        "_postman_id": "fcm-token-api-collection",
+        "name": "Makook - FCM Token API",
+        "description": "FCM Token update endpoints for all guards (User, Admin, Vendor, Delivery).\n\nThese endpoints allow updating the Firebase Cloud Messaging token for push notifications.\n\nSet the {{base_url}} and the appropriate token variable before using.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000/api",
+            "type": "string"
+        },
+        {
+            "key": "user_token",
+            "value": "your_user_bearer_token_here",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "your_admin_bearer_token_here",
+            "type": "string"
+        },
+        {
+            "key": "vendor_token",
+            "value": "your_vendor_bearer_token_here",
+            "type": "string"
+        },
+        {
+            "key": "delivery_token",
+            "value": "your_delivery_bearer_token_here",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "User",
+            "item": [
+                {
+                    "name": "Update FCM Token (User)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "description": "Use 'ar' for Arabic",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "fcm_token",
+                                    "value": "your_fcm_token_from_firebase_sdk",
+                                    "description": "Required - FCM token from Firebase SDK",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/user/fcm-token",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "user",
+                                "fcm-token"
+                            ]
+                        },
+                        "description": "Update the FCM token for the authenticated user.\n\nThis token is used for sending push notifications to the user's device.\n\n**When to call:**\n- After user login\n- When the FCM token is refreshed by Firebase SDK\n- When the user switches devices"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "FCM Token endpoint for regular users (customers)"
+        },
+        {
+            "name": "Admin",
+            "item": [
+                {
+                    "name": "Update FCM Token (Admin)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "description": "Use 'ar' for Arabic",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "fcm_token",
+                                    "value": "your_fcm_token_from_firebase_sdk",
+                                    "description": "Required - FCM token from Firebase SDK",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/fcm-token",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "fcm-token"
+                            ]
+                        },
+                        "description": "Update the FCM token for the authenticated admin.\n\nThis token is used for sending push notifications to the admin's device.\n\n**When to call:**\n- After admin login\n- When the FCM token is refreshed by Firebase SDK\n- When the admin switches devices"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "FCM Token endpoint for administrators"
+        },
+        {
+            "name": "Vendor",
+            "item": [
+                {
+                    "name": "Update FCM Token (Vendor)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "description": "Use 'ar' for Arabic",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "fcm_token",
+                                    "value": "your_fcm_token_from_firebase_sdk",
+                                    "description": "Required - FCM token from Firebase SDK",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/vendor/fcm-token",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "vendor",
+                                "fcm-token"
+                            ]
+                        },
+                        "description": "Update the FCM token for the authenticated vendor.\n\nThis token is used for sending push notifications to the vendor's device (e.g., new order notifications).\n\n**When to call:**\n- After vendor login\n- When the FCM token is refreshed by Firebase SDK\n- When the vendor switches devices"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "FCM Token endpoint for store vendors"
+        },
+        {
+            "name": "Delivery",
+            "item": [
+                {
+                    "name": "Update FCM Token (Delivery)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{delivery_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "description": "Use 'ar' for Arabic",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "fcm_token",
+                                    "value": "your_fcm_token_from_firebase_sdk",
+                                    "description": "Required - FCM token from Firebase SDK",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/delivery/fcm-token",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "delivery",
+                                "fcm-token"
+                            ]
+                        },
+                        "description": "Update the FCM token for the authenticated delivery personnel.\n\nThis token is used for sending push notifications to the delivery person's device (e.g., new delivery assignments).\n\n**When to call:**\n- After delivery login\n- When the FCM token is refreshed by Firebase SDK\n- When the delivery person switches devices"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "FCM Token endpoint for delivery personnel"
+        }
+    ]
+}

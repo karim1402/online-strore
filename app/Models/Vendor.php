@@ -42,6 +42,7 @@ class Vendor extends Authenticatable implements JWTSubject
         'address',
         'store_id',
         'status',
+        'fcm_token',
     ];
 
     /**
@@ -52,6 +53,7 @@ class Vendor extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'fcm_token',
     ];
 
     /**

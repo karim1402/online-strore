@@ -168,4 +168,23 @@ class AuthController extends Controller
             'expires_in' => Auth::guard('deliveries')->factory()->getTTL() * 60
         ], 'success.token_refreshed');
     }
+
+    /**
+     * Update FCM token for push notifications
+     */
+    public function updateFcmToken(Request $request): JsonResponse
+    {
+        $validator = ValidationService::make($request->all(), [
+            'fcm_token' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorWithFirstMessage($validator);
+        }
+
+        $delivery = Auth::guard('deliveries')->user();
+        $delivery->update(['fcm_token' => $request->fcm_token]);
+
+        return $this->successResponse(null, 'success.fcm_token_updated');
+    }
 }

@@ -38,6 +38,7 @@ Route::prefix('admin')->group(function () {
         Route::post('refresh', 'refresh')->middleware('auth:admins');
         Route::get('profile', 'profile')->middleware('auth:admins');
         Route::put('profile', 'updateProfile')->middleware('auth:admins');
+        Route::post('fcm-token', 'updateFcmToken')->middleware('auth:admins');
     });
 
     // Protected admin routes

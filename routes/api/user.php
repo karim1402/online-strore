@@ -28,6 +28,7 @@ Route::prefix('user')->group(function () {
         Route::post('logout', 'logout')->middleware('auth:api')->name('user.logout');
         Route::post('refresh', 'refresh')->middleware('auth:api')->name('user.refresh');
         Route::get('profile', 'profile')->middleware('auth:api')->name('user.profile');
+        Route::post('fcm-token', 'updateFcmToken')->middleware('auth:api')->name('user.fcm-token');
     });
 
     // Protected user routes

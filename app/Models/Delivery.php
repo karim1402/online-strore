@@ -39,6 +39,7 @@ class Delivery extends Authenticatable implements JWTSubject
         'availability',
         'shift_start_time',
         'shift_end_time',
+        'fcm_token',
     ];
 
     /**
@@ -49,6 +50,7 @@ class Delivery extends Authenticatable implements JWTSubject
     protected $hidden = [
         'password',
         'remember_token',
+        'fcm_token',
     ];
 
     /**
