@@ -161,6 +161,7 @@
     "cart": {
         "item_added": "Item added to cart successfully",
         "quantity_updated": "Cart item quantity updated successfully",
+        "item_updated": "Cart item updated successfully",
         "item_removed": "Item removed from cart successfully",
         "cleared": "Cart cleared successfully",
         "replaced": "Cart replaced successfully",
