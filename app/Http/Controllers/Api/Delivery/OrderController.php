@@ -110,6 +110,15 @@ class OrderController extends Controller
         try {
             $delivery = auth('deliveries')->user();
 
+            // Check if delivery person already has an active order
+            $activeOrder = Order::where('delivery_id', $delivery->id)
+                ->whereIn('simple_status', ['ready_to_pick', 'in_delivery'])
+                ->first();
+
+            if ($activeOrder) {
+                return $this->errorResponse('errors.delivery_has_active_order', [], 400);
+            }
+
             $order = Order::whereNull('delivery_id')
                 ->where('simple_status', 'ready_to_pick')
                 ->find($id);
@@ -124,7 +133,7 @@ class OrderController extends Controller
 
             $order->load(['store', 'branch', 'user', 'items.options', 'items.addons', 'delivery']);
 
-            return $this->successResponse($order, 'success.data_retrieved');
+            return $this->successResponse($order, 'order.picked_successfully');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
