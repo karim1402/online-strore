@@ -97,7 +97,8 @@
         "order_not_found": "Order not found",
         "order_cannot_cancel": "Order cannot be cancelled in current status",
         "delivery_has_active_order": "You already have an active order. Please complete or cancel it before picking a new one",
-        "delivery_not_available": "You are currently marked as unavailable. Please change your status to available to pick orders"
+        "delivery_not_available": "You are currently marked as unavailable. Please change your status to available to pick orders",
+        "store_not_approved": "Your store is not yet approved. Please contact support"
     },
     "validation": {
         "required": "The :attribute field is required",

@@ -177,8 +177,11 @@ class AuthController extends Controller
                 ])
                 ->log('Vendor registered with new store');
 
-            // Login vendor
-            $token = Auth::guard('vendors')->login($vendor);
+            // Login vendor only if store is approved
+            $token = null;
+            if ($store->isApproved()) {
+                $token = Auth::guard('vendors')->login($vendor);
+            }
 
             return $this->successResponse([
                 'access_token' => $token,
@@ -244,6 +247,12 @@ class AuthController extends Controller
         if (!$vendor->status) {
             Auth::guard('vendors')->logout();
             return $this->errorResponse('errors.account_disabled', [], 403);
+        }
+
+        // Check if store is approved
+        if (!$vendor->store || !$vendor->store->isApproved()) {
+            Auth::guard('vendors')->logout();
+            return $this->errorResponse('errors.store_not_approved', [], 403);
         }
 
         // Log the login activity
@@ -392,6 +401,11 @@ class AuthController extends Controller
     public function refresh(): JsonResponse
     {
         try {
+            $vendor = Auth::guard('vendors')->user();
+            if (!$vendor || !$vendor->store || !$vendor->store->isApproved()) {
+                Auth::guard('vendors')->logout();
+                return $this->errorResponse('errors.store_not_approved', [], 403);
+            }
             $token = Auth::guard('vendors')->refresh();
         } catch (\Exception $e) {
             return $this->errorResponse('errors.token_refresh_failed', [], 401);
