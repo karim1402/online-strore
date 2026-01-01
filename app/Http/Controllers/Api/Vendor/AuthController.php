@@ -48,8 +48,8 @@ class AuthController extends Controller
             'name_ar' => 'required|string|max:255',
             'description_en' => 'required|string',
             'description_ar' => 'required|string',
-            'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
-            'document' => 'nullable|file|mimes:pdf,jpeg,jpg,png|max:5120',
+            'logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'document' => 'required|file|mimes:pdf,jpeg,jpg,png|max:5120',
             
             // Branches array (required for store creation)
             'branches' => 'required|array|min:1',
