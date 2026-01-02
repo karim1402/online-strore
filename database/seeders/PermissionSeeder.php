@@ -51,6 +51,10 @@ class PermissionSeeder extends Seeder
             ['name' => 'users.create', 'category' => 'User Management'],
             ['name' => 'users.update', 'category' => 'User Management'],
             ['name' => 'users.delete', 'category' => 'User Management'],
+
+            // Notification Management
+            ['name' => 'notifications.view', 'category' => 'Notification Management'],
+            ['name' => 'notifications.create', 'category' => 'Notification Management'],
         ];
 
         foreach ($adminPermissions as $permission) {
