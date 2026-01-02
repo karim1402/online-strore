@@ -423,5 +423,15 @@ Route::prefix('admin')->group(function () {
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
         });
+        // Notification Management routes
+        Route::controller(\App\Http\Controllers\Api\Admin\NotificationController::class)->prefix('notifications')->group(function () {
+            Route::middleware('permission:notifications.view,admins')->group(function () {
+                Route::get('/', 'index');
+            });
+            
+            Route::middleware('permission:notifications.create,admins')->group(function () {
+                Route::post('/send', 'send');
+            });
+        });
     });
 });

@@ -63,9 +63,12 @@
         "user_retrieved": "User retrieved successfully",
         "user_updated": "User updated successfully",
         "user_deleted": "User deleted successfully",
+        "notifications_retrieved": "Notifications history retrieved successfully",
+        "notification_sent": "Notification sent successfully",
         "fcm_token_updated": "FCM token updated successfully"
     },
     "errors": {
+        "no_users_with_tokens": "No users found with active push notification tokens",
         "validation_failed": "Validation failed",
         "invalid_credentials": "Invalid email or password",
         "account_disabled": "Account is disabled",

@@ -63,9 +63,12 @@
         "user_retrieved": "تم جلب المستخدم بنجاح",
         "user_updated": "تم تحديث المستخدم بنجاح",
         "user_deleted": "تم حذف المستخدم بنجاح",
+        "notifications_retrieved": "تم جلب سجل الإشعارات بنجاح",
+        "notification_sent": "تم إرسال الإشعار بنجاح",
         "fcm_token_updated": "تم تحديث رمز FCM بنجاح"
     },
     "errors": {
+        "no_users_with_tokens": "لم يتم العثور على مستخدمين لديهم رموز إشعارات نشطة",
         "validation_failed": "فشل التحقق من صحة البيانات",
         "invalid_credentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
         "account_disabled": "الحساب معطل",
