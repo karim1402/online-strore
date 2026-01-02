@@ -58,6 +58,11 @@
         "delivery_user_updated": "تم تحديث مستخدم التوصيل بنجاح",
         "delivery_user_deleted": "تم حذف مستخدم التوصيل بنجاح",
         "delivery_user_status_updated": "تم تحديث حالة مستخدم التوصيل بنجاح",
+        "users_retrieved": "تم جلب المستخدمين بنجاح",
+        "user_created": "تم إنشاء المستخدم بنجاح",
+        "user_retrieved": "تم جلب المستخدم بنجاح",
+        "user_updated": "تم تحديث المستخدم بنجاح",
+        "user_deleted": "تم حذف المستخدم بنجاح",
         "fcm_token_updated": "تم تحديث رمز FCM بنجاح"
     },
     "errors": {

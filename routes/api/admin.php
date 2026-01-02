@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\Admin\AddonController;
 use App\Http\Controllers\Api\Admin\ProductAddonController;
 use App\Http\Controllers\Api\Admin\ActivityLogController;
 use App\Http\Controllers\Api\Admin\DeliveryUserController; 
+use App\Http\Controllers\Api\Admin\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,14 +55,24 @@ Route::prefix('admin')->group(function () {
             ]);
         });
         
-        Route::get('users', function () {
-            $message = \App\Services\LocalizationService::getMessage('guards.admin_dashboard');
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'data' => ['info' => 'All Users Management'],
-                'guard' => 'admins'
-            ]);
+        // Regular Users CRUD routes (permission-based)
+        Route::controller(UserController::class)->prefix('users')->group(function () {
+            Route::middleware('permission:users.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:users.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:users.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+            });
+            
+            Route::middleware('permission:users.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
         });
         
         Route::get('settings', function () {

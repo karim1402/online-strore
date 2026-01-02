@@ -58,6 +58,11 @@
         "delivery_user_updated": "Delivery user updated successfully",
         "delivery_user_deleted": "Delivery user deleted successfully",
         "delivery_user_status_updated": "Delivery user status updated successfully",
+        "users_retrieved": "Users retrieved successfully",
+        "user_created": "User created successfully",
+        "user_retrieved": "User retrieved successfully",
+        "user_updated": "User updated successfully",
+        "user_deleted": "User deleted successfully",
         "fcm_token_updated": "FCM token updated successfully"
     },
     "errors": {
