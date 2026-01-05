@@ -33,6 +33,8 @@ class Order extends Model
         'notes',
         'order_pickup_image',
         'is_cash_handed_over',
+        'is_paid_to_vendor',
+        'vendor_invoice_id',
     ];
 
     protected $casts = [
@@ -42,6 +44,7 @@ class Order extends Model
         'tax' => 'decimal:2',
         'total' => 'decimal:2',
         'is_cash_handed_over' => 'boolean',
+        'is_paid_to_vendor' => 'boolean',
     ];
 
     /**
@@ -97,6 +100,11 @@ class Order extends Model
     public function latestPayment()
     {
         return $this->hasOne(Payment::class)->latestOfMany();
+    }
+
+    public function vendorInvoice()
+    {
+        return $this->belongsTo(VendorInvoice::class);
     }
 
     /**

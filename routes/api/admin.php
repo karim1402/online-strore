@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\Admin\ProductAddonController;
 use App\Http\Controllers\Api\Admin\ActivityLogController;
 use App\Http\Controllers\Api\Admin\DeliveryUserController; 
 use App\Http\Controllers\Api\Admin\UserController;
+use App\Http\Controllers\Api\Admin\VendorInvoiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -432,6 +433,12 @@ Route::prefix('admin')->group(function () {
             Route::middleware('permission:notifications.create,admins')->group(function () {
                 Route::post('/send', 'send');
             });
+        });
+
+        // Vendor Invoice Management routes
+        Route::controller(VendorInvoiceController::class)->prefix('vendor-invoices')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/{id}/pay', 'markAsPaid');
         });
     });
 });
