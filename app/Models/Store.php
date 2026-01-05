@@ -103,6 +103,11 @@ class Store extends Model
         return $this->hasMany(Category::class);
     }
 
+    public function vendorInvoices()
+    {
+        return $this->hasMany(VendorInvoice::class);
+    }
+
     /**
      * Get the admin who approved the store.
      */
