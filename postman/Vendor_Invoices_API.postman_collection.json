@@ -1,0 +1,197 @@
+{
+    "info": {
+        "_postman_id": "vendor-invoices-collection",
+        "name": "Vendor Invoices API",
+        "description": "API endpoints for managing vendor invoices in the Makook application",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Admin - Vendor Invoices",
+            "description": "Admin endpoints for vendor invoice management",
+            "item": [
+                {
+                    "name": "List All Vendor Invoices",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/vendor-invoices",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "vendor-invoices"
+                            ]
+                        },
+                        "description": "Get a paginated list of all vendor invoices with their associated store information."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Mark Invoice as Paid",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/vendor-invoices/:id/pay",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "vendor-invoices",
+                                ":id",
+                                "pay"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the vendor invoice to mark as paid"
+                                }
+                            ]
+                        },
+                        "description": "Mark a vendor invoice as paid. This will update the invoice status to 'paid' and update all related orders to set is_paid_to_vendor = true."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Vendor - My Invoices",
+            "description": "Vendor endpoints to view their own invoices",
+            "item": [
+                {
+                    "name": "List My Invoices",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vendor/invoices?status=pending&per_page=15",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "vendor",
+                                "invoices"
+                            ],
+                            "query": [
+                                {
+                                    "key": "status",
+                                    "value": "pending",
+                                    "description": "Filter by status (pending/paid)"
+                                },
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Items per page (max 100)"
+                                }
+                            ]
+                        },
+                        "description": "Get a paginated list of invoices for the vendor's store. Returns invoice details including orders_count."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Invoice with Orders",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{vendor_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/vendor/invoices/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "vendor",
+                                "invoices",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "The ID of the invoice to view"
+                                }
+                            ]
+                        },
+                        "description": "Get a specific invoice with all its related orders. Each order includes user details and items."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "your_admin_jwt_token_here",
+            "type": "string"
+        },
+        {
+            "key": "vendor_token",
+            "value": "your_vendor_jwt_token_here",
+            "type": "string"
+        }
+    ]
+}

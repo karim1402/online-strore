@@ -161,6 +161,12 @@ Route::prefix('vendor')->group(function () {
             Route::get('/{id}', 'show');
         });
 
+        // Vendor Invoice routes
+        Route::controller(\App\Http\Controllers\Api\Vendor\VendorInvoiceController::class)->prefix('invoices')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+        });
+
         // Add more vendor-specific routes here
         Route::get('dashboard', function () {
             $vendor = auth('vendors')->user();
