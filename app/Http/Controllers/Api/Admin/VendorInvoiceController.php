@@ -19,6 +19,21 @@ class VendorInvoiceController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        $invoice = VendorInvoice::with(['store', 'orders' => function ($query) {
+            $query->with(['user', 'items'])->latest();
+        }])->findOrFail($id);
+
+        return response()->json([
+            'success' => true,
+            'data' => $invoice
+        ]);
+    }
+
+    /**
      * Mark the invoice as paid.
      */
     public function markAsPaid($id)

@@ -438,6 +438,14 @@ Route::prefix('admin')->group(function () {
         // Vendor Invoice Management routes
         Route::controller(VendorInvoiceController::class)->prefix('vendor-invoices')->group(function () {
             Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+            Route::post('/{id}/pay', 'markAsPaid');
+        });
+
+        // Delivery Invoice Management routes
+        Route::controller(\App\Http\Controllers\Api\Admin\DeliveryInvoiceController::class)->prefix('delivery-invoices')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
             Route::post('/{id}/pay', 'markAsPaid');
         });
     });

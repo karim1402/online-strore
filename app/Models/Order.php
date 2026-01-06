@@ -35,6 +35,7 @@ class Order extends Model
         'is_cash_handed_over',
         'is_paid_to_vendor',
         'vendor_invoice_id',
+        'delivery_invoice_id',
     ];
 
     protected $casts = [
@@ -105,6 +106,11 @@ class Order extends Model
     public function vendorInvoice()
     {
         return $this->belongsTo(VendorInvoice::class);
+    }
+
+    public function deliveryInvoice()
+    {
+        return $this->belongsTo(DeliveryInvoice::class);
     }
 
     /**
