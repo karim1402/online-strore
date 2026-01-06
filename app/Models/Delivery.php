@@ -102,4 +102,20 @@ class Delivery extends Authenticatable implements JWTSubject
             ->setDescriptionForEvent(fn(string $eventName) => "Delivery {$eventName}")
             ->useLogName('delivery');
     }
+
+    /**
+     * Get the delivery invoices for this delivery driver.
+     */
+    public function deliveryInvoices()
+    {
+        return $this->hasMany(DeliveryInvoice::class);
+    }
+
+    /**
+     * Get the orders for this delivery driver.
+     */
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

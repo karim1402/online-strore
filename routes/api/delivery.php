@@ -49,6 +49,12 @@ Route::prefix('delivery')->group(function () {
             Route::post('{id}/deliver', 'deliver');
             Route::post('{id}/chat', [\App\Http\Controllers\Api\Delivery\ChatController::class, 'sendMessage']);
         });
+
+        // Delivery Invoice routes
+        Route::controller(\App\Http\Controllers\Api\Delivery\DeliveryInvoiceController::class)->prefix('invoices')->group(function () {
+            Route::get('/', 'index');
+            Route::get('/{id}', 'show');
+        });
         
         Route::post('update-availability', function () {
             $user = auth('deliveries')->user();

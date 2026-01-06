@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Http\Controllers\Api\Vendor;
+namespace App\Http\Controllers\Api\Delivery;
 
 use App\Http\Controllers\Controller;
-use App\Models\VendorInvoice;
+use App\Models\DeliveryInvoice;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class VendorInvoiceController extends Controller
+class DeliveryInvoiceController extends Controller
 {
     use ApiResponse;
 
     /**
-     * Get all invoices for the vendor's store
+     * Get all invoices for the authenticated delivery driver
      */
     public function index(Request $request): JsonResponse
     {
         try {
-            $vendor = Auth::guard('vendors')->user();
+            $delivery = Auth::guard('deliveries')->user();
 
-            if (!$vendor || !$vendor->store_id) {
-                return $this->errorResponse('errors.store_not_found', [], 404);
+            if (!$delivery) {
+                return $this->errorResponse('errors.unauthenticated', [], 401);
             }
 
-            $query = VendorInvoice::where('store_id', $vendor->store_id)
+            $query = DeliveryInvoice::where('delivery_id', $delivery->id)
                 ->withCount('orders')
                 ->orderBy('created_at', 'desc');
 
@@ -57,15 +57,15 @@ class VendorInvoiceController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $vendor = Auth::guard('vendors')->user();
+            $delivery = Auth::guard('deliveries')->user();
 
-            if (!$vendor || !$vendor->store_id) {
-                return $this->errorResponse('errors.store_not_found', [], 404);
+            if (!$delivery) {
+                return $this->errorResponse('errors.unauthenticated', [], 401);
             }
 
-            $invoice = VendorInvoice::where('store_id', $vendor->store_id)
+            $invoice = DeliveryInvoice::where('delivery_id', $delivery->id)
                 ->with(['orders' => function ($query) {
-                    $query->with(['user', 'items'])
+                    $query->with(['user', 'store', 'items'])
                         ->orderBy('created_at', 'desc');
                 }])
                 ->find($id);
