@@ -405,7 +405,7 @@ class OrderController extends Controller
 
         $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
-            ->with(['store', 'items.options', 'items.addons'])
+            ->with(['store', 'items.options', 'items.addons', 'delivery'])
             ->first();
 
         if (!$order) {
@@ -822,6 +822,13 @@ class OrderController extends Controller
                 'logo_url' => $order->store->logo_url ?? null,
                 'phone' => $order->store->phone ?? null,
             ],
+            'delivery' => $order->delivery ? [
+                'id' => $order->delivery->id,
+                'name' => $order->delivery->name,
+                'phone' => $order->delivery->phone,
+                'vehicle_type' => $order->delivery->vehicle_type,
+                'vehicle_number' => $order->delivery->vehicle_number,
+            ] : null,
             'address' => $order->address_snapshot,
             'items' => $order->items->map(function ($item) use ($locale) {
                 return [
