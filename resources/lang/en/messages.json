@@ -4,6 +4,7 @@
         "user_registered": "User successfully registered",
         "user_logged_in": "Login successful",
         "user_logged_out": "Successfully logged out",
+        "account_deleted": "Account deleted successfully",
         "token_refreshed": "Token refreshed successfully",
         "profile_fetched": "Profile fetched successfully",
         "profile_updated": "Profile updated successfully",
