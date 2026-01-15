@@ -58,6 +58,8 @@ class OrderController extends Controller
         // Get cart with all items
         $cart = $user->cart()->with([
             'items.product.store',
+            'items.product.primaryImage',
+            'items.options.productOptionValue.optionValue.optionGroup',
             'items.options.productOptionValue.optionValue.optionGroup',
             'items.addons.addon'
         ])->first();
