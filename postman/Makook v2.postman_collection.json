@@ -4383,7 +4383,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"store_id\": {{store_id}},\n  \"category_id\": {{category_id}},\n  \"subcategory_id\": null,\n  \"name_en\": \"Margherita Pizza\",\n  \"name_ar\": \"بيتزا مارغريتا\",\n  \"description_en\": \"Classic Italian pizza\",\n  \"description_ar\": \"بيتزا إيطالية كلاسيكية\",\n  \"base_price\": 100.00,\n  \"is_active\": 1\n}"
+											"raw": "{\n  \"store_id\": {{store_id}},\n  \"category_id\": {{category_id}},\n  \"subcategory_id\": null,\n  \"name_en\": \"Margherita Pizza\",\n  \"name_ar\": \"بيتزا مارغريتا\",\n  \"description_en\": \"Classic Italian pizza\",\n  \"description_ar\": \"بيتزا إيطالية كلاسيكية\",\n  \"search_keywords\": \"pizza, italian, cheese\",\n  \"base_price\": 100.00,\n  \"is_active\": 1\n}"
 										},
 										"url": {
 											"raw": "{{local}}admin/products",
@@ -4427,7 +4427,7 @@
 										],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n  \"category_id\": {{category_id}},\n  \"subcategory_id\": null,\n  \"name_en\": \"Updated Pizza\",\n  \"base_price\": 120.00\n}"
+											"raw": "{\n  \"category_id\": {{category_id}},\n  \"subcategory_id\": null,\n  \"name_en\": \"Updated Pizza\",\n  \"search_keywords\": \"pizza, updated, spicy\",\n  \"base_price\": 120.00\n}"
 										},
 										"url": {
 											"raw": "{{local}}admin/products/{{product_id}}",
@@ -9818,6 +9818,10 @@
 												{
 													"key": "name_ar",
 													"value": "بيتزا سوبريم"
+												},
+												{
+													"key": "search_keywords",
+													"value": "pizza, supreme, meat"
 												},
 												{
 													"key": "base_price",
