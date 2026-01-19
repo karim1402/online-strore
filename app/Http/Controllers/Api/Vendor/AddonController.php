@@ -27,7 +27,11 @@ class AddonController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $query = Addon::with('store:id,name_en,name_ar')->where('store_id', $storeId);
+            $query = Addon::with('store:id,name_en,name_ar')
+                ->where(function ($q) use ($storeId) {
+                    $q->where('store_id', $storeId)
+                      ->orWhereNull('store_id');
+                });
 
             if ($request->filled('addon_category')) {
                 $query->where('addon_category', $request->addon_category);
@@ -272,7 +276,10 @@ class AddonController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $categories = Addon::where('store_id', $storeId)
+            $categories = Addon::where(function ($q) use ($storeId) {
+                    $q->where('store_id', $storeId)
+                      ->orWhereNull('store_id');
+                })
                 ->whereNotNull('addon_category')
                 ->select('addon_category')
                 ->distinct()

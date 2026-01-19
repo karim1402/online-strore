@@ -79,13 +79,16 @@ class ProductAddonController extends Controller
                 return $this->errorResponse('errors.product_not_found', [], 404);
             }
 
-            // Verify addons belong to vendor's store
+            // Verify addons belong to vendor's store or are global
             $addons = Addon::whereIn('id', $request->addon_ids)
-                ->where('store_id', $storeId)
+                ->where(function ($query) use ($storeId) {
+                    $query->where('store_id', $storeId)
+                        ->orWhereNull('store_id');
+                })
                 ->get();
 
             if ($addons->count() !== count($request->addon_ids)) {
-                return $this->errorResponse('errors.some_addons_not_in_store', [], 400);
+                return $this->errorResponse('errors.some_addons_invalid', [], 400);
             }
 
             // Attach addons

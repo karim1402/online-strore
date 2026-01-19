@@ -57,6 +57,25 @@ class Addon extends Model
     }
 
     /**
+     * Scope to get only global addons (no store)
+     */
+    public function scopeGlobal($query)
+    {
+        return $query->whereNull('store_id');
+    }
+
+    /**
+     * Scope to get addons for a specific store or global ones
+     */
+    public function scopeForStoreOrGlobal($query, $storeId)
+    {
+        return $query->where(function ($q) use ($storeId) {
+            $q->where('store_id', $storeId)
+              ->orWhereNull('store_id');
+        });
+    }
+
+    /**
      * Scope to get addons for a specific store
      */
     public function scopeForStore($query, $storeId)
