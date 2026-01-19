@@ -17,7 +17,7 @@ class CategoryController extends Controller
     use ApiResponse;
 
     /**
-     * Get all categories for the authenticated vendor's store
+     * Get all categories for the authenticated vendor's store's modules
      */
     public function index(Request $request): JsonResponse
     {
@@ -28,14 +28,33 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $query = Category::with(['products' => function ($query) {
+            // Get modules associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id');
+
+            $query = Category::with([
+                'parent:id,name_en,name_ar',
+                'children',
+                'products' => function ($query) {
                     $query->orderBy('sort_order', 'asc');
-                }])
-                ->where('store_id', $vendor->store_id);
+                }
+            ])
+            ->whereIn('module_id', $moduleIds);
+
+            // Filter by parent (null for top-level)
+            if ($request->has('parent_id')) {
+                $query->where('parent_id', $request->parent_id);
+            } elseif ($request->boolean('top_level_only')) {
+                $query->whereNull('parent_id');
+            }
 
             // Filter by active status
             if ($request->has('is_active')) {
                 $query->where('is_active', $request->boolean('is_active'));
+            }
+
+            // Filter by module
+            if ($request->filled('module_id')) {
+                $query->where('module_id', $request->module_id);
             }
 
             // Search by name
@@ -69,11 +88,18 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $category = Category::with(['products' => function ($query) {
+            // Get modules associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id');
+
+            $category = Category::with([
+                'parent:id,name_en,name_ar',
+                'children',
+                'products' => function ($query) {
                     $query->orderBy('sort_order', 'asc');
-                }])
-                ->where('store_id', $vendor->store_id)
-                ->find($id);
+                }
+            ])
+            ->whereIn('module_id', $moduleIds)
+            ->find($id);
 
             if (!$category) {
                 return $this->errorResponse('errors.not_found', [], 404);
@@ -86,7 +112,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Create a new category for the vendor's store
+     * Create a new category for a module
      */
     public function store(Request $request): JsonResponse
     {
@@ -98,6 +124,8 @@ class CategoryController extends Controller
             }
 
             $validator = ValidationService::make($request->all(), [
+                'module_id' => 'required|integer|exists:modules,id',
+                'parent_id' => 'nullable|integer|exists:categories,id',
                 'name_en' => 'required|string|max:255',
                 'name_ar' => 'required|string|max:255',
                 'description_en' => 'nullable|string',
@@ -111,6 +139,22 @@ class CategoryController extends Controller
                 return $this->validationErrorWithFirstMessage($validator);
             }
 
+            // Check if the module is associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id')->toArray();
+            if (!in_array($request->module_id, $moduleIds)) {
+                return $this->errorResponse('errors.module_not_found', [], 404);
+            }
+
+            // Check if parent category belongs to the same module
+            if ($request->filled('parent_id')) {
+                $parentCategory = Category::where('id', $request->parent_id)
+                    ->where('module_id', $request->module_id)
+                    ->first();
+                if (!$parentCategory) {
+                    return $this->errorResponse('errors.invalid_parent_category', [], 422);
+                }
+            }
+
             DB::beginTransaction();
 
             // Handle image upload
@@ -120,7 +164,8 @@ class CategoryController extends Controller
             }
 
             $category = Category::create([
-                'store_id' => $vendor->store_id,
+                'module_id' => $request->module_id,
+                'parent_id' => $request->parent_id,
                 'name_en' => $request->name_en,
                 'name_ar' => $request->name_ar,
                 'description_en' => $request->description_en,
@@ -130,7 +175,7 @@ class CategoryController extends Controller
                 'sort_order' => $request->get('sort_order', 0),
             ]);
 
-            $category->load('products');
+            $category->load(['parent', 'children', 'products']);
 
             DB::commit();
 
@@ -159,7 +204,10 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $category = Category::where('store_id', $vendor->store_id)
+            // Get modules associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id');
+
+            $category = Category::whereIn('module_id', $moduleIds)
                 ->find($id);
 
             if (!$category) {
@@ -167,6 +215,7 @@ class CategoryController extends Controller
             }
 
             $validator = ValidationService::make($request->all(), [
+                'parent_id' => 'nullable|integer|exists:categories,id',
                 'name_en' => 'nullable|string|max:255',
                 'name_ar' => 'nullable|string|max:255',
                 'description_en' => 'nullable|string',
@@ -193,6 +242,25 @@ class CategoryController extends Controller
                 $category->image = $request->file('image')->store('categories', 'public');
             }
 
+            // Handle parent_id update
+            if ($request->has('parent_id')) {
+                // Prevent self-parenting
+                if ($request->parent_id == $id) {
+                    return $this->errorResponse('errors.invalid_parent', [], 422);
+                }
+                
+                // Ensure parent belongs to the same module
+                if ($request->parent_id) {
+                    $parentCategory = Category::where('id', $request->parent_id)
+                        ->where('module_id', $category->module_id)
+                        ->first();
+                    if (!$parentCategory) {
+                        return $this->errorResponse('errors.invalid_parent_category', [], 422);
+                    }
+                }
+                $category->parent_id = $request->parent_id;
+            }
+
             // Update category fields
             if ($request->filled('name_en')) {
                 $category->name_en = $request->name_en;
@@ -214,7 +282,7 @@ class CategoryController extends Controller
             }
 
             $category->save();
-            $category->load('products');
+            $category->load(['parent', 'children', 'products']);
 
             DB::commit();
 
@@ -237,7 +305,10 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $category = Category::where('store_id', $vendor->store_id)
+            // Get modules associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id');
+
+            $category = Category::whereIn('module_id', $moduleIds)
                 ->find($id);
 
             if (!$category) {
@@ -274,7 +345,10 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $category = Category::where('store_id', $vendor->store_id)
+            // Get modules associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id');
+
+            $category = Category::whereIn('module_id', $moduleIds)
                 ->find($id);
 
             if (!$category) {
@@ -283,7 +357,7 @@ class CategoryController extends Controller
 
             $category->is_active = !$category->is_active;
             $category->save();
-            $category->load('products');
+            $category->load(['parent', 'children', 'products']);
 
             return $this->successResponse($category, 'success.status_updated');
         } catch (\Exception $e) {
@@ -315,10 +389,13 @@ class CategoryController extends Controller
 
             DB::beginTransaction();
 
+            // Get modules associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id')->toArray();
+
             foreach ($request->categories as $categoryData) {
-                // Only update categories belonging to this vendor's store
+                // Only update categories belonging to modules associated with this vendor's store
                 Category::where('id', $categoryData['id'])
-                    ->where('store_id', $vendor->store_id)
+                    ->whereIn('module_id', $moduleIds)
                     ->update(['sort_order' => $categoryData['sort_order']]);
             }
 

@@ -22,7 +22,7 @@ class StoreController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Store::with(['vendors', 'mainCategories', 'branches']);
+            $query = Store::with(['vendors', 'modules', 'branches']);
 
             // Search functionality
             if ($request->has('search') && $request->search) {
@@ -64,10 +64,10 @@ class StoreController extends Controller
                 $query->whereDate('created_at', $request->date);
             }
 
-            // Filter by main category
-            if ($request->has('category_id')) {
-                $query->whereHas('mainCategories', function ($q) use ($request) {
-                    $q->where('main_categories.id', $request->category_id);
+            // Filter by module
+            if ($request->has('module_id')) {
+                $query->whereHas('modules', function ($q) use ($request) {
+                    $q->where('modules.id', $request->module_id);
                 });
             }
 
@@ -100,7 +100,7 @@ class StoreController extends Controller
     public function getAll(): JsonResponse
     {
         try {
-            $stores = Store::with(['vendors', 'mainCategories', 'branches'])
+            $stores = Store::with(['vendors', 'modules', 'branches'])
                 ->orderBy('created_at', 'desc')
                 ->get();
             return $this->successResponse($stores, 'success.data_retrieved');
@@ -117,8 +117,8 @@ class StoreController extends Controller
         try {
             $validator = ValidationService::make($request->all(), [
                 // Store fields
-                'main_category_ids' => 'required|array|min:1',
-                'main_category_ids.*' => 'required|integer|exists:main_categories,id',
+                'module_ids' => 'required|array|min:1',
+                'module_ids.*' => 'required|integer|exists:modules,id',
                 'name_en' => 'required|string|max:255',
                 'name_ar' => 'required|string|max:255',
                 'description_en' => 'required|string',
@@ -186,8 +186,8 @@ class StoreController extends Controller
 
             $store = Store::create($storeData);
 
-            // Attach main categories
-            $store->mainCategories()->attach($request->main_category_ids);
+            // Attach modules
+            $store->modules()->attach($request->module_ids);
 
             // Create branches for the store
             $hasMainBranch = false;
@@ -236,7 +236,7 @@ class StoreController extends Controller
             }
 
             // Reload relationships
-            $store->load(['mainCategories', 'vendors', 'branches']);
+            $store->load(['modules', 'vendors', 'branches']);
 
             DB::commit();
 
@@ -277,7 +277,7 @@ class StoreController extends Controller
     public function getPendingStores(): JsonResponse
     {
         try {
-            $stores = Store::with(['vendors', 'mainCategories', 'branches'])
+            $stores = Store::with(['vendors', 'modules', 'branches'])
                 ->where('status', 'pending')
                 ->orderBy('created_at', 'desc')
                 ->get();
@@ -297,7 +297,7 @@ class StoreController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $store = Store::with(['vendors', 'mainCategories', 'branches','categories'])->find($id);
+            $store = Store::with(['vendors', 'modules', 'branches'])->find($id);
 
             if (!$store) {
                 return $this->errorResponse('errors.not_found', [], 404);
@@ -323,8 +323,8 @@ class StoreController extends Controller
 
             $validator = ValidationService::make($request->all(), [
                 // Store fields
-                'main_category_ids' => 'nullable|array|min:1',
-                'main_category_ids.*' => 'nullable|integer|exists:main_categories,id',
+                'module_ids' => 'nullable|array|min:1',
+                'module_ids.*' => 'nullable|integer|exists:modules,id',
                 'name_en' => 'nullable|string|max:255',
                 'name_ar' => 'nullable|string|max:255',
                 'description_en' => 'nullable|string',
@@ -407,13 +407,13 @@ class StoreController extends Controller
 
             $store->save();
 
-            // Update main categories if provided
-            if ($request->has('main_category_ids')) {
-                $store->mainCategories()->sync($request->main_category_ids);
+            // Update modules if provided
+            if ($request->has('module_ids')) {
+                $store->modules()->sync($request->module_ids);
             }
 
             // Reload relationships
-            $store->load(['mainCategories', 'vendors', 'branches']);
+            $store->load(['modules', 'vendors', 'branches']);
 
             DB::commit();
 
@@ -473,7 +473,7 @@ class StoreController extends Controller
                 ->log('Store approved by admin');
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories', 'branches']);
+            $store->load(['vendors', 'modules', 'branches']);
 
             return $this->successResponse($store, 'success.store_approved');
         } catch (\Exception $e) {
@@ -524,7 +524,7 @@ class StoreController extends Controller
                 ->log('Store rejected by admin');
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories', 'branches']);
+            $store->load(['vendors', 'modules', 'branches']);
 
             return $this->successResponse($store, 'success.store_rejected');
         } catch (\Exception $e) {
@@ -603,7 +603,7 @@ class StoreController extends Controller
             ]);
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories', 'branches']);
+            $store->load(['vendors', 'modules', 'branches']);
 
             return $this->successResponse($store, 'success.store_suspended');
         } catch (\Exception $e) {
@@ -639,7 +639,7 @@ class StoreController extends Controller
             ]);
 
             // Reload relationships
-            $store->load(['vendors', 'mainCategories', 'branches']);
+            $store->load(['vendors', 'modules', 'branches']);
 
             return $this->successResponse($store, 'success.store_reactivated');
         } catch (\Exception $e) {

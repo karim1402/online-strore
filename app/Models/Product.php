@@ -19,6 +19,7 @@ class Product extends Model
     protected $fillable = [
         'store_id',
         'category_id',
+        'subcategory_id',
         'name_en',
         'name_ar',
         'description_en',
@@ -98,6 +99,14 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Get the subcategory that owns the product
+     */
+    public function subcategory(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'subcategory_id');
     }
 
     /**
@@ -200,7 +209,7 @@ class Product extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name_en', 'name_ar', 'description_en', 'description_ar', 'base_price', 'is_active', 'category_id'])
+            ->logOnly(['name_en', 'name_ar', 'description_en', 'description_ar', 'base_price', 'is_active', 'category_id', 'subcategory_id'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}")

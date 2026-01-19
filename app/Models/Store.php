@@ -88,19 +88,11 @@ class Store extends Model
     }
 
     /**
-     * Get the main categories that the store belongs to.
+     * Get the modules that the store belongs to.
      */
-    public function mainCategories()
+    public function modules()
     {
-        return $this->belongsToMany(MainCategory::class, 'main_category_store');
-    }
-
-    /**
-     * Get the product categories that belong to the store.
-     */
-    public function categories()
-    {
-        return $this->hasMany(Category::class);
+        return $this->belongsToMany(Module::class, 'module_store');
     }
 
     public function vendorInvoices()

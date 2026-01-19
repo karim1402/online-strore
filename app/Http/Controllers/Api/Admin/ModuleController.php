@@ -3,19 +3,19 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\MainCategory;
+use App\Models\Module;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
-class MainCategoryController extends Controller
+class ModuleController extends Controller
 {
     use ApiResponse;
 
     /**
-     * Display a listing of the main categories.
+     * Display a listing of the modules.
      *
      * @param Request $request
      * @return JsonResponse
@@ -27,7 +27,7 @@ class MainCategoryController extends Controller
             $search = $request->get('search');
             $status = $request->get('status');
 
-            $query = MainCategory::query();
+            $query = Module::query();
 
             // Search functionality
             if ($search) {
@@ -42,9 +42,9 @@ class MainCategoryController extends Controller
                 $query->where('status', $status);
             }
 
-            $categories = $query->ordered()->paginate($perPage);
+            $modules = $query->ordered()->paginate($perPage);
 
-            return $this->successResponse($categories, 'success.main_categories_retrieved');
+            return $this->successResponse($modules, 'success.modules_retrieved');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -52,7 +52,7 @@ class MainCategoryController extends Controller
     }
 
     /**
-     * Store a newly created main category.
+     * Store a newly created module.
      *
      * @param Request $request
      * @return JsonResponse
@@ -61,8 +61,8 @@ class MainCategoryController extends Controller
     {
         try {
             $validator = ValidationService::make($request->all(), [
-                'name_en' => 'required|string|max:255|unique:main_categories,name_en',
-                'name_ar' => 'required|string|max:255|unique:main_categories,name_ar',
+                'name_en' => 'required|string|max:255|unique:modules,name_en',
+                'name_ar' => 'required|string|max:255|unique:modules,name_ar',
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -78,13 +78,13 @@ class MainCategoryController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('main-categories', 'public');
+                $imagePath = $request->file('image')->store('modules', 'public');
                 $data['image'] = $imagePath;
             }
 
-            $category = MainCategory::create($data);
+            $module = Module::create($data);
 
-            return $this->successResponse($category, 'success.main_category_created', [], 201);
+            return $this->successResponse($module, 'success.module_created', [], 201);
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -92,7 +92,7 @@ class MainCategoryController extends Controller
     }
 
     /**
-     * Display the specified main category.
+     * Display the specified module.
      *
      * @param int $id
      * @return JsonResponse
@@ -100,9 +100,9 @@ class MainCategoryController extends Controller
     public function show(int $id): JsonResponse
     {
         try {
-            $category = MainCategory::findOrFail($id);
+            $module = Module::findOrFail($id);
 
-            return $this->successResponse($category, 'success.main_category_retrieved');
+            return $this->successResponse($module, 'success.module_retrieved');
 
         } catch (\Exception $e) {
             return $this->notFoundResponse('errors.resource_not_found');
@@ -110,7 +110,7 @@ class MainCategoryController extends Controller
     }
 
     /**
-     * Update the specified main category.
+     * Update the specified module.
      *
      * @param Request $request
      * @param int $id
@@ -119,11 +119,11 @@ class MainCategoryController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         try {
-            $category = MainCategory::findOrFail($id);
+            $module = Module::findOrFail($id);
 
             $validator = ValidationService::make($request->all(), [
-                'name_en' => 'required|string|max:255|unique:main_categories,name_en,' . $id,
-                'name_ar' => 'required|string|max:255|unique:main_categories,name_ar,' . $id,
+                'name_en' => 'required|string|max:255|unique:modules,name_en,' . $id,
+                'name_ar' => 'required|string|max:255|unique:modules,name_ar,' . $id,
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -140,17 +140,17 @@ class MainCategoryController extends Controller
             // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 // Delete old image if exists
-                if ($category->image && Storage::disk('public')->exists($category->image)) {
-                    Storage::disk('public')->delete($category->image);
+                if ($module->image && Storage::disk('public')->exists($module->image)) {
+                    Storage::disk('public')->delete($module->image);
                 }
                 
-                $imagePath = $request->file('image')->store('main-categories', 'public');
+                $imagePath = $request->file('image')->store('modules', 'public');
                 $data['image'] = $imagePath;
             }
 
-            $category->update($data);
+            $module->update($data);
 
-            return $this->successResponse($category->fresh(), 'success.main_category_updated');
+            return $this->successResponse($module->fresh(), 'success.module_updated');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -158,7 +158,7 @@ class MainCategoryController extends Controller
     }
 
     /**
-     * Remove the specified main category.
+     * Remove the specified module.
      *
      * @param int $id
      * @return JsonResponse
@@ -166,16 +166,16 @@ class MainCategoryController extends Controller
     public function destroy(int $id): JsonResponse
     {
         try {
-            $category = MainCategory::findOrFail($id);
+            $module = Module::findOrFail($id);
 
             // Delete associated image if exists
-            if ($category->image && Storage::disk('public')->exists($category->image)) {
-                Storage::disk('public')->delete($category->image);
+            if ($module->image && Storage::disk('public')->exists($module->image)) {
+                Storage::disk('public')->delete($module->image);
             }
 
-            $category->delete();
+            $module->delete();
 
-            return $this->successResponse(null, 'success.main_category_deleted');
+            return $this->successResponse(null, 'success.module_deleted');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -183,7 +183,7 @@ class MainCategoryController extends Controller
     }
 
     /**
-     * Toggle the status of the specified main category.
+     * Toggle the status of the specified module.
      *
      * @param int $id
      * @return JsonResponse
@@ -191,10 +191,10 @@ class MainCategoryController extends Controller
     public function toggleStatus(int $id): JsonResponse
     {
         try {
-            $category = MainCategory::findOrFail($id);
-            $category->update(['status' => !$category->status]);
+            $module = Module::findOrFail($id);
+            $module->update(['status' => !$module->status]);
 
-            return $this->successResponse($category->fresh(), 'success.main_category_status_updated');
+            return $this->successResponse($module->fresh(), 'success.module_status_updated');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -202,16 +202,16 @@ class MainCategoryController extends Controller
     }
 
     /**
-     * Get all active main categories for dropdown/select options.
+     * Get all active modules for dropdown/select options.
      *
      * @return JsonResponse
      */
-    public function getActiveCategories(): JsonResponse
+    public function getActiveModules(): JsonResponse
     {
         try {
-            $categories = MainCategory::active()->ordered()->get(['id', 'name_en', 'name_ar']);
+            $modules = Module::active()->ordered()->get(['id', 'name_en', 'name_ar']);
 
-            return $this->successResponse($categories, 'success.active_main_categories_retrieved');
+            return $this->successResponse($modules, 'success.active_modules_retrieved');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Store;
+use App\Models\Module;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -23,15 +23,24 @@ class CategoryController extends Controller
     {
         try {
             $query = Category::with([
-                'store:id,name_en,name_ar',
+                'module:id,name_en,name_ar',
+                'parent:id,name_en,name_ar',
+                'children',
                 'products' => function ($query) {
                     $query->orderBy('sort_order', 'asc');
                 }
             ]);
 
-            // Filter by store
-            if ($request->filled('store_id')) {
-                $query->where('store_id', $request->store_id);
+            // Filter by parent (null for top-level)
+            if ($request->has('parent_id')) {
+                $query->where('parent_id', $request->parent_id);
+            } elseif ($request->boolean('top_level_only')) {
+                $query->whereNull('parent_id');
+            }
+
+            // Filter by module
+            if ($request->filled('module_id')) {
+                $query->where('module_id', $request->module_id);
             }
 
             // Filter by active status
@@ -65,7 +74,9 @@ class CategoryController extends Controller
     {
         try {
             $category = Category::with([
-                'store:id,name_en,name_ar',
+                'module:id,name_en,name_ar',
+                'parent:id,name_en,name_ar',
+                'children',
                 'products' => function ($query) {
                     $query->orderBy('sort_order', 'asc');
                 }
@@ -88,7 +99,8 @@ class CategoryController extends Controller
     {
         try {
             $validator = ValidationService::make($request->all(), [
-                'store_id' => 'required|integer|exists:stores,id',
+                'module_id' => 'required|integer|exists:modules,id',
+                'parent_id' => 'nullable|integer|exists:categories,id',
                 'name_en' => 'required|string|max:255',
                 'name_ar' => 'required|string|max:255',
                 'description_en' => 'nullable|string',
@@ -104,10 +116,10 @@ class CategoryController extends Controller
 
             DB::beginTransaction();
 
-            // Check if store exists
-            $store = Store::find($request->store_id);
-            if (!$store) {
-                return $this->errorResponse('errors.store_not_found', [], 404);
+            // Check if module exists
+            $module = Module::find($request->module_id);
+            if (!$module) {
+                return $this->errorResponse('errors.module_not_found', [], 404);
             }
 
             // Handle image upload
@@ -117,7 +129,8 @@ class CategoryController extends Controller
             }
 
             $category = Category::create([
-                'store_id' => $request->store_id,
+                'module_id' => $request->module_id,
+                'parent_id' => $request->parent_id,
                 'name_en' => $request->name_en,
                 'name_ar' => $request->name_ar,
                 'description_en' => $request->description_en,
@@ -127,7 +140,7 @@ class CategoryController extends Controller
                 'sort_order' => $request->get('sort_order', 0),
             ]);
 
-            $category->load(['store:id,name_en,name_ar', 'products']);
+            $category->load(['module:id,name_en,name_ar', 'parent', 'children', 'products']);
 
             DB::commit();
 
@@ -157,6 +170,7 @@ class CategoryController extends Controller
             }
 
             $validator = ValidationService::make($request->all(), [
+                'parent_id' => 'nullable|integer|exists:categories,id',
                 'name_en' => 'nullable|string|max:255',
                 'name_ar' => 'nullable|string|max:255',
                 'description_en' => 'nullable|string',
@@ -183,6 +197,15 @@ class CategoryController extends Controller
                 $category->image = $request->file('image')->store('categories', 'public');
             }
 
+            // Handle parent_id update
+            if ($request->has('parent_id')) {
+                // Prevent self-parenting
+                if ($request->parent_id == $id) {
+                    return $this->errorResponse('errors.invalid_parent', [], 422);
+                }
+                $category->parent_id = $request->parent_id;
+            }
+
             // Update category fields
             if ($request->filled('name_en')) {
                 $category->name_en = $request->name_en;
@@ -204,7 +227,7 @@ class CategoryController extends Controller
             }
 
             $category->save();
-            $category->load(['store:id,name_en,name_ar', 'products']);
+            $category->load(['module:id,name_en,name_ar', 'parent', 'children', 'products']);
 
             DB::commit();
 
@@ -259,7 +282,7 @@ class CategoryController extends Controller
 
             $category->is_active = !$category->is_active;
             $category->save();
-            $category->load(['store:id,name_en,name_ar', 'products']);
+            $category->load(['module:id,name_en,name_ar', 'parent', 'children', 'products']);
 
             return $this->successResponse($category, 'success.status_updated');
         } catch (\Exception $e) {
@@ -268,27 +291,27 @@ class CategoryController extends Controller
     }
 
     /**
-     * Get categories for a specific store
+     * Get categories for a specific module
      */
-    public function getStoreCategories($storeId): JsonResponse
+    public function getModuleCategories($moduleId): JsonResponse
     {
         try {
-            $store = Store::find($storeId);
+            $module = Module::find($moduleId);
 
-            if (!$store) {
-                return $this->errorResponse('errors.store_not_found', [], 404);
+            if (!$module) {
+                return $this->errorResponse('errors.module_not_found', [], 404);
             }
 
             $categories = Category::with(['products' => function ($query) {
                     $query->orderBy('sort_order', 'asc');
                 }])
-                ->where('store_id', $storeId)
+                ->where('module_id', $moduleId)
                 ->orderBy('sort_order', 'asc')
                 ->orderBy('created_at', 'desc')
                 ->get();
 
             return $this->successResponse([
-                'store' => $store,
+                'module' => $module,
                 'categories' => $categories
             ], 'success.data_retrieved');
         } catch (\Exception $e) {

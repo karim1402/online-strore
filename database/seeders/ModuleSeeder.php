@@ -5,14 +5,14 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class MainCategorySeeder extends Seeder
+class ModuleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $categories = [
+        $modules = [
             [
                 'name_en' => 'Electronics',
                 'name_ar' => 'الإلكترونيات',
@@ -61,42 +61,10 @@ class MainCategorySeeder extends Seeder
                 'status' => true,
                 'sort_order' => 6,
             ],
-            [
-                'name_en' => 'Home & Garden',
-                'name_ar' => 'المنزل والحديقة',
-                'description_en' => 'Home improvement and garden supplies',
-                'description_ar' => 'تحسين المنزل ومستلزمات الحديقة',
-                'status' => true,
-                'sort_order' => 7,
-            ],
-            [
-                'name_en' => 'Home & Garden',
-                'name_ar' => 'المنزل والحديقة',
-                'description_en' => 'Home improvement and garden supplies',
-                'description_ar' => 'تحسين المنزل ومستلزمات الحديقة',
-                'status' => true,
-                'sort_order' => 8,
-            ],
-            [
-                'name_en' => 'Home & Garden',
-                'name_ar' => 'المنزل والحديقة',
-                'description_en' => 'Home improvement and garden supplies',
-                'description_ar' => 'تحسين المنزل ومستلزمات الحديقة',
-                'status' => true,
-                'sort_order' => 9,
-            ],
-            [
-                'name_en' => 'Home & Garden',
-                'name_ar' => 'المنزل والحديقة',
-                'description_en' => 'Home improvement and garden supplies',
-                'description_ar' => 'تحسين المنزل ومستلزمات الحديقة',
-                'status' => true,
-                'sort_order' => 10,
-            ],
         ];
 
-        foreach ($categories as $category) {
-            \App\Models\MainCategory::create($category);
+        foreach ($modules as $module) {
+            \App\Models\Module::create($module);
         }
     }
 }

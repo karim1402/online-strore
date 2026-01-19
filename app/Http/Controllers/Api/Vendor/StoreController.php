@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Vendor;
 
 use App\Http\Controllers\Controller;
 use App\Models\Store;
-use App\Models\MainCategory;
+use App\Models\Module;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -30,7 +30,7 @@ class StoreController extends Controller
         }
 
         // Load relationships
-        $store->load(['mainCategories']);
+        $store->load(['modules']);
 
         return $this->successResponse([
             'store' => [
@@ -47,7 +47,7 @@ class StoreController extends Controller
                 'status' => $store->status,
                 'rejection_note' => $store->rejection_note,
                 'approved_at' => $store->approved_at,
-                'main_categories' => $store->mainCategories,
+                'modules' => $store->modules,
                 'created_at' => $store->created_at,
                 'updated_at' => $store->updated_at,
             ]
@@ -67,8 +67,8 @@ class StoreController extends Controller
         }
 
         $validator = ValidationService::make($request->all(), [
-            'main_category_ids' => 'sometimes|array|min:1',
-            'main_category_ids.*' => 'sometimes|integer|exists:main_categories,id',
+            'module_ids' => 'sometimes|array|min:1',
+            'module_ids.*' => 'sometimes|integer|exists:modules,id',
             'name_en' => 'sometimes|string|max:255',
             'name_ar' => 'sometimes|string|max:255',
             'description_en' => 'sometimes|string',
@@ -84,15 +84,15 @@ class StoreController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        // Verify all main categories exist and are active if provided
-        if ($request->has('main_category_ids')) {
-            $activeCategories = MainCategory::whereIn('id', $request->main_category_ids)
+        // Verify all modules exist and are active if provided
+        if ($request->has('module_ids')) {
+            $activeModules = Module::whereIn('id', $request->module_ids)
                 ->where('status', true)
                 ->pluck('id')
                 ->toArray();
                 
-            if (count($activeCategories) !== count($request->main_category_ids)) {
-                return $this->errorResponse('errors.category_not_found', [], 404);
+            if (count($activeModules) !== count($request->module_ids)) {
+                return $this->errorResponse('errors.module_not_found', [], 404);
             }
         }
 
@@ -148,15 +148,15 @@ class StoreController extends Controller
 
             $store->save();
 
-            // Update main categories if provided
-            if ($request->has('main_category_ids')) {
-                $store->mainCategories()->sync($request->main_category_ids);
+            // Update modules if provided
+            if ($request->has('module_ids')) {
+                $store->modules()->sync($request->module_ids);
             }
 
             DB::commit();
 
             // Load relationships for response
-            $store->load(['mainCategories']);
+            $store->load(['modules']);
 
             return $this->successResponse([
                 'store' => [
@@ -173,7 +173,7 @@ class StoreController extends Controller
                     'status' => $store->status,
                     'rejection_note' => $store->rejection_note,
                     'approved_at' => $store->approved_at,
-                    'main_categories' => $store->mainCategories,
+                    'modules' => $store->modules,
                     'created_at' => $store->created_at,
                     'updated_at' => $store->updated_at,
                 ]

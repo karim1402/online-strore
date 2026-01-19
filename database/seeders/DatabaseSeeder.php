@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             RoleSeeder::class,
             AdminSeeder::class,
-            MainCategorySeeder::class,
+            ModuleSeeder::class,
             OptionGroupSeeder::class,
         ]);
     }

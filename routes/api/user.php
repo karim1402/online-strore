@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\User\AuthController;
 use App\Http\Controllers\Api\User\AddressController;
 use App\Http\Controllers\Api\User\StoreController;
-use App\Http\Controllers\Api\User\MainCategoryController;
+use App\Http\Controllers\Api\User\ModuleController;
 use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\Api\User\CartController;
 use App\Http\Controllers\Api\User\OrderController;
@@ -81,15 +81,15 @@ Route::prefix('user')->group(function () {
         });
     });
 
-    // Main Category routes (public)
-    Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
-        Route::get('/', 'index')->name('user.mainCategories.index');
-        Route::get('/{id}', 'show')->name('user.mainCategories.show');
+    // Module routes (public)
+    Route::controller(ModuleController::class)->prefix('modules')->group(function () {
+        Route::get('/', 'index')->name('user.modules.index');
+        Route::get('/{id}', 'show')->name('user.modules.show');
     });
 
     // Store routes (public, works for both guests and authenticated users)
     Route::controller(StoreController::class)->prefix('stores')->group(function () {
-        Route::get('/by-category/{mainCategoryId}', 'getStoresByMainCategory')->name('user.stores.byCategory');
+        Route::get('/by-module/{moduleId}', 'getStoresByModule')->name('user.stores.byModule');
         Route::get('/{storeId}/categories', 'getStoreCategoriesWithProducts')->name('user.stores.categories');
     });
 
