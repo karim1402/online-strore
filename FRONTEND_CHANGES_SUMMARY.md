@@ -42,6 +42,8 @@ Products can now be specifically assigned to a sub-category.
 *   **New Input Field**: `search_keywords` (nullable string).
     *   **Purpose**: Allows Admins and Vendors to add comma-separated keywords (e.g., "pizza, spicy, italian") when creating or updating products.
     *   **Note**: This field is currently for data collection only and will be used for advanced search features (like Elasticsearch) in the future. Please include this field in the Product forms.
+*   **Option Values**: Added `image` field (nullable string/file) to option values.
+    *   **Response**: `OptionValue` objects now include an `image_url` attribute.
 *   **API Responses**: Product objects now include a `subcategory` relationship.
 
 ## 4. User Account Management

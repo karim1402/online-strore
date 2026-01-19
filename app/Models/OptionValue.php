@@ -16,6 +16,7 @@ class OptionValue extends Model
         'option_group_id',
         'value_en',
         'value_ar',
+        'image',
         'sort_order',
         'is_active',
     ];
@@ -25,7 +26,20 @@ class OptionValue extends Model
         'is_active' => 'boolean',
     ];
 
-    protected $appends = ['value'];
+    protected $appends = ['value', 'image_url'];
+
+    /**
+     * Get the full URL for the image.
+     *
+     * @return string|null
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            return \Illuminate\Support\Facades\Storage::disk('public')->url($this->image);
+        }
+        return null;
+    }
 
     /**
      * Get the option group that owns the value
