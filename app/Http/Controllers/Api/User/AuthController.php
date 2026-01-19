@@ -168,4 +168,27 @@ class AuthController extends Controller
 
         return $this->successResponse(null, 'success.fcm_token_updated');
     }
+
+    /**
+     * Delete user account
+     */
+    public function deleteAccount(): JsonResponse
+    {
+        $user = Auth::guard('api')->user();
+
+        // Log the deletion activity
+        if ($user) {
+            activity('user')
+                ->causedBy($user)
+                ->performedOn($user)
+                ->log('User deleted account');
+            
+            // Soft delete the user
+            $user->delete();
+        }
+
+        Auth::guard('api')->logout();
+
+        return $this->successResponse(null, 'success.account_deleted');
+    }
 }

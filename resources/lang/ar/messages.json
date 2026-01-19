@@ -4,6 +4,7 @@
         "user_registered": "تم تسجيل المستخدم بنجاح",
         "user_logged_in": "تم تسجيل الدخول بنجاح",
         "user_logged_out": "تم تسجيل الخروج بنجاح",
+        "account_deleted": "تم حذف الحساب بنجاح",
         "token_refreshed": "تم تحديث الرمز بنجاح",
         "profile_fetched": "تم جلب الملف الشخصي بنجاح",
         "profile_updated": "تم تحديث الملف الشخصي بنجاح",

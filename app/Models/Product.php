@@ -42,7 +42,16 @@ class Product extends Model
         'sort_order' => 'integer',
     ];
 
-    protected $appends = ['name', 'description'];
+    protected $appends = ['name', 'description', 'image_url'];
+
+    /**
+     * Get the product image url
+     */
+    public function getImageUrlAttribute()
+    {
+        $image = $this->primaryImage ?? $this->images->first();
+        return $image ? $image->image_url : null;
+    }
 
     /**
      * Boot method for model events
