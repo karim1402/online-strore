@@ -65,7 +65,7 @@ class ModuleController extends Controller
                 'name_ar' => 'required|string|max:255|unique:modules,name_ar',
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'status' => 'boolean',
                 'sort_order' => 'integer|min:0'
             ]);
@@ -126,7 +126,7 @@ class ModuleController extends Controller
                 'name_ar' => 'required|string|max:255|unique:modules,name_ar,' . $id,
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'status' => 'boolean',
                 'sort_order' => 'integer|min:0'
             ]);
