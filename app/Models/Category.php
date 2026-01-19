@@ -16,7 +16,8 @@ class Category extends Model
     use HasFactory, LogsActivity, SoftDeletes;
 
     protected $fillable = [
-        'store_id',
+        'module_id',
+        'parent_id',
         'name_en',
         'name_ar',
         'description_en',
@@ -39,11 +40,35 @@ class Category extends Model
     protected $appends = ['image_url'];
 
     /**
-     * Get the store that owns the category
+     * Get the module that owns the category
      */
-    public function store(): BelongsTo
+    public function module(): BelongsTo
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Module::class);
+    }
+
+    /**
+     * Get the parent category
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    /**
+     * Get the sub-categories
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(Category::class, 'parent_id')->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Alias for children
+     */
+    public function subcategories(): HasMany
+    {
+        return $this->children();
     }
 
     /**
@@ -63,11 +88,11 @@ class Category extends Model
     }
 
     /**
-     * Scope to get categories for a specific store
+     * Scope to get categories for a specific module
      */
-    public function scopeForStore($query, $storeId)
+    public function scopeForModule($query, $moduleId)
     {
-        return $query->where('store_id', $storeId);
+        return $query->where('module_id', $moduleId);
     }
 
     /**

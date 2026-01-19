@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\AdminUserController;
-use App\Http\Controllers\Api\Admin\MainCategoryController;
+use App\Http\Controllers\Api\Admin\ModuleController;
 use App\Http\Controllers\Api\Admin\StoreController;
 use App\Http\Controllers\Api\Admin\RoleController;
 use App\Http\Controllers\Api\Admin\PermissionController;
@@ -86,11 +86,11 @@ Route::prefix('admin')->group(function () {
             ]);
         });
 
-        // Main Categories CRUD routes (permission-based)
-        Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
+        // Modules CRUD routes (permission-based)
+        Route::controller(ModuleController::class)->prefix('modules')->group(function () {
             Route::middleware('permission:categories.view,admins')->group(function () {
                 Route::get('/', 'index');
-                Route::get('/active', 'getActiveCategories');
+                Route::get('/active', 'getActiveModules');
                 Route::get('/{id}', 'show');
             });
             
@@ -205,11 +205,11 @@ Route::prefix('admin')->group(function () {
             });
         });
 
-        // Category Management routes (store-specific categories)
+        // Category Management routes (module-specific categories)
         Route::controller(CategoryController::class)->prefix('categories')->group(function () {
             Route::middleware('permission:stores.view,admins')->group(function () {
                 Route::get('/', 'index');
-                Route::get('/store/{storeId}', 'getStoreCategories');
+                Route::get('/module/{moduleId}', 'getModuleCategories');
                 Route::get('/{id}', 'show');
             });
             

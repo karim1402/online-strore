@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Models\Store;
 use App\Models\Branch;
-use App\Models\MainCategory;
+use App\Models\Module;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -42,8 +42,8 @@ class AuthController extends Controller
             'phone' => 'required|string|max:20',
             
             // Store fields
-            'main_category_ids' => 'required|array|min:1',
-            'main_category_ids.*' => 'required|integer|exists:main_categories,id',
+            'module_ids' => 'required|array|min:1',
+            'module_ids.*' => 'required|integer|exists:modules,id',
             'name_en' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
             'description_en' => 'required|string',
@@ -70,22 +70,22 @@ class AuthController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        // Verify all main categories exist and are active
-        $activeCategories = MainCategory::whereIn('id', $request->main_category_ids)
+        // Verify all modules exist and are active
+        $activeModules = Module::whereIn('id', $request->module_ids)
             ->where('status', true)
             ->pluck('id')
             ->toArray();
 
        
             
-        if (count($activeCategories) !== count($request->main_category_ids)) {
-            return $this->errorResponse('errors.category_not_found', [], 404);
+        if (count($activeModules) !== count($request->module_ids)) {
+            return $this->errorResponse('errors.module_not_found', [], 404);
         }
 
         // Debug: Log the received data
         Log::info('Vendor registration data:', [
             'branches' => $request->branches,
-            'main_category_ids' => $request->main_category_ids,
+            'module_ids' => $request->module_ids,
             'all_data' => $request->except(['password', 'logo', 'document'])
         ]);
 
@@ -118,8 +118,8 @@ class AuthController extends Controller
 
           
 
-            // Attach main categories to store
-            $store->mainCategories()->attach($request->main_category_ids);
+            // Attach modules to store
+            $store->modules()->attach($request->module_ids);
 
             // Create branches for the store
             $hasMainBranch = false;

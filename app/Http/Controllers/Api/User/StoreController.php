@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api\User;
 
 use App\Http\Controllers\Controller;
-use App\Models\MainCategory;
+use App\Models\Category;
+use App\Models\Module;
 use App\Models\Store;
 use App\Models\UserAddress;
 use App\Services\LocalizationService;
@@ -14,22 +15,22 @@ use Illuminate\Support\Facades\Log;
 class StoreController extends Controller
 {
     /**
-     * Get stores by main category ID, ordered by distance from user location.
+     * Get stores by module ID, ordered by distance from user location.
      *
-     * @param int $mainCategoryId
+     * @param int $moduleId
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getStoresByMainCategory($mainCategoryId, Request $request)
+    public function getStoresByModule($moduleId, Request $request)
     {
-       //log the request and mainCategoryId
-       Log::info('getStoresByMainCategory', ['mainCategoryId' => $mainCategoryId, 'request' => $request->all()]);
-        // Validate main category exists
-        $mainCategory = MainCategory::find($mainCategoryId);
-        if (!$mainCategory) {
+       //log the request and moduleId
+       Log::info('getStoresByModule', ['moduleId' => $moduleId, 'request' => $request->all()]);
+        // Validate module exists
+        $module = Module::find($moduleId);
+        if (!$module) {
             return response()->json([
                 'success' => false,
-                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Main Category']),
+                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Module']),
             ], 404);
         }
 
@@ -69,12 +70,12 @@ class StoreController extends Controller
         $perPage = $request->input('per_page', 15);
         $radius = $request->input('radius'); // Optional radius filter in km
 
-        // Query stores by main category with active branches
-        $query = Store::whereHas('mainCategories', function ($q) use ($mainCategoryId) {
-            $q->where('main_categories.id', $mainCategoryId);
+        // Query stores by module with active branches
+        $query = Store::whereHas('modules', function ($q) use ($moduleId) {
+            $q->where('modules.id', $moduleId);
         })
-        ->with(['mainCategories' => function ($q) {
-            $q->select('main_categories.id', 'name_en', 'name_ar', 'image');
+        ->with(['modules' => function ($q) {
+            $q->select('modules.id', 'name_en', 'name_ar', 'image');
         }])
         ->approved(); // Only approved stores
 
@@ -284,21 +285,33 @@ class StoreController extends Controller
             ], 404);
         }
 
-        // Query only active categories with active products
-        $categories = $store->categories()
+        // Get module IDs associated with this store
+        $moduleIds = $store->modules()->pluck('modules.id');
+
+        // Query only active categories from the store's modules with active products
+        $categories = Category::whereIn('module_id', $moduleIds)
             ->active()
-            ->with(['products' => function ($query) {
+            ->with(['children' => function ($query) {
+                $query->active()->with(['products' => function ($q) {
+                    $q->active()
+                        ->whereColumn('subcategory_id', 'categories.id') // Products assigned to this subcategory
+                        ->with(['primaryImage', 'images'])
+                        ->orderBy('sort_order', 'asc');
+                }]);
+            }, 'products' => function ($query) {
                 $query->active()
+                    ->whereNull('subcategory_id') // Only products directly in the main category
                     ->with(['primaryImage', 'images'])
                     ->orderBy('sort_order', 'asc')
                     ->orderBy('name_en', 'asc');
             }])
+            ->whereNull('parent_id') // Get only top-level categories
             ->orderBy('sort_order', 'asc')
             ->orderBy('name_en', 'asc')
             ->get();
 
-        // Transform the data
-        $categoriesData = $categories->map(function ($category) {
+        // Recursive function to transform category data
+        $transformCategory = function ($category) use (&$transformCategory) {
             $productsData = $category->products->map(function ($product) {
                 return [
                     'id' => $product->id,
@@ -337,8 +350,11 @@ class StoreController extends Controller
                 'sort_order' => $category->sort_order,
                 'products_count' => $productsData->count(),
                 'products' => $productsData,
+                'subcategories' => $category->children->map($transformCategory),
             ];
-        });
+        };
+
+        $categoriesData = $categories->map($transformCategory);
 
         // Localize the data
         $localizedCategories = LocalizationService::localizeCollection($categoriesData->toArray(), ['name', 'description']);

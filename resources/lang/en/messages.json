@@ -20,13 +20,13 @@
         "admin_user_updated": "Admin user updated successfully",
         "admin_user_deleted": "Admin user deleted successfully",
         "admin_user_status_updated": "Admin user status updated successfully",
-        "main_categories_retrieved": "Main categories retrieved successfully",
-        "main_category_created": "Main category created successfully",
-        "main_category_retrieved": "Main category retrieved successfully",
-        "main_category_updated": "Main category updated successfully",
-        "main_category_deleted": "Main category deleted successfully",
-        "main_category_status_updated": "Main category status updated successfully",
-        "active_main_categories_retrieved": "Active main categories retrieved successfully",
+        "modules_retrieved": "Modules retrieved successfully",
+        "module_created": "Module created successfully",
+        "module_retrieved": "Module retrieved successfully",
+        "module_updated": "Module updated successfully",
+        "module_deleted": "Module deleted successfully",
+        "module_status_updated": "Module status updated successfully",
+        "active_modules_retrieved": "Active modules retrieved successfully",
         "roles_retrieved": "Roles retrieved successfully",
         "role_created": "Role created successfully",
         "role_retrieved": "Role retrieved successfully",
@@ -91,7 +91,7 @@
         "role_not_found": "Role not found",
         "role_has_users": "Cannot delete role that is assigned to users",
         "store_creation_failed": "Failed to create store",
-        "category_not_found": "Main category not found",
+        "module_not_found": "Module not found",
         "not_found": "Resource not found",
         "store_not_found": "Store not found",
         "store_already_approved": "Store is already approved",
@@ -106,7 +106,10 @@
         "order_cannot_cancel": "Order cannot be cancelled in current status",
         "delivery_has_active_order": "You already have an active order. Please complete or cancel it before picking a new one",
         "delivery_not_available": "You are currently marked as unavailable. Please change your status to available to pick orders",
-        "store_not_approved": "Your store is not yet approved. Please contact support"
+        "store_not_approved": "Your store is not yet approved. Please contact support",
+        "invalid_parent": "A category cannot be its own parent",
+        "invalid_parent_category": "The selected parent category must belong to the same module",
+        "subcategory_not_found_in_category": "The selected subcategory does not belong to the selected category"
     },
     "validation": {
         "required": "The :attribute field is required",
@@ -160,8 +163,8 @@
         "longitude": "longitude",
         "logo": "logo",
         "document": "document",
-        "main_category_id": "main category",
-        "main_category_ids": "main categories"
+        "module_id": "module",
+        "module_ids": "modules"
     },
     "guards": {
         "user_dashboard": "User Dashboard",

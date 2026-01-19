@@ -34,7 +34,7 @@ class ProductController extends Controller
                 return $this->errorResponse('errors.store_not_found', [], 404);
             }
 
-            $query = Product::with(['store:id,name_en,name_ar', 'category:id,name_en,name_ar', 'images'])
+            $query = Product::with(['store:id,name_en,name_ar', 'category:id,name_en,name_ar', 'subcategory:id,name_en,name_ar', 'images'])
                 ->where('store_id', $storeId);
 
             // Filter by category
@@ -91,6 +91,7 @@ class ProductController extends Controller
             $product = Product::with([
                 'store:id,name_en,name_ar',
                 'category:id,name_en,name_ar',
+                'subcategory:id,name_en,name_ar',
                 'images',
                 'productOptions.optionGroup',
                 'productOptions.productOptionValues.optionValue',
@@ -124,6 +125,7 @@ class ProductController extends Controller
 
             $validator = ValidationService::make($request->all(), [
                 'category_id' => 'required|integer|exists:categories,id',
+                'subcategory_id' => 'nullable|integer|exists:categories,id',
                 'name_en' => 'required|string|max:255',
                 'name_ar' => 'required|string|max:255',
                 'description_en' => 'nullable|string',
@@ -155,19 +157,32 @@ class ProductController extends Controller
 
             DB::beginTransaction();
 
-            // Verify category belongs to vendor's store
+            // Verify category belongs to one of the modules associated with vendor's store
+            $moduleIds = $vendor->store->modules()->pluck('modules.id')->toArray();
             $category = Category::where('id', $request->category_id)
-                ->where('store_id', $storeId)
+                ->whereIn('module_id', $moduleIds)
                 ->first();
             
             if (!$category) {
-                return $this->errorResponse('errors.category_not_found_in_store', [], 404);
+                return $this->errorResponse('errors.category_not_found_in_store_modules', [], 404);
+            }
+
+            // Verify subcategory if provided
+            if ($request->filled('subcategory_id')) {
+                $subcategory = Category::where('id', $request->subcategory_id)
+                    ->where('parent_id', $request->category_id)
+                    ->whereIn('module_id', $moduleIds)
+                    ->first();
+                if (!$subcategory) {
+                    return $this->errorResponse('errors.subcategory_not_found_in_category', [], 404);
+                }
             }
 
             // Create product with vendor's store_id
             $product = Product::create([
                 'store_id' => $storeId,
                 'category_id' => $request->category_id,
+                'subcategory_id' => $request->subcategory_id,
                 'name_en' => $request->name_en,
                 'name_ar' => $request->name_ar,
                 'description_en' => $request->description_en,
@@ -252,7 +267,7 @@ class ProductController extends Controller
                 $product->addons()->sync($request->addon_ids);
             }
 
-            $product->load(['store', 'category', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
+            $product->load(['store', 'category', 'subcategory', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
 
             DB::commit();
 
@@ -284,6 +299,7 @@ class ProductController extends Controller
 
             $validator = ValidationService::make($request->all(), [
                 'category_id' => 'nullable|integer|exists:categories,id',
+                'subcategory_id' => 'nullable|integer|exists:categories,id',
                 'name_en' => 'nullable|string|max:255',
                 'name_ar' => 'nullable|string|max:255',
                 'description_en' => 'nullable|string',
@@ -312,16 +328,32 @@ class ProductController extends Controller
 
             DB::beginTransaction();
 
-            // Verify category belongs to vendor's store if changing category
-            if ($request->filled('category_id')) {
-                $category = Category::where('id', $request->category_id)
-                    ->where('store_id', $storeId)
+            // Verify category and subcategory if changing
+            if ($request->filled('category_id') || $request->filled('subcategory_id')) {
+                $categoryId = $request->filled('category_id') ? $request->category_id : $product->category_id;
+                $subcategoryId = $request->filled('subcategory_id') ? $request->subcategory_id : $product->subcategory_id;
+                $moduleIds = $vendor->store->modules()->pluck('modules.id')->toArray();
+
+                $category = Category::where('id', $categoryId)
+                    ->whereIn('module_id', $moduleIds)
                     ->first();
                 
                 if (!$category) {
-                    return $this->errorResponse('errors.category_not_found_in_store', [], 404);
+                    return $this->errorResponse('errors.category_not_found_in_store_modules', [], 404);
                 }
-                $product->category_id = $request->category_id;
+
+                if ($subcategoryId) {
+                    $subcategory = Category::where('id', $subcategoryId)
+                        ->where('parent_id', $categoryId)
+                        ->whereIn('module_id', $moduleIds)
+                        ->first();
+                    if (!$subcategory) {
+                        return $this->errorResponse('errors.subcategory_not_found_in_category', [], 404);
+                    }
+                }
+
+                $product->category_id = $categoryId;
+                $product->subcategory_id = $subcategoryId;
             }
 
             // Update product fields
@@ -418,7 +450,7 @@ class ProductController extends Controller
                 }
             }
 
-            $product->load(['store', 'category', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
+            $product->load(['store', 'category', 'subcategory', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
 
             DB::commit();
 
@@ -480,7 +512,7 @@ class ProductController extends Controller
 
             $product->is_active = !$product->is_active;
             $product->save();
-            $product->load(['store', 'category', 'images']);
+            $product->load(['store', 'category', 'subcategory', 'images']);
 
             return $this->successResponse($product, 'success.status_updated');
         } catch (\Exception $e) {
@@ -714,7 +746,7 @@ class ProductController extends Controller
                 ]);
             }
 
-            $newProduct->load(['store', 'category', 'images']);
+            $newProduct->load(['store', 'category', 'subcategory', 'images']);
 
             DB::commit();
 

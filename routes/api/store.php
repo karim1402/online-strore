@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\Vendor\OptionValueController;
 use App\Http\Controllers\Api\Vendor\AddonController;
 use App\Http\Controllers\Api\Vendor\ProductOptionController;
 use App\Http\Controllers\Api\Vendor\ProductAddonController;
-use App\Http\Controllers\Api\Vendor\MainCategoryController;
+use App\Http\Controllers\Api\Vendor\ModuleController;
 use App\Http\Controllers\Api\Vendor\OrderController;
 
 /*
@@ -27,8 +27,8 @@ use App\Http\Controllers\Api\Vendor\OrderController;
 
 Route::prefix('vendor')->group(function () {
     // Public routes (no authentication required)
-    Route::controller(MainCategoryController::class)->prefix('main-categories')->group(function () {
-        Route::get('/', 'getPublicMainCategories');
+    Route::controller(ModuleController::class)->prefix('modules')->group(function () {
+        Route::get('/', 'getPublicModules');
     });
 
     // Authentication routes
@@ -170,7 +170,7 @@ Route::prefix('vendor')->group(function () {
         // Add more vendor-specific routes here
         Route::get('dashboard', function () {
             $vendor = auth('vendors')->user();
-            $vendor->load(['store.mainCategories']);
+            $vendor->load(['store.modules']);
             
             $message = \App\Services\LocalizationService::getMessage('guards.vendor_dashboard');
             return response()->json([

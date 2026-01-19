@@ -20,13 +20,13 @@
         "admin_user_updated": "تم تحديث مستخدم الإدارة بنجاح",
         "admin_user_deleted": "تم حذف مستخدم الإدارة بنجاح",
         "admin_user_status_updated": "تم تحديث حالة مستخدم الإدارة بنجاح",
-        "main_categories_retrieved": "تم استرداد الفئات الرئيسية بنجاح",
-        "main_category_created": "تم إنشاء الفئة الرئيسية بنجاح",
-        "main_category_retrieved": "تم استرداد الفئة الرئيسية بنجاح",
-        "main_category_updated": "تم تحديث الفئة الرئيسية بنجاح",
-        "main_category_deleted": "تم حذف الفئة الرئيسية بنجاح",
-        "main_category_status_updated": "تم تحديث حالة الفئة الرئيسية بنجاح",
-        "active_main_categories_retrieved": "تم استرداد الفئات الرئيسية النشطة بنجاح",
+        "modules_retrieved": "تم استرداد الموديولات بنجاح",
+        "module_created": "تم إنشاء الموديول بنجاح",
+        "module_retrieved": "تم استرداد الموديول بنجاح",
+        "module_updated": "تم تحديث الموديول بنجاح",
+        "module_deleted": "تم حذف الموديول بنجاح",
+        "module_status_updated": "تم تحديث حالة الموديول بنجاح",
+        "active_modules_retrieved": "تم استرداد الموديولات النشطة بنجاح",
         "roles_retrieved": "تم جلب الأدوار بنجاح",
         "role_created": "تم إنشاء الدور بنجاح",
         "role_retrieved": "تم جلب الدور بنجاح",
@@ -91,7 +91,7 @@
         "role_not_found": "الدور غير موجود",
         "role_has_users": "لا يمكن حذف دور مُعيَّن للمستخدمين",
         "store_creation_failed": "فشل إنشاء المتجر",
-        "category_not_found": "الفئة الرئيسية غير موجودة",
+        "module_not_found": "الموديول غير موجود",
         "not_found": "المورد غير موجود",
         "store_not_found": "المتجر غير موجود",
         "store_already_approved": "المتجر معتمد بالفعل",
@@ -106,7 +106,10 @@
         "order_cannot_cancel": "لا يمكن إلغاء الطلب في الحالة الحالية",
         "delivery_has_active_order": "لديك طلب نشط بالفعل. يرجى إكماله  قبل استلام طلب جديد",
         "delivery_not_available": "أنت حالياً غير متاح. يرجى تغيير حالتك إلى متاح لاستلام الطلبات",
-        "store_not_approved": "متجرك لم يتم اعتماده بعد. يرجى التواصل مع الدعم"
+        "store_not_approved": "متجرك لم يتم اعتماده بعد. يرجى التواصل مع الدعم",
+        "invalid_parent": "لا يمكن للفئة أن تكون أباً لنفسها",
+        "invalid_parent_category": "يجب أن تنتمي الفئة الأب المختارة إلى نفس الموديول",
+        "subcategory_not_found_in_category": "الفئة الفرعية المختارة لا تنتمي إلى الفئة المختارة"
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
@@ -158,8 +161,8 @@
         "longitude": "خط الطول",
         "logo": "الشعار",
         "document": "المستند",
-        "main_category_id": "الفئة الرئيسية",
-        "main_category_ids": "الفئات الرئيسية"
+        "module_id": "الموديول",
+        "module_ids": "الموديولات"
     },
     "guards": {
         "user_dashboard": "لوحة تحكم المستخدم",
