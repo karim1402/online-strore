@@ -27,6 +27,9 @@ Categories now support a parent-child relationship, allowing for nested sub-cate
     *   `POST /categories`: Requires `module_id`, optional `parent_id`.
 *   **User API**:
     *   `GET /stores/{id}/categories-with-products`: Now returns a **nested tree structure**.
+    *   `GET /categories/by-module/{moduleId}`: **New Endpoint** to fetch all categories for a specific module (nested structure).
+    *   `GET /categories/{id}`: **New Endpoint** to fetch a main category with its sub-categories and their products (limit 20 products per sub-category).
+    *   `GET /categories/{id}/subcategories`: **New Endpoint** to fetch ONLY the list of sub-categories for a given main category, with their products (limit 50 products per sub-category).
     *   Top-level categories have a `children` array containing their sub-categories.
     *   Products are distributed: products in a sub-category appear inside that sub-category; products in a main category (with no sub-category) appear at the top level.
 
@@ -44,6 +47,9 @@ Products can now be specifically assigned to a sub-category.
     *   **Note**: This field is currently for data collection only and will be used for advanced search features (like Elasticsearch) in the future. Please include this field in the Product forms.
 *   **Option Values**: Added `image` field (nullable string/file) to option values.
     *   **Response**: `OptionValue` objects now include an `image_url` attribute.
+*   **Global Addons**: Addons can now be created without a `store_id` (Global Addons).
+    *   **Admin API**: `store_id` is now optional in `POST /admin/addons`.
+    *   **Vendor API**: Vendors can now see and assign global addons to their products.
 *   **API Responses**: Product objects now include a `subcategory` relationship.
 
 ## 4. User Account Management

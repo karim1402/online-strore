@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\User\ProductController;
 use App\Http\Controllers\Api\User\CartController;
 use App\Http\Controllers\Api\User\OrderController;
 
+use App\Http\Controllers\Api\User\CategoryController;
+
 /*
 |--------------------------------------------------------------------------
 | User API Routes
@@ -85,6 +87,13 @@ Route::prefix('user')->group(function () {
     Route::controller(ModuleController::class)->prefix('modules')->group(function () {
         Route::get('/', 'index')->name('user.modules.index');
         Route::get('/{id}', 'show')->name('user.modules.show');
+    });
+
+    // Category routes (public)
+    Route::controller(CategoryController::class)->prefix('categories')->group(function () {
+        Route::get('/by-module/{moduleId}', 'getByModule')->name('user.categories.byModule');
+        Route::get('/{id}', 'show')->name('user.categories.show');
+        Route::get('/{id}/subcategories', 'getSubcategories')->name('user.categories.subcategories');
     });
 
     // Store routes (public, works for both guests and authenticated users)

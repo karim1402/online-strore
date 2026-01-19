@@ -80,7 +80,7 @@ class AddonController extends Controller
     {
         try {
             $validator = ValidationService::make($request->all(), [
-                'store_id' => 'required|integer|exists:stores,id',
+                'store_id' => 'nullable|integer|exists:stores,id',
                 'name_en' => 'required|string|max:255',
                 'name_ar' => 'required|string|max:255',
                 'description_en' => 'nullable|string',
@@ -95,12 +95,6 @@ class AddonController extends Controller
             }
 
             DB::beginTransaction();
-
-            // Verify store exists
-            $store = Store::find($request->store_id);
-            if (!$store) {
-                return $this->errorResponse('errors.store_not_found', [], 404);
-            }
 
             $addon = Addon::create([
                 'store_id' => $request->store_id,

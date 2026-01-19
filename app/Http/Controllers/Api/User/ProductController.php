@@ -71,9 +71,9 @@ class ProductController extends Controller
     {
         // Find the product with all relationships
         $product = Product::with([
-            'store' => function ($query) {
-                $query->select('id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'logo', 'status');
-            },
+            // 'store' => function ($query) {
+            //     $query->select('id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'logo', 'status');
+            // },
             'category' => function ($query) {
                 $query->select('id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'image', 'is_active');
             },
@@ -124,7 +124,7 @@ class ProductController extends Controller
             'name_ar' => $product->name_ar,
             'description_en' => $product->description_en,
             'description_ar' => $product->description_ar,
-            'search_keywords' => $product->search_keywords,
+            // 'search_keywords' => $product->search_keywords,
             'base_price' => $product->base_price,
             'is_active' => $product->is_active,
             'view_count' => $product->view_count,

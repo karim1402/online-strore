@@ -58,13 +58,16 @@ class ProductAddonController extends Controller
 
             $product = Product::find($request->product_id);
 
-            // Verify addons belong to same store as product
+            // Verify addons belong to same store as product or are global
             $addons = Addon::whereIn('id', $request->addon_ids)
-                ->where('store_id', $product->store_id)
+                ->where(function ($query) use ($product) {
+                    $query->where('store_id', $product->store_id)
+                        ->orWhereNull('store_id');
+                })
                 ->get();
 
             if ($addons->count() !== count($request->addon_ids)) {
-                return $this->errorResponse('errors.some_addons_not_in_store', [], 400);
+                return $this->errorResponse('errors.some_addons_invalid', [], 400);
             }
 
             // Attach addons with default values
