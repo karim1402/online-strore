@@ -72,6 +72,7 @@ class OptionValueController extends Controller
                 'option_group_id' => 'required|integer|exists:option_groups,id',
                 'value_en' => 'required|string|max:255',
                 'value_ar' => 'required|string|max:255',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'sort_order' => 'nullable|integer|min:0',
                 'is_active' => 'nullable|boolean',
             ]);
@@ -82,10 +83,16 @@ class OptionValueController extends Controller
 
             DB::beginTransaction();
 
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('option-values', 'public');
+            }
+
             $optionValue = OptionValue::create([
                 'option_group_id' => $request->option_group_id,
                 'value_en' => $request->value_en,
                 'value_ar' => $request->value_ar,
+                'image' => $imagePath,
                 'sort_order' => $request->get('sort_order', 0),
                 'is_active' => $request->boolean('is_active', true),
             ]);
@@ -116,6 +123,7 @@ class OptionValueController extends Controller
             $validator = ValidationService::make($request->all(), [
                 'value_en' => 'nullable|string|max:255',
                 'value_ar' => 'nullable|string|max:255',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'sort_order' => 'nullable|integer|min:0',
                 'is_active' => 'nullable|boolean',
             ]);
@@ -132,6 +140,15 @@ class OptionValueController extends Controller
             if ($request->filled('value_ar')) {
                 $optionValue->value_ar = $request->value_ar;
             }
+            
+            if ($request->hasFile('image')) {
+                // Delete old image if exists
+                if ($optionValue->image) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($optionValue->image);
+                }
+                $optionValue->image = $request->file('image')->store('option-values', 'public');
+            }
+
             if ($request->has('sort_order')) {
                 $optionValue->sort_order = $request->sort_order;
             }
@@ -164,6 +181,11 @@ class OptionValueController extends Controller
             }
 
             DB::beginTransaction();
+
+            // Delete image if exists
+            if ($optionValue->image) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($optionValue->image);
+            }
 
             $optionValue->delete();
 
