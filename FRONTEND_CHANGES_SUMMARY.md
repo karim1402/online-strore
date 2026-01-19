@@ -21,17 +21,11 @@ Categories now support a parent-child relationship, allowing for nested sub-cate
 *   **New Field**: `parent_id` (nullable).
 *   **Validation**:
     *   A category cannot be its own parent.
-    *   A sub-category must belong to the same **Module** as its parent.
-*   **Admin/Vendor API**:
-    *   `GET /categories`: Added `parent_id` and `module_id` filters.
-    *   `POST /categories`: Requires `module_id`, optional `parent_id`.
 *   **User API**:
-    *   `GET /stores/{id}/categories-with-products`: Now returns a **nested tree structure**.
-    *   `GET /categories/by-module/{moduleId}`: **New Endpoint** to fetch all categories for a specific module (nested structure).
-    *   `GET /categories/{id}`: **New Endpoint** to fetch a main category with its sub-categories and their products (limit 20 products per sub-category).
-    *   `GET /categories/{id}/subcategories`: **New Endpoint** to fetch ONLY the list of sub-categories for a given main category, with their products (limit 50 products per sub-category).
-    *   Top-level categories have a `children` array containing their sub-categories.
-    *   Products are distributed: products in a sub-category appear inside that sub-category; products in a main category (with no sub-category) appear at the top level.
+    *   `GET /categories/by-module/{moduleId}`: Get all top-level categories for a specific module.
+    *   `GET /categories/all-with-products`: Get all categories and their related products (optionally filter by `module_id`).
+    *   `GET /categories/{id}`: Get a main category with its subcategories and products.
+    *   `GET /categories/{id}/subcategories`: Get only the list of subcategories for a given main category, with their products.
 
 ## 3. Product Sub-category Support
 Products can now be specifically assigned to a sub-category.
@@ -44,31 +38,19 @@ Products can now be specifically assigned to a sub-category.
     *   `description`: Returns the localized description based on the request language.
 *   **New Input Field**: `search_keywords` (nullable string).
     *   **Purpose**: Allows Admins and Vendors to add comma-separated keywords (e.g., "pizza, spicy, italian") when creating or updating products.
-    *   **Note**: This field is currently for data collection only and will be used for advanced search features (like Elasticsearch) in the future. Please include this field in the Product forms.
 *   **Option Values**: Added `image` field (nullable string/file) to option values.
     *   **Response**: `OptionValue` objects now include an `image_url` attribute.
 *   **Global Addons**: Addons can now be created without a `store_id` (Global Addons).
     *   **Admin API**: `store_id` is now optional in `POST /admin/addons`.
     *   **Vendor API**: Vendors can now see and assign global addons to their products.
-*   **API Responses**: Product objects now include a `subcategory` relationship.
 
 ## 4. User Account Management
 *   **Delete Account**: New endpoint `DELETE /api/user/delete-account` (requires authentication).
-*   **Localization**: Added `account_deleted` message in English and Arabic.
 
-## 5. Localization Updates
-New error and success messages added to `messages.json`:
-*   `invalid_parent`: Category cannot be its own parent.
-*   `invalid_parent_category`: Parent must be in the same module.
-*   `subcategory_not_found_in_category`: The selected sub-category doesn't belong to the main category.
-*   `account_deleted`: Success message for account deletion.
-
-## 6. Postman Collection
-The Postman collection `Makook v2.postman_collection.json` has been fully updated:
-*   All "Main Category" references renamed to "Module".
-*   Routes updated to `/modules`.
-*   New `subcategory_id` and `parent_id` fields added to relevant requests.
-*   Added the `delete-account` request.
+## 5. Postman Collection
+Two Postman collections are available:
+1.  `Makook v2.postman_collection.json`: Full collection updated with Modules and new fields.
+2.  `Category_Management.postman_collection.json`: Focused collection for Category APIs using form-data.
 
 ---
 **Note for Portal Developers**: If you are working on the Admin Portal (Makook Owner) or the Vendor Portal, please ensure you update your form data and API calls to use `module_id` and handle the optional `parent_id` for categories and `subcategory_id` for products.

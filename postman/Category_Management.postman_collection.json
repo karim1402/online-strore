@@ -1,0 +1,378 @@
+{
+    "info": {
+        "_postman_id": "c1a2b3c4-d5e6-4f7g-8h9i-j0k1l2m3n4o5",
+        "name": "Makook Category API",
+        "description": "Postman collection for Category Management (User, Admin, and Vendor APIs) using form-data for POST/PUT requests.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "User API",
+            "item": [
+                {
+                    "name": "Get All Categories with Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}user/categories/all-with-products?module_id=1",
+                            "host": [
+                                "{{local}}user"
+                            ],
+                            "path": [
+                                "categories",
+                                "all-with-products"
+                            ],
+                            "query": [
+                                {
+                                    "key": "module_id",
+                                    "value": "1",
+                                    "description": "Optional: Filter by module"
+                                }
+                            ]
+                        },
+                        "description": "Get all categories and their related products (optionally filtered by module)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Categories by Module",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}user/categories/by-module/1",
+                            "host": [
+                                "{{local}}user"
+                            ],
+                            "path": [
+                                "categories",
+                                "by-module",
+                                "1"
+                            ]
+                        },
+                        "description": "Get all top-level categories for a specific module."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Category Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}user/categories/1",
+                            "host": [
+                                "{{local}}user"
+                            ],
+                            "path": [
+                                "categories",
+                                "1"
+                            ]
+                        },
+                        "description": "Get a main category with its sub-categories and products."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Subcategories with Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}user/categories/1/subcategories",
+                            "host": [
+                                "{{local}}user"
+                            ],
+                            "path": [
+                                "categories",
+                                "1",
+                                "subcategories"
+                            ]
+                        },
+                        "description": "Get only the list of sub-categories for a given main category, with their products."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Admin API",
+            "item": [
+                {
+                    "name": "List Categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}admin/categories?module_id=1",
+                            "host": [
+                                "{{local}}admin"
+                            ],
+                            "path": [
+                                "categories"
+                            ],
+                            "query": [
+                                {
+                                    "key": "module_id",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "value": "",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "top_level_only",
+                                    "value": "1",
+                                    "disabled": true
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Category",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "module_id",
+                                    "value": "1",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "value": "",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "name_en",
+                                    "value": "New Category",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "name_ar",
+                                    "value": "فئة جديدة",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "description_en",
+                                    "value": "Category description",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "description_ar",
+                                    "value": "وصف الفئة",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "sort_order",
+                                    "value": "0",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{local}}admin/categories",
+                            "host": [
+                                "{{local}}admin"
+                            ],
+                            "path": [
+                                "categories"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Category",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "_method",
+                                    "value": "PUT",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "name_en",
+                                    "value": "Updated Category Name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "name_ar",
+                                    "value": "اسم الفئة المحدث",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{local}}admin/categories/1",
+                            "host": [
+                                "{{local}}admin"
+                            ],
+                            "path": [
+                                "categories",
+                                "1"
+                            ]
+                        },
+                        "description": "Use POST with _method=PUT to support multipart/form-data (images) in Laravel."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Category",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}admin/categories/1",
+                            "host": [
+                                "{{local}}admin"
+                            ],
+                            "path": [
+                                "categories",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Toggle Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}admin/categories/1/toggle-status",
+                            "host": [
+                                "{{local}}admin"
+                            ],
+                            "path": [
+                                "categories",
+                                "1",
+                                "toggle-status"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Vendor API",
+            "item": [
+                {
+                    "name": "List My Categories",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local}}vendor/categories",
+                            "host": [
+                                "{{local}}vendor"
+                            ],
+                            "path": [
+                                "categories"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Category",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "module_id",
+                                    "value": "1",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "name_en",
+                                    "value": "Vendor Category",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "name_ar",
+                                    "value": "فئة المتجر",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{local}}vendor/categories",
+                            "host": [
+                                "{{local}}vendor"
+                            ],
+                            "path": [
+                                "categories"
+                            ]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "local",
+            "value": "http://localhost:8000/api/",
+            "type": "string"
+        }
+    ]
+}

@@ -235,4 +235,109 @@ class CategoryController extends Controller
             ],
         ], 200);
     }
+    /**
+     * Get all categories with their related products.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAllWithProducts(Request $request,$id)
+    {
+        $query = Category::active()
+            ->whereNull('parent_id')->where('module_id', $id); // Top-level categories
+
+
+        $categories = $query->with(['products' => function ($q) {
+                $q->active()
+                    ->with(['primaryImage', 'store' => function($q) {
+                        $q->select('id', 'name_en', 'name_ar', 'status');
+                    }])
+                    ->orderBy('sort_order', 'asc')
+                    ->limit(20);
+            }, 'children' => function ($q) {
+                $q->active()->with(['products' => function ($pq) {
+                    $pq->active()
+                        ->with(['primaryImage', 'store' => function($sq) {
+                            $sq->select('id', 'name_en', 'name_ar', 'status');
+                        }])
+                        ->orderBy('sort_order', 'asc')
+                        ->limit(20);
+                }]);
+            }])
+            ->orderBy('sort_order', 'asc')
+            ->get();
+
+        // Transform the data
+        $categoriesData = $categories->map(function ($category) {
+            return [
+                'id' => $category->id,
+                'name_en' => $category->name_en,
+                'name_ar' => $category->name_ar,
+                'description_en' => $category->description_en,
+                'description_ar' => $category->description_ar,
+                'image_url' => $category->image_url,
+                'sort_order' => $category->sort_order,
+                'products' => $category->products->map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name_en' => $product->name_en,
+                        'name_ar' => $product->name_ar,
+                        'base_price' => $product->base_price,
+                        'image_url' => $product->image_url,
+                        'store' => $product->store ? [
+                            'id' => $product->store->id,
+                            'name_en' => $product->store->name_en,
+                            'name_ar' => $product->store->name_ar,
+                        ] : null,
+                    ];
+                }),
+                'subcategories' => $category->children->map(function ($child) {
+                    return [
+                        'id' => $child->id,
+                        'name_en' => $child->name_en,
+                        'name_ar' => $child->name_ar,
+                        'description_en' => $child->description_en,
+                        'description_ar' => $child->description_ar,
+                        'image_url' => $child->image_url,
+                        'sort_order' => $child->sort_order,
+                        'products' => $child->products->map(function ($product) {
+                            return [
+                                'id' => $product->id,
+                                'name_en' => $product->name_en,
+                                'name_ar' => $product->name_ar,
+                                'base_price' => $product->base_price,
+                                'image_url' => $product->image_url,
+                                'store' => $product->store ? [
+                                    'id' => $product->store->id,
+                                    'name_en' => $product->store->name_en,
+                                    'name_ar' => $product->store->name_ar,
+                                ] : null,
+                            ];
+                        }),
+                    ];
+                }),
+            ];
+        });
+
+        // Localize the data
+        $localizedCategories = $categoriesData->map(function ($cat) {
+            $localizedCat = LocalizationService::localizeFields($cat, ['name', 'description']);
+            $localizedCat['products'] = LocalizationService::localizeCollection($cat['products']->toArray(), ['name']);
+            $localizedCat['subcategories'] = $cat['subcategories']->map(function ($sub) {
+                $localizedSub = LocalizationService::localizeFields($sub, ['name', 'description']);
+                $localizedSub['products'] = LocalizationService::localizeCollection($sub['products']->toArray(), ['name']);
+                return $localizedSub;
+            })->toArray();
+            return $localizedCat;
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'categories' => $localizedCategories,
+                'total' => $categoriesData->count(),
+            ],
+        ], 200);
+    }
 }

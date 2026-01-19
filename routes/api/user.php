@@ -91,6 +91,7 @@ Route::prefix('user')->group(function () {
 
     // Category routes (public)
     Route::controller(CategoryController::class)->prefix('categories')->group(function () {
+        Route::get('/{id}/all-with-products', 'getAllWithProducts')->name('user.categories.allWithProducts');
         Route::get('/by-module/{moduleId}', 'getByModule')->name('user.categories.byModule');
         Route::get('/{id}', 'show')->name('user.categories.show');
         Route::get('/{id}/subcategories', 'getSubcategories')->name('user.categories.subcategories');
