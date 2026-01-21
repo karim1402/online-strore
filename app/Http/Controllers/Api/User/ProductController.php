@@ -107,12 +107,12 @@ class ProductController extends Controller
         }
 
         // Check if store is approved
-        if (!$product->store || !$product->store->isApproved()) {
-            return response()->json([
-                'success' => false,
-                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Product']),
-            ], 404);
-        }
+        // if (!$product->store || !$product->store->isApproved()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Product']),
+        //     ], 404);
+        // }
 
         // Increment view count
         $product->incrementViewCount();
