@@ -269,7 +269,9 @@ Route::prefix('admin')->group(function () {
             Route::middleware('permission:stores.view,admins')->group(function () {
                 Route::get('/', 'index');
                 Route::get('/types', 'getTypes');
+                Route::get('/makook-sandwitch', 'makookSandwitchList');
                 Route::get('/{id}', 'show');
+               
             });
             
             Route::middleware('permission:stores.create,admins')->group(function () {
