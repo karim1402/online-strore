@@ -26,7 +26,7 @@ class CartController extends Controller
         $user = auth('api')->user();
 
         $cart = Cart::with([
-            'store:id,name_en,name_ar,description_en,description_ar,logo,status',
+            // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
             'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -88,7 +88,7 @@ class CartController extends Controller
         }
 
         // Get product with store
-        $product = Product::with('store')->find($request->product_id);
+        $product = Product::find($request->product_id);
 
         if (!$product || !$product->is_active) {
             return response()->json([
@@ -97,21 +97,21 @@ class CartController extends Controller
             ], 404);
         }
 
-        if (!$product->store || $product->store->status !== 'approved') {
-            return response()->json([
-                'success' => false,
-                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Product']),
-            ], 404);
-        }
+        // if (!$product->store || $product->store->status !== 'approved') {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Product']),
+        //     ], 404);
+        // }
 
         // Check if user has a cart
         $cart = Cart::where('user_id', $user->id)->first();
 
         // Check for store conflict
-         if ($cart && $cart->store_id !== $product->store_id) {
-            $cart->delete();
-            $cart = null;
-        }
+        //  if ($cart && $cart->store_id !== $product->store_id) {
+        //     $cart->delete();
+        //     $cart = null;
+        // }
 
 
         DB::beginTransaction();
@@ -120,7 +120,7 @@ class CartController extends Controller
             if (!$cart) {
                 $cart = Cart::create([
                     'user_id' => $user->id,
-                    'store_id' => $product->store_id,
+                    // 'store_id' => $product->store_id,
                 ]);
             }
 
@@ -191,7 +191,7 @@ class CartController extends Controller
 
             // Reload cart with relationships
             $cart->load([
-                'store:id,name_en,name_ar,description_en,description_ar,logo,status',
+                // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
                 'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -268,7 +268,7 @@ class CartController extends Controller
         // Reload cart
         $cart = $cartItem->cart;
        $cart->load([
-            'store:id,name_en,name_ar,description_en,description_ar,logo,status',
+            // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
             'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -373,7 +373,7 @@ class CartController extends Controller
             // Reload cart
             $cart = $cartItem->cart;
             $cart->load([
-                'store:id,name_en,name_ar,description_en,description_ar,logo,status',
+                // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
                 'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -443,7 +443,7 @@ class CartController extends Controller
 
         // Reload cart
         $cart->load([
-            'store:id,name_en,name_ar,description_en,description_ar,logo,status',
+            // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
             'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -521,7 +521,7 @@ class CartController extends Controller
         }
 
         // Get product
-        $product = Product::with('store')->find($request->product_id);
+        $product = Product::find($request->product_id);
 
         if (!$product || !$product->is_active) {
             return response()->json([
@@ -538,7 +538,7 @@ class CartController extends Controller
             // Create new cart
             $cart = Cart::create([
                 'user_id' => $user->id,
-                'store_id' => $product->store_id,
+                // 'store_id' => $product->store_id,
             ]);
 
             // Create cart item
@@ -573,7 +573,7 @@ class CartController extends Controller
 
             // Reload cart
             $cart->load([
-                'store:id,name_en,name_ar,description_en,description_ar,logo,status',
+                // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
                 'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -658,15 +658,15 @@ class CartController extends Controller
     {
         return [
             'id' => $cart->id,
-            'store' => [
-                'id' => $cart->store->id,
-                'name_en' => $cart->store->name_en,
-                'name_ar' => $cart->store->name_ar,
-                'description_en' => $cart->store->description_en,
-                'description_ar' => $cart->store->description_ar,
-                'logo_url' => $cart->store->logo_url,
-                'status' => $cart->store->status,
-            ],
+            // 'store' => [
+            //     'id' => $cart->store->id,
+            //     'name_en' => $cart->store->name_en,
+            //     'name_ar' => $cart->store->name_ar,
+            //     'description_en' => $cart->store->description_en,
+            //     'description_ar' => $cart->store->description_ar,
+            //     'logo_url' => $cart->store->logo_url,
+            //     'status' => $cart->store->status,
+            // ],
             'items' => $cart->items->map(function ($item) {
                 return [
                     'id' => $item->id,
