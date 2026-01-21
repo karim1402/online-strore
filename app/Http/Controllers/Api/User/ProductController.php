@@ -24,14 +24,14 @@ class ProductController extends Controller
         // Get random active products from approved stores
         $products = Product::with([
             'primaryImage',
-            'store' => function ($query) {
-                $query->select('id', 'status');
-            }
+            // 'store' => function ($query) {
+            //     $query->select('id', 'status');
+            // }
         ])
         ->active()
-        ->whereHas('store', function ($query) {
-            $query->where('status', 'approved');
-        })
+        // ->whereHas('store', function ($query) {
+        //     $query->where('status', 'approved');
+        // })
         ->inRandomOrder()
         ->limit($count)
         ->get();
@@ -135,15 +135,15 @@ class ProductController extends Controller
         ];
 
         // Add store information
-        $productData['store'] = [
-            'id' => $product->store->id,
-            'name_en' => $product->store->name_en,
-            'name_ar' => $product->store->name_ar,
-            'description_en' => $product->store->description_en,
-            'description_ar' => $product->store->description_ar,
-            'logo_url' => $product->store->logo_url,
-            'status' => $product->store->status,
-        ];
+        // $productData['store'] = [
+        //     'id' => $product->store->id,
+        //     'name_en' => $product->store->name_en,
+        //     'name_ar' => $product->store->name_ar,
+        //     'description_en' => $product->store->description_en,
+        //     'description_ar' => $product->store->description_ar,
+        //     'logo_url' => $product->store->logo_url,
+        //     'status' => $product->store->status,
+        // ];
 
         // Add category information
         if ($product->category) {
