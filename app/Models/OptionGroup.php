@@ -16,10 +16,13 @@ class OptionGroup extends Model
         'name_ar',
         'type',
         'is_active',
+        'image',
+        'makook_sandwitch',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'makook_sandwitch' => 'boolean',
     ];
 
     protected $appends = ['name'];

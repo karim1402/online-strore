@@ -9,6 +9,7 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class OptionGroupController extends Controller
 {
@@ -21,6 +22,41 @@ class OptionGroupController extends Controller
     {
         try {
             $query = OptionGroup::with('values');
+            $query->where('makook_sandwitch', false);
+
+            // Filter by type
+            if ($request->filled('type')) {
+                $query->where('type', $request->type);
+            }
+
+            // Filter by active status
+            if ($request->has('is_active')) {
+                $query->where('is_active', $request->boolean('is_active'));
+            }
+
+            // Search by name
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name_en', 'like', "%{$search}%")
+                        ->orWhere('name_ar', 'like', "%{$search}%");
+                });
+            }
+
+            $optionGroups = $query->orderBy('created_at', 'desc')->paginate(15);
+
+            return $this->successResponse($optionGroups, 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    //makook makook_sandwitch list
+    public function makookSandwitchList(Request $request): JsonResponse
+    {
+        try {
+            $query = OptionGroup::with('values');
+            $query->where('makook_sandwitch', true);
 
             // Filter by type
             if ($request->filled('type')) {
@@ -78,6 +114,8 @@ class OptionGroupController extends Controller
                 'name_ar' => 'required|string|max:255',
                 'type' => 'required|string|max:50',
                 'is_active' => 'nullable|boolean',
+                'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'makook_sandwitch' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -86,11 +124,19 @@ class OptionGroupController extends Controller
 
             DB::beginTransaction();
 
+            // Handle image upload
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store('option_groups', 'public');
+            }
+
             $optionGroup = OptionGroup::create([
                 'name_en' => $request->name_en,
                 'name_ar' => $request->name_ar,
                 'type' => $request->type,
                 'is_active' => $request->boolean('is_active', true),
+                'image' => $imagePath,
+                'makook_sandwitch' => $request->boolean('makook_sandwitch', false),
             ]);
 
             $optionGroup->load('values');
@@ -100,6 +146,12 @@ class OptionGroupController extends Controller
             return $this->successResponse($optionGroup, 'success.option_group_created', [], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // Clean up uploaded image if creation failed
+            if (isset($imagePath) && $imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
@@ -121,6 +173,8 @@ class OptionGroupController extends Controller
                 'name_ar' => 'nullable|string|max:255',
                 'type' => 'nullable|string|max:50',
                 'is_active' => 'nullable|boolean',
+                'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'makook_sandwitch' => 'nullable|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -140,6 +194,20 @@ class OptionGroupController extends Controller
             }
             if ($request->has('is_active')) {
                 $optionGroup->is_active = $request->boolean('is_active');
+            }
+            if ($request->has('makook_sandwitch')) {
+                $optionGroup->makook_sandwitch = $request->boolean('makook_sandwitch');
+            }
+
+            // Handle image upload
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                // Delete old image
+                if ($optionGroup->image && Storage::disk('public')->exists($optionGroup->image)) {
+                    Storage::disk('public')->delete($optionGroup->image);
+                }
+                
+                // Upload new image
+                $optionGroup->image = $request->file('image')->store('option_groups', 'public');
             }
 
             $optionGroup->save();
@@ -167,6 +235,11 @@ class OptionGroupController extends Controller
             }
 
             DB::beginTransaction();
+
+            // Delete image
+            if ($optionGroup->image && Storage::disk('public')->exists($optionGroup->image)) {
+                Storage::disk('public')->delete($optionGroup->image);
+            }
 
             $optionGroup->delete();
 
