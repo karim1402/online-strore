@@ -22,7 +22,7 @@ class OptionGroupController extends Controller
     {
         try {
             $query = OptionGroup::with('values');
-            $query->where('makook_sandwitch', false);
+            $query->where('makook_sandwitch', 0);
 
             // Filter by type
             if ($request->filled('type')) {
@@ -56,7 +56,7 @@ class OptionGroupController extends Controller
     {
         try {
             $query = OptionGroup::with('values');
-            $query->where('makook_sandwitch', true);
+            $query->where('makook_sandwitch', 1);
 
             // Filter by type
             if ($request->filled('type')) {

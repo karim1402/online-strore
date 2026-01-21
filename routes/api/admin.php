@@ -268,10 +268,9 @@ Route::prefix('admin')->group(function () {
         Route::controller(OptionGroupController::class)->prefix('option-groups')->group(function () {
             Route::middleware('permission:stores.view,admins')->group(function () {
                 Route::get('/', 'index');
-                Route::get('/types', 'getTypes');      
-                Route::get('/{id}', 'show');
+                Route::get('/types', 'getTypes');
                 Route::get('/makook-sandwitch', 'makookSandwitchList');
-               
+                Route::get('/{id}', 'show');
             });
             
             Route::middleware('permission:stores.create,admins')->group(function () {
