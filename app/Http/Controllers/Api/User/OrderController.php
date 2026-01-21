@@ -57,7 +57,7 @@ class OrderController extends Controller
 
         // Get cart with all items
         $cart = $user->cart()->with([
-            'items.product.store',
+            // 'items.product.store',
             'items.product.primaryImage',
             'items.options.productOptionValue.optionValue.optionGroup',
             'items.options.productOptionValue.optionValue.optionGroup',
@@ -146,14 +146,15 @@ class OrderController extends Controller
             ];
 
             // Find nearest branch for the store based on delivery address
-            $nearestBranch = $this->getNearestBranchForAddress($cart->store_id, $address);
-            $branchId = $nearestBranch ? $nearestBranch->id : null;
+            // $nearestBranch = $this->getNearestBranchForAddress($cart->store_id, $address);
+            // $branchId = $nearestBranch ? $nearestBranch->id : null;
+            $branchId = null;
 
             // Create order
             $order = Order::create([
                 'order_number' => $orderNumber,
                 'user_id' => $user->id,
-                'store_id' => $cart->store_id,
+                // 'store_id' => $cart->store_id,
                 'branch_id' => $branchId,
                 'address_id' => $address->id,
                 'address_snapshot' => $addressSnapshot,
@@ -320,7 +321,7 @@ class OrderController extends Controller
                     'order_number' => $orderNumber,
                     'payment_method' => $request->payment_method,
                     'total' => $total,
-                    'store_id' => $cart->store_id,
+                    // 'store_id' => $cart->store_id,
                 ])
                 ->log('Order created');
 
@@ -367,7 +368,7 @@ class OrderController extends Controller
         $user = auth('api')->user();
 
         $query = Order::where('user_id', $user->id)
-            ->with(['store', 'items'])
+            ->with([/*'store',*/ 'items'])
             ->orderBy('created_at', 'desc');
 
         // Filter by simple status
@@ -407,7 +408,7 @@ class OrderController extends Controller
 
         $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
-            ->with(['store', 'items.options', 'items.addons', 'delivery'])
+            ->with([/*'store',*/ 'items.options', 'items.addons', 'delivery'])
             ->first();
 
         if (!$order) {
@@ -598,7 +599,7 @@ class OrderController extends Controller
                 'success' => true,
                 'message' => $message,
                 'data' => [
-                    'order' => $this->transformOrderDetail($order->load(['store', 'items.options', 'items.addons'])),
+                    'order' => $this->transformOrderDetail($order->load([/*'store',*/ 'items.options', 'items.addons'])),
                 ],
             ], 200);
 
@@ -633,12 +634,12 @@ class OrderController extends Controller
             }
 
             // Check store is approved
-            if ($product->store->status !== 'approved') {
-                $errors[] = [
-                    'product_id' => $product->id,
-                    'error' => 'Store is not available',
-                ];
-            }
+            // if ($product->store->status !== 'approved') {
+            //     $errors[] = [
+            //         'product_id' => $product->id,
+            //         'error' => 'Store is not available',
+            //     ];
+            // }
         }
 
         return $errors;
@@ -791,11 +792,11 @@ class OrderController extends Controller
         return [
             'id' => $order->id,
             'order_number' => $order->order_number,
-            'store' => [
-                'id' => $order->store->id,
-                'name' => $order->store->{"name_{$locale}"} ?? $order->store->name_en,
-                'logo_url' => $order->store->logo_url ?? null,
-            ],
+            // 'store' => [
+            //     'id' => $order->store->id,
+            //     'name' => $order->store->{"name_{$locale}"} ?? $order->store->name_en,
+            //     'logo_url' => $order->store->logo_url ?? null,
+            // ],
             'status' => $order->order_status,
             'status_label' => $order->status_label,
             'simple_status' => $order->simple_status,
@@ -817,13 +818,13 @@ class OrderController extends Controller
         return [
             'id' => $order->id,
             'order_number' => $order->order_number,
-            'store' => [
-                'id' => $order->store->id,
-                'name' => $order->store->{"name_{$locale}"} ?? $order->store->name_en,
-                'description' => $order->store->{"description_{$locale}"} ?? $order->store->description_en ?? '',
-                'logo_url' => $order->store->logo_url ?? null,
-                'phone' => $order->store->phone ?? null,
-            ],
+            // 'store' => [
+            //     'id' => $order->store->id,
+            //     'name' => $order->store->{"name_{$locale}"} ?? $order->store->name_en,
+            //     'description' => $order->store->{"description_{$locale}"} ?? $order->store->description_en ?? '',
+            //     'logo_url' => $order->store->logo_url ?? null,
+            //     'phone' => $order->store->phone ?? null,
+            // ],
             'delivery' => $order->delivery ? [
                 'id' => $order->delivery->id,
                 'name' => $order->delivery->name,
