@@ -106,9 +106,8 @@ Route::prefix('user')->group(function () {
     // Product routes (public, works for both guests and authenticated users)
     Route::controller(ProductController::class)->prefix('products')->group(function () {
         Route::get('/random', 'random')->name('user.products.random');
-        Route::get('/{productId}', 'show')->name('user.products.show');
-        Route::get('/{productId}', 'show')->name('user.products.show');
         Route::get('/product-makook-sandwich', 'showMakookSandwich')->name('user.products.showMakookSandwich');
+        Route::get('/{productId}', 'show')->name('user.products.show');
     });
     
     // Test route without authentication
