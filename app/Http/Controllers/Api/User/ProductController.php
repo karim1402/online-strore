@@ -246,4 +246,170 @@ class ProductController extends Controller
             ],
         ], 200);
     }
+    /**
+     * Get Makook Sandwich product details (ID 74) including images for options.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showMakookSandwich(Request $request)
+    {
+        $productId = 74;
+
+        // Find the product with all relationships
+        $product = Product::with([
+            'category' => function ($query) {
+                $query->select('id', 'name_en', 'name_ar', 'description_en', 'description_ar', 'image', 'is_active');
+            },
+            'images' => function ($query) {
+                $query->orderBy('is_primary', 'desc')->orderBy('sort_order', 'asc');
+            },
+            'addons' => function ($query) {
+                $query->where('addons.is_active', true)
+                    ->orderBy('product_addons.sort_order', 'asc')
+                    ->orderBy('addons.name_en', 'asc');
+            },
+            'productOptions' => function ($query) {
+                $query->orderBy('sort_order', 'asc');
+            },
+            'productOptions.optionGroup' => function ($query) {
+                $query->where('is_active', true);
+            },
+            'productOptions.productOptionValues.optionValue' => function ($query) {
+                $query->where('is_active', true);
+            }
+        ])
+        ->active()
+        ->find($productId);
+
+        // Check if product exists
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Product']),
+            ], 404);
+        }
+
+        // Increment view count
+        $product->incrementViewCount();
+
+        // Transform product data
+        $productData = [
+            'id' => $product->id,
+            'name_en' => $product->name_en,
+            'name_ar' => $product->name_ar,
+            'description_en' => $product->description_en,
+            'description_ar' => $product->description_ar,
+            'base_price' => $product->base_price,
+            'is_active' => $product->is_active,
+            'view_count' => $product->view_count,
+            'sales_count' => $product->sales_count,
+            'sort_order' => $product->sort_order,
+            'created_at' => $product->created_at,
+            'updated_at' => $product->updated_at,
+        ];
+
+        // Add category information
+        if ($product->category) {
+            $productData['category'] = [
+                'id' => $product->category->id,
+                'name_en' => $product->category->name_en,
+                'name_ar' => $product->category->name_ar,
+                'description_en' => $product->category->description_en,
+                'description_ar' => $product->category->description_ar,
+                'image_url' => $product->category->image_url,
+                'is_active' => $product->category->is_active,
+            ];
+        }
+
+        // Add images
+        $productData['images'] = $product->images->map(function ($image) {
+            return [
+                'id' => $image->id,
+                'image_url' => $image->image_url,
+                'is_primary' => $image->is_primary,
+                'sort_order' => $image->sort_order,
+            ];
+        })->toArray();
+
+        // Add primary image separately for convenience
+        $primaryImage = $product->images->where('is_primary', true)->first();
+        $productData['primary_image'] = $primaryImage ? [
+            'id' => $primaryImage->id,
+            'image_url' => $primaryImage->image_url,
+        ] : null;
+
+        // Add addons
+        $productData['addons'] = $product->addons->map(function ($addon) {
+            return [
+                'id' => $addon->id,
+                'name_en' => $addon->name_en,
+                'name_ar' => $addon->name_ar,
+                'description_en' => $addon->description_en,
+                'description_ar' => $addon->description_ar,
+                'price' => $addon->price,
+                'addon_category' => $addon->addon_category,
+                'is_active' => $addon->is_active,
+                'is_available' => $addon->pivot->is_available,
+                'sort_order' => $addon->pivot->sort_order,
+            ];
+        })->toArray();
+
+        // Add options with their values
+        $productData['options'] = $product->productOptions->map(function ($productOption) use ($product) {
+            // Skip if option group is not active
+            if (!$productOption->optionGroup) {
+                return null;
+            }
+
+            return [
+                'id' => $productOption->id,
+                'is_required' => $productOption->is_required,
+                'sort_order' => $productOption->sort_order,
+                'option_group' => [
+                    'id' => $productOption->optionGroup->id,
+                    'name_en' => $productOption->optionGroup->name_en,
+                    'name_ar' => $productOption->optionGroup->name_ar,
+                    'type' => $productOption->optionGroup->type,
+                    'is_active' => $productOption->optionGroup->is_active,
+                    'image' => $productOption->optionGroup->image ? \Illuminate\Support\Facades\Storage::disk('public')->url($productOption->optionGroup->image) : null,
+                ],
+                'values' => $productOption->productOptionValues
+                    ->filter(function ($productOptionValue) {
+                        // Only include active option values
+                        return $productOptionValue->optionValue && $productOptionValue->is_available;
+                    })
+                    ->map(function ($productOptionValue) use ($product) {
+                        $optionValue = $productOptionValue->optionValue;
+                        
+                        return [
+                            'id' => $productOptionValue->id,
+                            'option_value_id' => $optionValue->id,
+                            'value_en' => $optionValue->value_en,
+                            'value_ar' => $optionValue->value_ar,
+                            'price_type' => $productOptionValue->price_type,
+                            'price_value' => $productOptionValue->price_value,
+                            'calculated_price' => $productOptionValue->calculatePrice($product->base_price),
+                            'stock_quantity' => $productOptionValue->stock_quantity,
+                            'is_available' => $productOptionValue->is_available,
+                            'in_stock' => $productOptionValue->inStock(),
+                            'image_url' => $optionValue->image_url,
+                        ];
+                    })
+                    ->values()
+                    ->toArray(),
+            ];
+        })->filter()->values()->toArray(); // Remove null entries and reindex
+
+        // Localize all nested data (store, category, addons, options, values)
+        $localizedProduct = LocalizationService::localizeCollection([$productData], ['name', 'description', 'value'])[0];
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'product' => $localizedProduct,
+            ],
+        ], 200);
+    }
 }

@@ -107,6 +107,8 @@ Route::prefix('user')->group(function () {
     Route::controller(ProductController::class)->prefix('products')->group(function () {
         Route::get('/random', 'random')->name('user.products.random');
         Route::get('/{productId}', 'show')->name('user.products.show');
+        Route::get('/{productId}', 'show')->name('user.products.show');
+        Route::get('/product-makook-sandwich', 'showMakookSandwich')->name('user.products.showMakookSandwich');
     });
     
     // Test route without authentication
