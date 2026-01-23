@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Module;
+use App\Models\Product;
 use App\Services\LocalizationService;
 use Illuminate\Http\Request;
 
@@ -183,17 +184,30 @@ class CategoryController extends Controller
             ], 404);
         }
 
-        // Get subcategories with products
+        // Get subcategories with products (products are linked via subcategory_id)
         $subcategories = Category::active()
             ->where('parent_id', $categoryId)
-            ->with(['products' => function ($q) {
-                $q->active()
-                    ->with(['primaryImage'])
-                    ->orderBy('sort_order', 'asc')
-                    ->limit(50);
-            }])
             ->orderBy('sort_order', 'asc')
             ->get();
+
+        // Load products for each subcategory using subcategory_id
+        $subcategories->load(['products' => function ($q) {
+            $q->active()
+                ->with(['primaryImage'])
+                ->orderBy('sort_order', 'asc');
+        }]);
+
+        // Also load products by subcategory_id for subcategories
+        foreach ($subcategories as $subcategory) {
+            // Get products where subcategory_id matches this subcategory
+            $subcategory->setRelation('products', 
+                Product::active()
+                    ->where('subcategory_id', $subcategory->id)
+                    ->with(['primaryImage'])
+                    ->orderBy('sort_order', 'asc')
+                    ->get()
+            );
+        }
 
         // Transform the data
         $subcategoriesData = $subcategories->map(function ($subcategory) {
