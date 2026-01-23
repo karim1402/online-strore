@@ -29,7 +29,7 @@ class ProductController extends Controller
     {
 
         try {
-            $query = Product::with(['store:id,name_en,name_ar', 'category:id,name_en,name_ar', 'subcategory:id,name_en,name_ar', 'images']);
+            $query = Product::where('id','!=', 74 )->with(['store:id,name_en,name_ar', 'category:id,name_en,name_ar', 'subcategory:id,name_en,name_ar', 'images']);
 
             // Filter by store
             if ($request->filled('store_id')) {
