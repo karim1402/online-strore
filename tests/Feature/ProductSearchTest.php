@@ -133,4 +133,60 @@ class ProductSearchTest extends TestCase
             ->assertJsonCount(1, 'data.products')
             ->assertJsonPath('data.products.0.name', 'Expensive Item');
     }
+
+    public function test_search_endpoint_filters_by_module()
+    {
+        // Create another module
+        $otherModule = Module::create([
+            'name_en' => 'Electronics',
+            'name_ar' => 'إلكترونيات',
+            'description_en' => 'Electronics module',
+            'description_ar' => 'وحدة الإلكترونيات',
+            'image' => 'modules/electronics.png',
+            'is_active' => true
+        ]);
+
+        // Create category for other module
+        $otherCategory = Category::create([
+            'module_id' => $otherModule->id,
+            'name_en' => 'Phones',
+            'name_ar' => 'هواتف',
+            'description_en' => 'Phones category',
+            'description_ar' => 'فئة الهواتف',
+            'image' => 'categories/phones.png',
+            'is_active' => true
+        ]);
+
+        // Product in target module (Food)
+        Product::create([
+            'store_id' => $this->store->id,
+            'category_id' => $this->category->id,
+            'name_en' => 'Food Item',
+            'name_ar' => 'عنصر طعام',
+            'base_price' => 50,
+            'is_active' => true
+        ]);
+
+        // Product in other module (Electronics)
+        Product::create([
+            'store_id' => $this->store->id,
+            'category_id' => $otherCategory->id,
+            'name_en' => 'Phone Item',
+            'name_ar' => 'عنصر هاتف',
+            'base_price' => 500,
+            'is_active' => true
+        ]);
+
+        // Filter for Food module
+        $response = $this->getJson('/api/user/products/search?module_id=' . $this->module->id);
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data.products')
+            ->assertJsonPath('data.products.0.name', 'Food Item');
+
+        // Filter for Electronics module
+        $response = $this->getJson('/api/user/products/search?module_id=' . $otherModule->id);
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data.products')
+            ->assertJsonPath('data.products.0.name', 'Phone Item');
+    }
 }

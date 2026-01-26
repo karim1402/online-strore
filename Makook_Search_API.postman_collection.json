@@ -41,6 +41,12 @@
                             "description": "Search query string (matches name, description, keywords)"
                         },
                         {
+                            "key": "module_id",
+                            "value": "",
+                            "disabled": true,
+                            "description": "Filter by module ID"
+                        },
+                        {
                             "key": "category_id",
                             "value": "",
                             "disabled": true,
@@ -75,7 +81,7 @@
                         }
                     ]
                 },
-                "description": "Search for products using keyword matching and filters.\n\n**Parameters:**\n- `q`: Search term (optional)\n- `category_id`: Filter by category (optional)\n- `store_id`: Filter by store (optional)\n- `min_price`: Minimum price (optional)\n- `max_price`: Maximum price (optional)\n- `page`: Pagination page (default 1)\n- `per_page`: Items per page (default 15)"
+                "description": "Search for products using keyword matching and filters.\n\n**Parameters:**\n- `q`: Search term (optional)\n- `module_id`: Filter by module (optional)\n- `category_id`: Filter by category (optional)\n- `store_id`: Filter by store (optional)\n- `min_price`: Minimum price (optional)\n- `max_price`: Maximum price (optional)\n- `page`: Pagination page (default 1)\n- `per_page`: Items per page (default 15)"
             },
             "response": []
         }

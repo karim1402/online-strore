@@ -21,7 +21,7 @@ class ProductController extends Controller
         $page = (int) $request->input('page', 1);
         $perPage = (int) $request->input('per_page', 15);
         
-        $productsQuery = Product::with([
+        $productsQuery =  Product::where('id' ,'!=' , 74)->with([
             'primaryImage',
             'category' => function ($query) {
                 $query->select('id', 'name_en', 'name_ar');
@@ -42,6 +42,12 @@ class ProductController extends Controller
         // Apply filters
         if ($request->filled('category_id')) {
             $productsQuery->where('category_id', $request->input('category_id'));
+        }
+
+        if ($request->filled('module_id')) {
+            $productsQuery->whereHas('category', function ($q) use ($request) {
+                $q->where('module_id', $request->input('module_id'));
+            });
         }
 
         if ($request->filled('store_id')) {
