@@ -1,0 +1,96 @@
+{
+    "info": {
+        "_postman_id": "makook-search-api",
+        "name": "Makook Search API",
+        "description": "Collection for Makook Product Search API endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Search Products",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept-Language",
+                        "value": "en",
+                        "type": "text",
+                        "description": "Response language (en/ar)"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/user/products/search?q=sandwich&min_price=10&page=1&per_page=15",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "user",
+                        "products",
+                        "search"
+                    ],
+                    "query": [
+                        {
+                            "key": "q",
+                            "value": "sandwich",
+                            "description": "Search query string (matches name, description, keywords)"
+                        },
+                        {
+                            "key": "module_id",
+                            "value": "",
+                            "disabled": true,
+                            "description": "Filter by module ID"
+                        },
+                        {
+                            "key": "category_id",
+                            "value": "",
+                            "disabled": true,
+                            "description": "Filter by category ID"
+                        },
+                        {
+                            "key": "store_id",
+                            "value": "",
+                            "disabled": true,
+                            "description": "Filter by store ID"
+                        },
+                        {
+                            "key": "min_price",
+                            "value": "10",
+                            "description": "Minimum price filter"
+                        },
+                        {
+                            "key": "max_price",
+                            "value": "",
+                            "disabled": true,
+                            "description": "Maximum price filter"
+                        },
+                        {
+                            "key": "page",
+                            "value": "1",
+                            "description": "Page number"
+                        },
+                        {
+                            "key": "per_page",
+                            "value": "15",
+                            "description": "Items per page"
+                        }
+                    ]
+                },
+                "description": "Search for products using keyword matching and filters.\n\n**Parameters:**\n- `q`: Search term (optional)\n- `module_id`: Filter by module (optional)\n- `category_id`: Filter by category (optional)\n- `store_id`: Filter by store (optional)\n- `min_price`: Minimum price (optional)\n- `max_price`: Maximum price (optional)\n- `page`: Pagination page (default 1)\n- `per_page`: Items per page (default 15)"
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        }
+    ]
+}

@@ -10,6 +10,97 @@ use Illuminate\Http\Request;
 class ProductController extends Controller
 {
     /**
+     * Search products using database queries.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request)
+    {
+        $query = $request->input('q', '');
+        $page = (int) $request->input('page', 1);
+        $perPage = (int) $request->input('per_page', 15);
+        
+        $productsQuery =  Product::where('id' ,'!=' , 74)->with([
+            'primaryImage',
+            'category' => function ($query) {
+                $query->select('id', 'name_en', 'name_ar');
+            }
+        ])->active();
+
+        // Apply keyword search
+        if (!empty($query)) {
+            $productsQuery->where(function ($q) use ($query) {
+                $q->where('name_en', 'like', "%{$query}%")
+                  ->orWhere('name_ar', 'like', "%{$query}%")
+                  ->orWhere('description_en', 'like', "%{$query}%")
+                  ->orWhere('description_ar', 'like', "%{$query}%")
+                  ->orWhere('search_keywords', 'like', "%{$query}%");
+            });
+        }
+
+        // Apply filters
+        if ($request->filled('category_id')) {
+            $productsQuery->where('category_id', $request->input('category_id'));
+        }
+
+        if ($request->filled('module_id')) {
+            $productsQuery->whereHas('category', function ($q) use ($request) {
+                $q->where('module_id', $request->input('module_id'));
+            });
+        }
+
+        if ($request->filled('store_id')) {
+            $productsQuery->where('store_id', $request->input('store_id'));
+        }
+
+        if ($request->filled('min_price')) {
+            $productsQuery->where('base_price', '>=', $request->input('min_price'));
+        }
+
+        if ($request->filled('max_price')) {
+            $productsQuery->where('base_price', '<=', $request->input('max_price'));
+        }
+
+        // Sort results
+        // For database search, we don't have relevance scoring, so we sort by sort_order or created_at
+        $productsQuery->orderBy('sort_order', 'asc')
+                      ->orderBy('created_at', 'desc');
+
+        $products = $productsQuery->paginate($perPage, ['*'], 'page', $page);
+
+        // Transform the data
+        $productsData = collect($products->items())->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
+                'base_price' => $product->base_price,
+                'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
+                'category' => $product->category ? [
+                    'id' => $product->category->id,
+                    'name_en' => $product->category->name_en,
+                    'name_ar' => $product->category->name_ar,
+                ] : null,
+            ];
+        })->toArray();
+
+        // Localize the data
+        $localizedProducts = LocalizationService::localizeCollection($productsData, ['name']);
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'products' => $localizedProducts,
+                'total' => $products->total(),
+                'page' => $products->currentPage(),
+                'per_page' => $products->perPage(),
+                'last_page' => $products->lastPage(),
+            ],
+        ], 200);
+    }
+    /**
      * Get random products with basic information.
      *
      * @param Request $request

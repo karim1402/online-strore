@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -14,7 +15,9 @@ return new class extends Migration
         if (!Schema::hasColumn('products', 'search_keywords')) {
             Schema::table('products', function (Blueprint $table) {
                 $table->text('search_keywords')->nullable()->comment('For Elasticsearch optimization')->after('description_ar');
-                $table->fullText('search_keywords');
+                if (DB::getDriverName() !== 'sqlite') {
+                    $table->fullText('search_keywords');
+                }
             });
         }
     }
