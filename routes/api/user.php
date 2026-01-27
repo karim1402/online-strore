@@ -81,6 +81,9 @@ Route::prefix('user')->group(function () {
             Route::post('/{orderId}/confirm-payment', 'confirmPayment')->name('user.orders.confirmPayment');
             Route::post('/{orderId}/chat', [\App\Http\Controllers\Api\User\ChatController::class, 'sendMessage'])->name('user.orders.chat');
         });
+
+        // Voucher Routes
+        Route::post('vouchers/verify', [\App\Http\Controllers\Api\User\VoucherController::class, 'verify'])->name('user.vouchers.verify');
     });
 
     // Module routes (public)

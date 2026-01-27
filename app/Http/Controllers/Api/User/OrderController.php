@@ -119,7 +119,18 @@ class OrderController extends Controller
             $subtotal = $this->calculateSubtotal($cart);
             $deliveryFee = 0.00; // Placeholder
             $tax = 0.00; // Placeholder
-            $total = $subtotal + $deliveryFee + $tax;
+            
+            // Apply Voucher
+            $discount = 0.00;
+            $voucher = null;
+            if ($request->filled('voucher_code')) {
+                $voucher = \App\Models\Voucher::where('code', $request->voucher_code)->first();
+                if ($voucher && $voucher->isValidForUser($user, $subtotal)) {
+                    $discount = $voucher->getDiscountAmount($subtotal);
+                }
+            }
+
+            $total = max(0, $subtotal + $deliveryFee + $tax - $discount);
 
             // Determine order status based on payment method
             $orderStatus = $request->payment_method === 'cash' ? 'pending' : 'pending_payment';
@@ -166,11 +177,24 @@ class OrderController extends Controller
                 'subtotal' => $subtotal,
                 'delivery_fee' => $deliveryFee,
                 'tax' => $tax,
+                'discount' => $discount,
                 'total' => $total,
                 'notes' => $request->notes,
                 'is_cash_handed_over' => $request->payment_method === 'online',
                 'is_paid_to_vendor' => $request->payment_method === 'cash',
             ]);
+
+            // Record Voucher Usage
+            if ($voucher && $discount > 0) {
+                \App\Models\VoucherUsage::create([
+                    'user_id' => $user->id,
+                    'voucher_id' => $voucher->id,
+                    'order_id' => $order->id,
+                    'discount_amount' => $discount,
+                ]);
+                
+                $voucher->increment('usage_count');
+            }
 
             // Copy cart items to order items
             foreach ($cart->items as $cartItem) {
@@ -776,6 +800,7 @@ class OrderController extends Controller
             'subtotal' => number_format($order->subtotal, 2),
             'delivery_fee' => number_format($order->delivery_fee, 2),
             'tax' => number_format($order->tax, 2),
+            'discount' => number_format($order->discount, 2),
             'total' => number_format($order->total, 2),
             'items_count' => $order->items->count(),
             'created_at' => $order->created_at->toISOString(),
