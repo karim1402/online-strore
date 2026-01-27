@@ -113,7 +113,8 @@ class ProductController extends Controller
         $count = min(max((int)$count, 1), 20); // Between 1 and 20
 
         // Get random active products from approved stores
-        $products = Product::with([
+        $products = Product::where('id','!=',74)->
+        with([
             'primaryImage',
             // 'store' => function ($query) {
             //     $query->select('id', 'status');
