@@ -36,6 +36,7 @@ class Order extends Model
         'is_paid_to_vendor',
         'vendor_invoice_id',
         'delivery_invoice_id',
+        'discount',
     ];
 
     protected $casts = [
@@ -43,6 +44,7 @@ class Order extends Model
         'subtotal' => 'decimal:2',
         'delivery_fee' => 'decimal:2',
         'tax' => 'decimal:2',
+        'discount' => 'decimal:2',
         'total' => 'decimal:2',
         'is_cash_handed_over' => 'boolean',
         'is_paid_to_vendor' => 'boolean',

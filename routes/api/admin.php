@@ -443,6 +443,15 @@ Route::prefix('admin')->group(function () {
             Route::post('/{id}/pay', 'markAsPaid');
         });
 
+        // Voucher Management routes
+        Route::controller(\App\Http\Controllers\Api\Admin\VoucherController::class)->prefix('vouchers')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+        });
+
         // Delivery Invoice Management routes
         Route::controller(\App\Http\Controllers\Api\Admin\DeliveryInvoiceController::class)->prefix('delivery-invoices')->group(function () {
             Route::get('/', 'index');
