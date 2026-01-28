@@ -30,6 +30,8 @@ Route::prefix('user')->group(function () {
         Route::post('logout', 'logout')->middleware('auth:api')->name('user.logout');
         Route::post('refresh', 'refresh')->middleware('auth:api')->name('user.refresh');
         Route::get('profile', 'profile')->middleware('auth:api')->name('user.profile');
+        Route::post('update-profile', 'updateProfile')->middleware('auth:api')->name('user.update-profile');
+        Route::post('change-password', 'changePassword')->middleware('auth:api')->name('user.change-password');
         Route::post('fcm-token', 'updateFcmToken')->middleware('auth:api')->name('user.fcm-token');
         Route::delete('delete-account', 'deleteAccount')->middleware('auth:api')->name('user.delete-account');
     });
