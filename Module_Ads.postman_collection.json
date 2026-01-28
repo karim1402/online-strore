@@ -1,0 +1,412 @@
+{
+    "info": {
+        "_postman_id": "module-ads-collection",
+        "name": "Module Ads CRUD",
+        "description": "CRUD operations for module ads (admin) and retrieving ads by module (user).",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Admin - Module Ads",
+            "item": [
+                {
+                    "name": "List Module Ads",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/module-ads?per_page=15&module_id=&status=",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "module-ads"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "15",
+                                    "description": "Items per page"
+                                },
+                                {
+                                    "key": "module_id",
+                                    "value": "",
+                                    "description": "Filter by module ID"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "",
+                                    "description": "Filter by status (true/false)"
+                                }
+                            ]
+                        },
+                        "description": "Get paginated list of all module ads."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Module Ad",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "module_id",
+                                    "value": "1",
+                                    "description": "Module ID (required)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "product_id",
+                                    "value": "1",
+                                    "description": "Product ID (required)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "description": "Ad image (required)"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "true",
+                                    "description": "Status (optional, default: true)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "sort_order",
+                                    "value": "0",
+                                    "description": "Sort order (optional)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "",
+                                    "description": "Start date (optional, YYYY-MM-DD)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "",
+                                    "description": "End date (optional, YYYY-MM-DD)",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/module-ads",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "module-ads"
+                            ]
+                        },
+                        "description": "Create a new module ad."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Single Module Ad",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/module-ads/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "module-ads",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Module Ad ID"
+                                }
+                            ]
+                        },
+                        "description": "Get a single module ad by ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Module Ad",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "module_id",
+                                    "value": "1",
+                                    "description": "Module ID",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "product_id",
+                                    "value": "2",
+                                    "description": "Product ID",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "description": "New ad image",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "true",
+                                    "description": "Status",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "sort_order",
+                                    "value": "1",
+                                    "description": "Sort order",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "start_date",
+                                    "value": "2026-01-01",
+                                    "description": "Start date",
+                                    "type": "text",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "end_date",
+                                    "value": "2026-12-31",
+                                    "description": "End date",
+                                    "type": "text",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/module-ads/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "module-ads",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Module Ad ID"
+                                }
+                            ]
+                        },
+                        "description": "Update a module ad. Enable only the fields you want to update."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Toggle Module Ad Status",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/module-ads/:id/toggle-status",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "module-ads",
+                                ":id",
+                                "toggle-status"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Module Ad ID"
+                                }
+                            ]
+                        },
+                        "description": "Toggle module ad status."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Module Ad",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/module-ads/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "module-ads",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "1",
+                                    "description": "Module Ad ID"
+                                }
+                            ]
+                        },
+                        "description": "Delete a module ad."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "User - Module Ads",
+            "item": [
+                {
+                    "name": "Get Ads by Module",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/user/modules/:moduleId/ads",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "modules",
+                                ":moduleId",
+                                "ads"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "moduleId",
+                                    "value": "1",
+                                    "description": "Module ID"
+                                }
+                            ]
+                        },
+                        "description": "Get active, scheduled ads for a module (public endpoint)."
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost",
+            "type": "string"
+        },
+        {
+            "key": "admin_token",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}
