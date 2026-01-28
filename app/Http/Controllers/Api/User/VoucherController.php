@@ -38,7 +38,11 @@ class VoucherController extends Controller
                 'message' => LocalizationService::getMessage('errors.invalid_voucher'), // You might need to add this message key
                 'data' => [
                     'valid' => false,
-                    'reason' => 'Voucher is not valid for this order or user.',
+                    'code' => null,
+                    'type' => null,
+                    'value' => null,
+                    'discount_amount' => null,
+                    'min_order_amount' => null,
                 ]
             ], 400);
         }

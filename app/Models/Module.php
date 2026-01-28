@@ -44,6 +44,14 @@ class Module extends Model
         return $this->hasMany(Category::class);
     }
 
+    /**
+     * Get ads for this module
+     */
+    public function ads()
+    {
+        return $this->hasMany(ModuleAd::class);
+    }
+
     public function getNameAttribute()
     {
         $locale = App::getLocale();

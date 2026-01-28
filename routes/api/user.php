@@ -92,6 +92,7 @@ Route::prefix('user')->group(function () {
     Route::controller(ModuleController::class)->prefix('modules')->group(function () {
         Route::get('/', 'index')->name('user.modules.index');
         Route::get('/{id}', 'show')->name('user.modules.show');
+        Route::get('/{id}/ads', [\App\Http\Controllers\Api\User\ModuleAdController::class, 'getByModule'])->name('user.modules.ads');
     });
 
     // Category routes (public)

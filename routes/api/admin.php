@@ -109,6 +109,28 @@ Route::prefix('admin')->group(function () {
             });
         });
 
+        // Module Ads CRUD routes (permission-based)
+        Route::controller(\App\Http\Controllers\Api\Admin\ModuleAdController::class)->prefix('module-ads')->group(function () {
+            Route::middleware('permission:categories.view,admins')->group(function () {
+                Route::get('/', 'index');
+                Route::get('/{id}', 'show');
+            });
+            
+            Route::middleware('permission:categories.create,admins')->group(function () {
+                Route::post('/', 'store');
+            });
+            
+            Route::middleware('permission:categories.update,admins')->group(function () {
+                Route::put('/{id}', 'update');
+                Route::post('/{id}', 'update'); // POST alternative for file uploads
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
+            });
+            
+            Route::middleware('permission:categories.delete,admins')->group(function () {
+                Route::delete('/{id}', 'destroy');
+            });
+        });
+
         // Admin Users CRUD routes (permission-based)
         Route::controller(AdminUserController::class)->prefix('admin-users')->group(function () {
             Route::middleware('permission:admin-users.view,admins')->group(function () {
