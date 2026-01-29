@@ -24,9 +24,12 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $fillable = [
         'name',
+        'phone',
         'email',
         'password',
         'fcm_token',
+        'social_provider',
+        'social_id',
     ];
 
     /**
@@ -38,6 +41,8 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'remember_token',
         'fcm_token',
+        'social_provider',
+        'social_id',
     ];
 
     /**

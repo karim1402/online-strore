@@ -1,0 +1,164 @@
+{
+    "info": {
+        "_postman_id": "social-auth-collection",
+        "name": "Social Authentication",
+        "description": "Social login endpoints for Google and Facebook authentication.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Login with Google",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept-Language",
+                        "value": "en",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "access_token",
+                            "value": "",
+                            "description": "Google OAuth access token from Flutter app",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/user/auth/google",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "user",
+                        "auth",
+                        "google"
+                    ]
+                },
+                "description": "Login or register with Google. Creates new user if not exists."
+            },
+            "response": []
+        },
+        {
+            "name": "Login with Facebook",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept-Language",
+                        "value": "en",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "access_token",
+                            "value": "",
+                            "description": "Facebook OAuth access token from Flutter app",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/user/auth/facebook",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "user",
+                        "auth",
+                        "facebook"
+                    ]
+                },
+                "description": "Login or register with Facebook. Creates new user if not exists."
+            },
+            "response": []
+        },
+        {
+            "name": "Login with Apple",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept-Language",
+                        "value": "en",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "identity_token",
+                            "value": "",
+                            "description": "Apple identity token (JWT) from Flutter app",
+                            "type": "text"
+                        },
+                        {
+                            "key": "user_identifier",
+                            "value": "",
+                            "description": "Apple user identifier",
+                            "type": "text"
+                        },
+                        {
+                            "key": "email",
+                            "value": "",
+                            "description": "User email (only provided by Apple on first login)",
+                            "type": "text"
+                        },
+                        {
+                            "key": "name",
+                            "value": "",
+                            "description": "User name (optional)",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/user/auth/apple",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "user",
+                        "auth",
+                        "apple"
+                    ]
+                },
+                "description": "Login or register with Apple. Creates new user if not exists."
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost",
+            "type": "string"
+        }
+    ]
+}
