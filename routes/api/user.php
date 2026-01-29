@@ -36,6 +36,13 @@ Route::prefix('user')->group(function () {
         Route::delete('delete-account', 'deleteAccount')->middleware('auth:api')->name('user.delete-account');
     });
 
+    // Social Authentication routes
+    Route::controller(\App\Http\Controllers\Api\User\SocialAuthController::class)->group(function () {
+        Route::post('auth/google', 'loginWithGoogle')->name('user.auth.google');
+        Route::post('auth/facebook', 'loginWithFacebook')->name('user.auth.facebook');
+        Route::post('auth/apple', 'loginWithApple')->name('user.auth.apple');
+    });
+
     // Protected user routes
     Route::middleware('auth:api')->group(function () {
         // Dashboard
