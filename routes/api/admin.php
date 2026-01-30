@@ -445,6 +445,7 @@ Route::prefix('admin')->group(function () {
         // Order Management routes
         Route::controller(\App\Http\Controllers\Api\Admin\OrderController::class)->prefix('orders')->group(function () {
             Route::get('/', 'index');
+            Route::post('/', 'store');
             Route::get('/{id}', 'show');
         });
         // Notification Management routes
