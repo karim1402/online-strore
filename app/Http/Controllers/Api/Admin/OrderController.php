@@ -286,17 +286,16 @@ class OrderController extends Controller
                     foreach ($itemData['options'] as $optionData) {
                         $productOptionValue = \App\Models\ProductOptionValue::with('optionValue.optionGroup')->find($optionData['product_option_value_id']);
                         
-                        \App\Models\OrderItemOption::create([
-                            'order_item_id' => $orderItem->id,
-                            'product_option_value_id' => $productOptionValue->id,
-                            'option_snapshot' => [
-                                'option_group_name_en' => $productOptionValue->optionValue->optionGroup->name_en ?? null,
-                                'option_group_name_ar' => $productOptionValue->optionValue->optionGroup->name_ar ?? null,
-                                'option_value_name_en' => $productOptionValue->optionValue->name_en ?? null,
-                                'option_value_name_ar' => $productOptionValue->optionValue->name_ar ?? null,
-                            ],
-                            'price' => $optionData['price'],
-                        ]);
+                            \App\Models\OrderItemOption::create([
+                                'order_item_id' => $orderItem->id,
+                                'option_snapshot' => [
+                                    'option_group_name_en' => $productOptionValue->optionValue->optionGroup->name_en ?? null,
+                                    'option_group_name_ar' => $productOptionValue->optionValue->optionGroup->name_ar ?? null,
+                                    'option_value_name_en' => $productOptionValue->optionValue->name_en ?? null,
+                                    'option_value_name_ar' => $productOptionValue->optionValue->name_ar ?? null,
+                                    'calculated_price' => $optionData['price'],
+                                ],
+                            ]);
                     }
 
                     // Create order item addons
@@ -305,13 +304,15 @@ class OrderController extends Controller
                         
                         \App\Models\OrderItemAddon::create([
                             'order_item_id' => $orderItem->id,
-                            'addon_id' => $addon->id,
                             'addon_snapshot' => [
                                 'name_en' => $addon->name_en,
                                 'name_ar' => $addon->name_ar,
+                                'description_en' => $addon->description_en,
+                                'description_ar' => $addon->description_ar,
                             ],
                             'quantity' => $addonData['quantity'],
-                            'price' => $addonData['price'],
+                            'unit_price' => $addonData['price'],
+                            'total_price' => $addonData['price'] * $addonData['quantity'],
                         ]);
                     }
                 }
