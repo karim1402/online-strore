@@ -22,6 +22,7 @@ class SocialAuthController extends Controller
     {
         $validator = ValidationService::make($request->all(), [
             'access_token' => 'required|string',
+            'phone' => 'required|string|min:10',
         ]);
 
         if ($validator->fails()) {
@@ -80,6 +81,7 @@ class SocialAuthController extends Controller
     {
         $validator = ValidationService::make($request->all(), [
             'access_token' => 'required|string',
+            'phone' => 'required|string|min:10',
         ]);
 
         if ($validator->fails()) {
@@ -168,6 +170,7 @@ class SocialAuthController extends Controller
             'email' => $email,
             'social_provider' => $provider,
             'social_id' => $socialId,
+            'phone' => $providerUser['phone'],
         ]);
 
         return $user;
@@ -183,6 +186,7 @@ class SocialAuthController extends Controller
             'user_identifier' => 'required|string',
             'email' => 'nullable|email',
             'name' => 'nullable|string',
+            'phone' => 'required|string|min:10',
         ]);
 
         if ($validator->fails()) {
