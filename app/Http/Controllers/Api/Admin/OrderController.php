@@ -74,8 +74,8 @@ class OrderController extends Controller
         try {
             // Validate input
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-                'user_id' => 'required|exists:users,id',
-                'address_id' => 'required_without:address|exists:user_addresses,id',
+                'user_id' => 'nullable|exists:users,id',
+                'address_id' => 'required_without_all:address,user_id|exists:user_addresses,id',
                 'address' => 'required_without:address_id|array',
                 'address.street_name' => 'required_with:address|string',
                 'address.building_name' => 'nullable|string',
@@ -108,18 +108,26 @@ class OrderController extends Controller
                 return $this->errorResponse('errors.validation_failed', $validator->errors(), 422);
             }
 
-            // Verify user exists
-            $user = \App\Models\User::find($request->user_id);
-            if (!$user) {
-                return $this->errorResponse('errors.user_not_found', [], 404);
+            // Verify user exists if provided
+            $user = null;
+            if ($request->filled('user_id')) {
+                $user = \App\Models\User::find($request->user_id);
+                if (!$user) {
+                    return $this->errorResponse('errors.user_not_found', [], 404);
+                }
             }
 
             // Get or create address snapshot
             $addressSnapshot = [];
             if ($request->filled('address_id')) {
-                $address = \App\Models\UserAddress::where('id', $request->address_id)
-                    ->where('user_id', $user->id)
-                    ->first();
+                $query = \App\Models\UserAddress::where('id', $request->address_id);
+                
+                // If user is specified, ensure address belongs to them
+                if ($user) {
+                    $query->where('user_id', $user->id);
+                }
+                
+                $address = $query->first();
 
                 if (!$address) {
                     return $this->errorResponse('errors.address_not_found', [], 404);
@@ -239,7 +247,7 @@ class OrderController extends Controller
                 // Create order
                 $order = Order::create([
                     'order_number' => $orderNumber,
-                    'user_id' => $user->id,
+                    'user_id' => $user ? $user->id : null,
                     'store_id' => null, // Admin orders don't require store
                     'address_id' => $request->address_id ?? null,
                     'address_snapshot' => $addressSnapshot,
