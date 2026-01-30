@@ -101,6 +101,44 @@ class ProductController extends Controller
         ], 200);
     }
     /**
+     * Get best seller products.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function bestSellers(Request $request)
+    {
+        $products = Product::where('id', '!=', 74)
+            ->with(['primaryImage'])
+            ->active()
+            ->where('is_best_seller', true)
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $productsData = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
+                'base_price' => $product->base_price,
+                'image' => $product->best_seller_image_url ?: ($product->primaryImage ? $product->primaryImage->image_url : null),
+            ];
+        })->toArray();
+
+        $localizedProducts = LocalizationService::localizeCollection($productsData, ['name']);
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'products' => $localizedProducts,
+                'count' => count($localizedProducts),
+            ],
+        ], 200);
+    }
+
+    /**
      * Get random products with basic information.
      *
      * @param Request $request

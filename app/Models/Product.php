@@ -31,18 +31,21 @@ class Product extends Model
         'sales_count',
         'metadata',
         'sort_order',
+        'is_best_seller',
+        'best_seller_image',
     ];
 
     protected $casts = [
         'base_price' => 'decimal:2',
         'is_active' => 'boolean',
+        'is_best_seller' => 'boolean',
         'view_count' => 'integer',
         'sales_count' => 'integer',
         'metadata' => 'array',
         'sort_order' => 'integer',
     ];
 
-    protected $appends = ['name', 'description', 'image_url'];
+    protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url'];
 
     /**
      * Get the product image url
@@ -51,6 +54,17 @@ class Product extends Model
     {
         $image = $this->primaryImage ?? $this->images->first();
         return $image ? $image->image_url : null;
+    }
+
+    /**
+     * Get the best seller image url
+     */
+    public function getBestSellerImageUrlAttribute()
+    {
+        if ($this->best_seller_image) {
+             return \Illuminate\Support\Facades\Storage::disk('public')->url($this->best_seller_image);
+        }
+        return null;
     }
 
     /**

@@ -118,6 +118,7 @@ Route::prefix('user')->group(function () {
 
     // Product routes (public, works for both guests and authenticated users)
     Route::controller(ProductController::class)->prefix('products')->group(function () {
+        Route::get('/best-sellers', 'bestSellers')->name('user.products.bestSellers');
         Route::get('/search', 'search')->name('user.products.search');
         Route::get('/random', 'random')->name('user.products.random');
         Route::get('/product-makook-sandwich', 'showMakookSandwich')->name('user.products.showMakookSandwich');

@@ -140,6 +140,8 @@ class ProductController extends Controller
                 'metadata' => 'nullable|array',
                 'images' => 'required|array',
                 'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:2048',
+                'is_best_seller' => 'nullable|boolean',
+                'best_seller_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
                 'primary_image_index' => 'nullable|integer|min:0',
                 'option_groups' => 'nullable|array',
                 'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
@@ -198,7 +200,15 @@ class ProductController extends Controller
                 'is_active' => $request->boolean('is_active', true),
                 'sort_order' => $request->get('sort_order', 0),
                 'metadata' => $request->metadata,
+                'is_best_seller' => $request->boolean('is_best_seller', false),
             ]);
+
+            // Handle Best Seller Image
+            if ($request->hasFile('best_seller_image')) {
+                $path = $request->file('best_seller_image')->store('products/bestseller', 'public');
+                $product->best_seller_image = $path;
+                $product->save();
+            }
 
             // Handle image uploads
             if ($request->hasFile('images')) {
@@ -313,6 +323,8 @@ class ProductController extends Controller
                 'sort_order' => 'nullable|integer|min:0',
                 'metadata' => 'nullable|array',
                 'option_groups' => 'nullable|array',
+                'is_best_seller' => 'nullable|boolean',
+                'best_seller_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
                 'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
                 'option_groups.*.is_required' => 'nullable|boolean',
                 'option_groups.*.sort_order' => 'nullable|integer|min:0',
@@ -392,6 +404,20 @@ class ProductController extends Controller
             }
             if ($request->has('metadata')) {
                 $product->metadata = $request->metadata;
+            }
+            if ($request->has('is_best_seller')) {
+                $product->is_best_seller = $request->boolean('is_best_seller');
+            }
+            
+            // Handle Best Seller Image Update
+            if ($request->hasFile('best_seller_image')) {
+                // Delete old image if exists
+                if ($product->best_seller_image && Storage::disk('public')->exists($product->best_seller_image)) {
+                    Storage::disk('public')->delete($product->best_seller_image);
+                }
+                
+                $path = $request->file('best_seller_image')->store('products/bestseller', 'public');
+                $product->best_seller_image = $path;
             }
 
             $product->save();
