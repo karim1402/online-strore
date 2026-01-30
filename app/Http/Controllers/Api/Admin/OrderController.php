@@ -317,7 +317,17 @@ class OrderController extends Controller
                 throw $e;
             }
         } catch (\Exception $e) {
-            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
+            \Illuminate\Support\Facades\Log::error('Admin Order Creation Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return $this->errorResponse('errors.server_error', [
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => basename($e->getFile())
+            ], 500);
         }
     }
 
