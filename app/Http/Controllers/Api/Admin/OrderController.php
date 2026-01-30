@@ -75,16 +75,8 @@ class OrderController extends Controller
             // Validate input
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
                 'user_id' => 'nullable|exists:users,id',
-                'address_id' => 'required_without_all:address,user_id|exists:user_addresses,id',
-                'address' => 'required_without:address_id|array',
-                'address.street_name' => 'required_with:address|string',
-                'address.building_name' => 'nullable|string',
-                'address.apartment_number' => 'nullable|string',
-                'address.floor_number' => 'nullable|string',
-                'address.landmark' => 'nullable|string',
-                'address.phone' => 'required_with:address|string',
-                'address.latitude' => 'required_with:address|numeric',
-                'address.longitude' => 'required_with:address|numeric',
+                'address_id' => 'nullable|exists:user_addresses,id',
+                'address' => 'nullable|array',
                 'payment_method' => 'required|in:cash,online',
                 'payment_status' => 'required|in:pending,paid,failed,refunded',
                 'order_status' => 'nullable|in:pending,pending_payment,confirmed,preparing,ready,out_for_delivery,delivered,cancelled',
@@ -117,8 +109,8 @@ class OrderController extends Controller
                 }
             }
 
-            // Get or create address snapshot
-            $addressSnapshot = [];
+            // Get or create address snapshot (optional)
+            $addressSnapshot = null;
             if ($request->filled('address_id')) {
                 $query = \App\Models\UserAddress::where('id', $request->address_id);
                 
@@ -145,7 +137,7 @@ class OrderController extends Controller
                     'latitude' => $address->latitude,
                     'longitude' => $address->longitude,
                 ];
-            } else {
+            } elseif ($request->filled('address')) {
                 // Use provided address
                 $addressSnapshot = $request->address;
             }
