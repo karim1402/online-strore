@@ -67,17 +67,18 @@ class CartItem extends Model
             return '0.00';
         }
 
-        $price = $this->product->base_price;
+        $basePrice = $this->product->offer_price ?? $this->product->base_price;
+        $price = $basePrice;
 
         // Add option prices
         foreach ($this->options as $option) {
             if ($option->productOptionValue) {
-                $optionPrice = $option->productOptionValue->calculatePrice($this->product->base_price);
+                $optionPrice = $option->productOptionValue->calculatePrice($basePrice);
                 // For 'fixed' type, add the full price. For others, subtract base to get the difference
                 if ($option->productOptionValue->price_type === 'fixed') {
                     $price += $optionPrice;
                 } else {
-                    $price += ($optionPrice - $this->product->base_price);
+                    $price += ($optionPrice - $basePrice);
                 }
             }
         }

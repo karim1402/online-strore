@@ -135,6 +135,7 @@ class ProductController extends Controller
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
                 'base_price' => 'required|numeric|min:0',
+                'offer_price' => 'nullable|numeric|min:0',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
                 'metadata' => 'nullable|array',
@@ -197,6 +198,7 @@ class ProductController extends Controller
                 'description_ar' => $request->description_ar,
                 'search_keywords' => $request->search_keywords,
                 'base_price' => $request->base_price,
+                'offer_price' => $request->offer_price,
                 'is_active' => $request->boolean('is_active', true),
                 'sort_order' => $request->get('sort_order', 0),
                 'metadata' => $request->metadata,
@@ -318,7 +320,10 @@ class ProductController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
-                'base_price' => 'nullable|numeric|min:0',
+                'search_keywords' => 'nullable|string',
+                'base_price' => 'required|numeric|min:0',
+                'offer_price' => 'nullable|numeric|min:0',
+                'is_active' => 'nullable|boolean',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
                 'metadata' => 'nullable|array',
@@ -395,6 +400,9 @@ class ProductController extends Controller
             }
             if ($request->filled('base_price')) {
                 $product->base_price = $request->base_price;
+            }
+            if ($request->has('offer_price')) {
+                $product->offer_price = $request->offer_price;
             }
             if ($request->has('is_active')) {
                 $product->is_active = $request->boolean('is_active');

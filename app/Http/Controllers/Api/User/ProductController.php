@@ -75,7 +75,9 @@ class ProductController extends Controller
                 'id' => $product->id,
                 'name_en' => $product->name_en,
                 'name_ar' => $product->name_ar,
+                'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
+                'offer_price' => $product->offer_price,
                 'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
                 'category' => $product->category ? [
                     'id' => $product->category->id,
@@ -121,7 +123,9 @@ class ProductController extends Controller
                 'id' => $product->id,
                 'name_en' => $product->name_en,
                 'name_ar' => $product->name_ar,
+                'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
+                'offer_price' => $product->offer_price,
                 'image' => $product->best_seller_image_url ?: ($product->primaryImage ? $product->primaryImage->image_url : null),
             ];
         })->toArray();
@@ -173,6 +177,7 @@ class ProductController extends Controller
                 'name_en' => $product->name_en,
                 'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
+                'offer_price' => $product->offer_price,
                 'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
             ];
         })->toArray();
@@ -256,6 +261,7 @@ class ProductController extends Controller
             'description_ar' => $product->description_ar,
             // 'search_keywords' => $product->search_keywords,
             'base_price' => $product->base_price,
+            'offer_price' => $product->offer_price,
             'is_active' => $product->is_active,
             'view_count' => $product->view_count,
             'sales_count' => $product->sales_count,
@@ -431,6 +437,7 @@ class ProductController extends Controller
             'description_en' => $product->description_en,
             'description_ar' => $product->description_ar,
             'base_price' => $product->base_price,
+            'offer_price' => $product->offer_price,
             'is_active' => $product->is_active,
             'view_count' => $product->view_count,
             'sales_count' => $product->sales_count,

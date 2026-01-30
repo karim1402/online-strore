@@ -33,10 +33,12 @@ class Product extends Model
         'sort_order',
         'is_best_seller',
         'best_seller_image',
+        'offer_price',
     ];
 
     protected $casts = [
         'base_price' => 'decimal:2',
+        'offer_price' => 'decimal:2',
         'is_active' => 'boolean',
         'is_best_seller' => 'boolean',
         'view_count' => 'integer',
@@ -45,7 +47,15 @@ class Product extends Model
         'sort_order' => 'integer',
     ];
 
-    protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url'];
+    protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url', 'effective_price'];
+
+    /**
+     * Get the effective price (offer price if set, otherwise base price)
+     */
+    public function getEffectivePriceAttribute()
+    {
+        return $this->offer_price !== null ? $this->offer_price : $this->base_price;
+    }
 
     /**
      * Get the product image url
