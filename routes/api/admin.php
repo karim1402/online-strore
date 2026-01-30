@@ -131,6 +131,16 @@ Route::prefix('admin')->group(function () {
             });
         });
 
+        // Home Ads CRUD routes
+        Route::controller(\App\Http\Controllers\Api\Admin\HomeAdController::class)->prefix('home-ads')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+        });
+
         // Admin Users CRUD routes (permission-based)
         Route::controller(AdminUserController::class)->prefix('admin-users')->group(function () {
             Route::middleware('permission:admin-users.view,admins')->group(function () {

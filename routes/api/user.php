@@ -124,6 +124,9 @@ Route::prefix('user')->group(function () {
         Route::get('/{productId}', 'show')->name('user.products.show');
     });
     
+    // Home Ads route (public)
+    Route::get('home-ads', [\App\Http\Controllers\Api\User\HomeAdController::class, 'index'])->name('user.home-ads.index');
+    
     // Test route without authentication
     Route::get('test', function () {
         $message = \App\Services\LocalizationService::getMessage('success.api_working');
