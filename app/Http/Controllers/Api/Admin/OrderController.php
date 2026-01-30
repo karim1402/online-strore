@@ -258,6 +258,16 @@ class OrderController extends Controller
 
                 // Create order items
                 foreach ($validatedItems as $itemData) {
+                    $itemSubtotal = $itemData['price'] * $itemData['quantity'];
+                    
+                    // Calculate addons total for this item
+                    $addonsTotal = 0;
+                    foreach ($itemData['addons'] as $addonData) {
+                        $addonsTotal += $addonData['price'] * $addonData['quantity'];
+                    }
+                    
+                    $totalItemPrice = $itemSubtotal + $addonsTotal;
+                    
                     $orderItem = \App\Models\OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $itemData['product']->id,
@@ -268,8 +278,8 @@ class OrderController extends Controller
                             'base_price' => $itemData['product']->base_price,
                         ],
                         'quantity' => $itemData['quantity'],
-                        'price' => $itemData['price'],
-                        'special_instructions' => $itemData['special_instructions'],
+                        'unit_price' => $itemData['price'],
+                        'total_price' => $totalItemPrice,
                     ]);
 
                     // Create order item options
