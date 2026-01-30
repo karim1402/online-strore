@@ -322,7 +322,7 @@ class OrderController extends Controller
                 // Load relationships for response
                 $order->load(['user', 'items.options', 'items.addons']);
 
-                return $this->successResponse($order, 'success.order_created', 201);
+                return $this->successResponse($order, 'success.order_created', [], 201);
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\DB::rollBack();
                 throw $e;
