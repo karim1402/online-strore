@@ -140,6 +140,7 @@ class CategoryController extends Controller
                             'name_en' => $product->name_en,
                             'name_ar' => $product->name_ar,
                             'base_price' => $product->base_price,
+                            'offer_price' => $product->offer_price,
                             'image_url' => $product->image_url,
                             'store' => $product->store ? [
                                 'id' => $product->store->id,
@@ -226,6 +227,7 @@ class CategoryController extends Controller
                         'name_en' => $product->name_en,
                         'name_ar' => $product->name_ar,
                         'base_price' => $product->base_price,
+                        'offer_price' => $product->offer_price,
                         'image_url' => $product->image_url,
                         
                     ];
@@ -297,6 +299,7 @@ class CategoryController extends Controller
                         'name_en' => $product->name_en,
                         'name_ar' => $product->name_ar,
                         'base_price' => $product->base_price,
+                        'offer_price' => $product->offer_price,
                         'image_url' => $product->image_url,
                         'store' => $product->store ? [
                             'id' => $product->store->id,
