@@ -198,7 +198,7 @@ class ProductController extends Controller
                 'description_ar' => $request->description_ar,
                 'search_keywords' => $request->search_keywords,
                 'base_price' => $request->base_price,
-                'offer_price' => $request->offer_price,
+                'offer_price' => ($request->offer_price < 1) ? null : $request->offer_price,
                 'is_active' => $request->boolean('is_active', true),
                 'sort_order' => $request->get('sort_order', 0),
                 'metadata' => $request->metadata,
@@ -402,7 +402,7 @@ class ProductController extends Controller
                 $product->base_price = $request->base_price;
             }
             if ($request->has('offer_price')) {
-                $product->offer_price = $request->offer_price;
+                $product->offer_price = ($request->offer_price < 1) ? null : $request->offer_price;
             }
             if ($request->has('is_active')) {
                 $product->is_active = $request->boolean('is_active');
