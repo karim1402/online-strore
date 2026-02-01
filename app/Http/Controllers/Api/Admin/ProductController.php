@@ -321,7 +321,7 @@ class ProductController extends Controller
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
-                'base_price' => 'required|numeric|min:0',
+                'base_price' => 'nullable|numeric|min:0',
                 'offer_price' => 'nullable|numeric|min:0',
                 'is_active' => 'nullable|boolean',
                 'is_active' => 'nullable|boolean',
