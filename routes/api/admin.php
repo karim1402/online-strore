@@ -457,6 +457,8 @@ Route::prefix('admin')->group(function () {
             Route::get('/', 'index');
             Route::post('/', 'store');
             Route::get('/{id}', 'show');
+            Route::post('/{id}/mark-ready', 'markReadyToPick');
+            Route::post('/{id}/cancel', 'cancel');
         });
         // Notification Management routes
         Route::controller(\App\Http\Controllers\Api\Admin\NotificationController::class)->prefix('notifications')->group(function () {
