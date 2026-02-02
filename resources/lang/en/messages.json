@@ -66,7 +66,17 @@
         "user_deleted": "User deleted successfully",
         "notifications_retrieved": "Notifications history retrieved successfully",
         "notification_sent": "Notification sent successfully",
-        "fcm_token_updated": "FCM token updated successfully"
+        "fcm_token_updated": "FCM token updated successfully",
+        "otp_sent": "OTP sent successfully",
+        "email_verified": "Email verified successfully",
+        "verification_code_resent": "Verification code resent successfully",
+        "data_created": "Data created successfully",
+        "data_updated": "Data updated successfully",
+        "data_deleted": "Data deleted successfully",
+        "password_changed": "Password changed successfully",
+        "password_reset_successful": "Password reset successfully",
+        "reset_code_sent": "Reset code sent successfully",
+        "module_ads_retrieved": "Module ads retrieved successfully"
     },
     "errors": {
         "no_users_with_tokens": "No users found with active push notification tokens",
@@ -110,7 +120,26 @@
         "store_not_approved": "Your store is not yet approved. Please contact support",
         "invalid_parent": "A category cannot be its own parent",
         "invalid_parent_category": "The selected parent category must belong to the same module",
-        "subcategory_not_found_in_category": "The selected subcategory does not belong to the selected category"
+        "subcategory_not_found_in_category": "The selected subcategory does not belong to the selected category",
+        "invalid_google_token": "Invalid Google token",
+        "google_email_not_found": "Google email not found",
+        "social_login_failed": "Social login failed",
+        "invalid_facebook_token": "Invalid Facebook token",
+        "facebook_email_not_found": "Facebook email not found",
+        "invalid_apple_token": "Invalid Apple token",
+        "apple_token_mismatch": "Apple token mismatch",
+        "apple_email_required": "Email is required for Apple login",
+        "email_sending_failed": "Failed to send email",
+        "invalid_reset_code": "Invalid reset code",
+        "reset_code_expired": "Reset code expired",
+        "otp_not_found": "OTP not found",
+        "invalid_otp": "Invalid OTP",
+        "otp_expired": "OTP expired",
+        "email_already_verified": "Email already verified",
+        "invalid_verification_code": "Invalid verification code",
+        "verification_code_expired": "Verification code expired",
+        "current_password_incorrect": "Current password incorrect",
+        "invalid_voucher": "Invalid voucher code"
     },
     "validation": {
         "required": "The :attribute field is required",
@@ -183,7 +212,11 @@
         "replaced": "Cart replaced successfully",
         "store_conflict": "Cart contains items from a different store. Adding this item will clear your current cart.",
         "limit_reached": "Cart limit reached",
-        "max_items": "Cart cannot contain more than 50 items"
+        "max_items": "Cart cannot contain more than 50 items",
+        "quantity_limit_exceeded": "Quantity limit exceeded",
+        "max_quantity_per_item": "You cannot add more of this item",
+        "product_unavailable": "Product is no longer available",
+        "store_unavailable": "Store is not available"
     },
     "order": {
         "placed_successfully": "Order placed successfully",
@@ -193,6 +226,8 @@
         "retrieved_successfully": "Order retrieved successfully",
         "cancelled_successfully": "Order cancelled successfully",
         "picked_successfully": "Order picked successfully",
+        "payment_method_not_online": "Order payment method is not online",
+        "already_paid": "Order has already been paid",
         "status": {
             "pending": "Pending Confirmation",
             "pending_payment": "Pending Payment",
@@ -220,5 +255,10 @@
             "cash": "Cash on Delivery",
             "online": "Online Payment"
         }
+    },
+    "chat": {
+        "no_delivery_person": "No delivery person assigned to this order yet",
+        "chat_closed": "Chat is closed for this order",
+        "message_sent": "Message sent successfully"
     }
 }

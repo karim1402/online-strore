@@ -554,14 +554,14 @@ class OrderController extends Controller
         if ($order->payment_method !== 'online') {
             return response()->json([
                 'success' => false,
-                'message' => 'Order payment method is not online',
+                'message' => LocalizationService::getMessage('order.payment_method_not_online'),
             ], 400);
         }
 
         if ($order->payment_status === 'paid') {
             return response()->json([
                 'success' => false,
-                'message' => 'Order has already been paid',
+                'message' => LocalizationService::getMessage('order.already_paid'),
             ], 400);
         }
 
@@ -662,7 +662,7 @@ class OrderController extends Controller
             if (!$product || !$product->is_active) {
                 $errors[] = [
                     'product_id' => $product->id ?? $item->product_id,
-                    'error' => 'Product is no longer available',
+                    'error' => LocalizationService::getMessage('cart.product_unavailable'),
                 ];
                 continue;
             }
@@ -671,7 +671,7 @@ class OrderController extends Controller
             // if ($product->store->status !== 'approved') {
             //     $errors[] = [
             //         'product_id' => $product->id,
-            //         'error' => 'Store is not available',
+            //         'error' => LocalizationService::getMessage('cart.store_unavailable'),
             //     ];
             // }
         }

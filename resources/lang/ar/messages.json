@@ -66,7 +66,17 @@
         "user_deleted": "تم حذف المستخدم بنجاح",
         "notifications_retrieved": "تم جلب سجل الإشعارات بنجاح",
         "notification_sent": "تم إرسال الإشعار بنجاح",
-        "fcm_token_updated": "تم تحديث رمز FCM بنجاح"
+        "fcm_token_updated": "تم تحديث رمز FCM بنجاح",
+        "otp_sent": "تم إرسال رمز التحقق بنجاح",
+        "email_verified": "تم التحقق من البريد الإلكتروني بنجاح",
+        "verification_code_resent": "تم إعادة إرسال رمز التحقق بنجاح",
+        "data_created": "تم إنشاء البيانات بنجاح",
+        "data_updated": "تم تحديث البيانات بنجاح",
+        "data_deleted": "تم حذف البيانات بنجاح",
+        "password_changed": "تم تغيير كلمة المرور بنجاح",
+        "password_reset_successful": "تم إعادة تعيين كلمة المرور بنجاح",
+        "reset_code_sent": "تم إرسال رمز إعادة التعيين بنجاح",
+        "module_ads_retrieved": "تم استرجاع إعلانات الوحدة بنجاح"
     },
     "errors": {
         "no_users_with_tokens": "لم يتم العثور على مستخدمين لديهم رموز إشعارات نشطة",
@@ -110,7 +120,26 @@
         "store_not_approved": "متجرك لم يتم اعتماده بعد. يرجى التواصل مع الدعم",
         "invalid_parent": "لا يمكن للفئة أن تكون أباً لنفسها",
         "invalid_parent_category": "يجب أن تنتمي الفئة الأب المختارة إلى نفس الموديول",
-        "subcategory_not_found_in_category": "الفئة الفرعية المختارة لا تنتمي إلى الفئة المختارة"
+        "subcategory_not_found_in_category": "الفئة الفرعية المختارة لا تنتمي إلى الفئة المختارة",
+        "invalid_google_token": "رمز Google غير صالح",
+        "google_email_not_found": "لم يتم العثور على بريد Google الإلكتروني",
+        "social_login_failed": "فشل تسجيل الدخول الاجتماعي",
+        "invalid_facebook_token": "رمز Facebook غير صالح",
+        "facebook_email_not_found": "لم يتم العثور على بريد Facebook الإلكتروني",
+        "invalid_apple_token": "رمز Apple غير صالح",
+        "apple_token_mismatch": "عدم تطابق رمز Apple",
+        "apple_email_required": "البريد الإلكتروني مطلوب لتسجيل الدخول عبر Apple",
+        "email_sending_failed": "فشل إرسال البريد الإلكتروني",
+        "invalid_reset_code": "رمز إعادة التعيين غير صالح",
+        "reset_code_expired": "انتهت صلاحية رمز إعادة التعيين",
+        "otp_not_found": "رمز التحقق (OTP) غير موجود",
+        "invalid_otp": "رمز التحقق غير صالح",
+        "otp_expired": "انتهت صلاحية رمز التحقق",
+        "email_already_verified": "البريد الإلكتروني تم التحقق منه مسبقاً",
+        "invalid_verification_code": "رمز التحقق غير صالح",
+        "verification_code_expired": "انتهت صلاحية رمز التحقق",
+        "current_password_incorrect": "كلمة المرور الحالية غير صحيحة",
+        "invalid_voucher": "رمز القسيمة غير صالح"
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
@@ -181,7 +210,11 @@
         "replaced": "تم استبدال السلة بنجاح",
         "store_conflict": "السلة تحتوي على عناصر من متجر مختلف. إضافة هذا العنصر سيمسح سلتك الحالية.",
         "limit_reached": "تم الوصول إلى حد السلة",
-        "max_items": "لا يمكن أن تحتوي السلة على أكثر من 50 عنصراً"
+        "max_items": "لا يمكن أن تحتوي السلة على أكثر من 50 عنصراً",
+        "quantity_limit_exceeded": "تم تجاوز حد الكمية",
+        "max_quantity_per_item": "لا يمكنك إضافة المزيد من هذا العنصر",
+        "product_unavailable": "المنتج لم يعد متوفراً",
+        "store_unavailable": "المتجر غير متوفر"
     },
     "order": {
         "placed_successfully": "تم تقديم الطلب بنجاح",
@@ -191,6 +224,8 @@
         "retrieved_successfully": "تم استرجاع الطلب بنجاح",
         "cancelled_successfully": "تم إلغاء الطلب بنجاح",
         "picked_successfully": "تم استلام الطلب بنجاح",
+        "payment_method_not_online": "طريقة دفع الطلب ليست عبر الإنترنت",
+        "already_paid": "تم دفع قيمة الطلب مسبقاً",
         "status": {
             "pending": "في انتظار التأكيد",
             "pending_payment": "في انتظار الدفع",
@@ -218,5 +253,10 @@
             "cash": "الدفع عند الاستلام",
             "online": "الدفع الإلكتروني"
         }
+    },
+    "chat": {
+        "no_delivery_person": "لم يتم تعيين مندوب توصيل لهذا الطلب بعد",
+        "chat_closed": "المحادثة مغلقة لهذا الطلب",
+        "message_sent": "تم إرسال الرسالة بنجاح"
     }
 }

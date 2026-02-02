@@ -132,12 +132,12 @@ class AuthController extends Controller
     }
 
     /**
-     * Login user
+     * Login user (can use email OR phone in the 'email' field)
      */
     public function login(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'required|string',
             'password' => 'required|string|min:6',
         ]);
 
@@ -145,7 +145,15 @@ class AuthController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        $credentials = $request->only('email', 'password');
+        // Detect if input is email or phone and set credentials accordingly
+        $loginField = $request->email;
+        if (filter_var($loginField, FILTER_VALIDATE_EMAIL)) {
+            // Input is an email
+            $credentials = ['email' => $loginField, 'password' => $request->password];
+        } else {
+            // Input is a phone number
+            $credentials = ['phone' => $loginField, 'password' => $request->password];
+        }
 
         if (!$token = Auth::guard('api')->attempt($credentials)) {
             return $this->errorResponse('errors.invalid_credentials', [], 401);

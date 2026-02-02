@@ -45,14 +45,14 @@ class ChatController extends Controller
         if (!$order->delivery_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'No delivery person assigned to this order yet.',
+                'message' => LocalizationService::getMessage('chat.no_delivery_person'),
             ], 400);
         }
 
         if (in_array($order->simple_status, ['delivered', 'cancelled'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Chat is closed for this order.',
+                'message' => LocalizationService::getMessage('chat.chat_closed'),
             ], 400);
         }
 
@@ -67,7 +67,7 @@ class ChatController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Message sent successfully',
+            'message' => LocalizationService::getMessage('chat.message_sent'),
         ]);
     }
 }
