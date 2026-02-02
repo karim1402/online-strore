@@ -10,6 +10,114 @@
             "name": "User Authentication",
             "item": [
                 {
+                    "name": "Send OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "email",
+                                    "value": "newuser@example.com",
+                                    "description": "Email to send OTP to (must not be registered yet)",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/send-otp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "send-otp"
+                            ]
+                        },
+                        "description": "Send OTP to email before registration. Must be called first before register."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Register (with OTP)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "name",
+                                    "value": "Test User",
+                                    "description": "User's full name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "value": "newuser@example.com",
+                                    "description": "Email (must match the one used in send-otp)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "password123",
+                                    "description": "Password (min 6 characters)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "phone",
+                                    "value": "1234567890",
+                                    "description": "Phone number (min 10 digits)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "otp",
+                                    "value": "1234",
+                                    "description": "OTP received via email from send-otp",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user. Requires OTP from send-otp endpoint."
+                    },
+                    "response": []
+                },
+                {
                     "name": "Verify Email",
                     "request": {
                         "method": "POST",

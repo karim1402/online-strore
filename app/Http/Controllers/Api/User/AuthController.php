@@ -27,6 +27,44 @@ class AuthController extends Controller
     }
 
     /**
+     * Send OTP to email for registration verification
+     */
+    public function sendOtp(Request $request): JsonResponse
+    {
+        $validator = ValidationService::make($request->all(), [
+            'email' => 'required|string|email|max:100|unique:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorWithFirstMessage($validator);
+        }
+
+        // Generate 4-digit OTP
+        $code = rand(1000, 9999);
+
+        // Store or update in email_verifications table
+        \Illuminate\Support\Facades\DB::table('email_verifications')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'code' => $code,
+                'expires_at' => Carbon::now()->addMinutes(15),
+                'updated_at' => Carbon::now(),
+                'created_at' => Carbon::now(),
+            ]
+        );
+
+        // Send OTP via email
+        try {
+            Mail::to($request->email)->send(new AccountVerificationMail($code));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send OTP email: ' . $e->getMessage());
+            return $this->errorResponse('errors.email_sending_failed', [], 500);
+        }
+
+        return $this->successResponse(null, 'success.otp_sent');
+    }
+
+    /**
      * Register a new user
      */
     public function register(Request $request): JsonResponse
@@ -36,32 +74,43 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
             'phone' => 'required|string|min:10',
+            'otp' => 'required|string|size:4',
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorWithFirstMessage($validator);
         }
 
+        // Verify OTP from email_verifications table
+        $verification = \Illuminate\Support\Facades\DB::table('email_verifications')
+            ->where('email', $request->email)
+            ->first();
+
+        if (!$verification) {
+            return $this->errorResponse('errors.otp_not_found', [], 400);
+        }
+
+        if ($verification->code !== $request->otp) {
+            return $this->errorResponse('errors.invalid_otp', [], 400);
+        }
+
+        if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
+            return $this->errorResponse('errors.otp_expired', [], 400);
+        }
+
+        // Create user with verified email
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
+            'email_verified_at' => Carbon::now(),
         ]);
 
-        // Generate Verification Code
-        $code = rand(1000, 9999);
-        $user->verification_code = $code;
-        $user->verification_code_expires_at = Carbon::now()->addMinutes(15);
-        $user->save();
-
-        // Send Verification Email
-        try {
-            Mail::to($user->email)->send(new AccountVerificationMail($code));
-        } catch (\Exception $e) {
-            // Log error but don't fail registration
-            \Illuminate\Support\Facades\Log::error('Failed to send verification email: ' . $e->getMessage());
-        }
+        // Delete the verification record
+        \Illuminate\Support\Facades\DB::table('email_verifications')
+            ->where('email', $request->email)
+            ->delete();
 
         // Log the registration activity
         activity('user')
