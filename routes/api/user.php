@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\User\CategoryController;
 Route::prefix('user')->group(function () {
     // Authentication routes
     Route::controller(AuthController::class)->group(function () {
+        Route::post('send-otp', 'sendOtp')->name('user.send-otp');
         Route::post('register', 'register')->name('user.register');
         Route::post('login', 'login')->name('user.login');
         Route::post('logout', 'logout')->middleware('auth:api')->name('user.logout');
