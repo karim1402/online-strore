@@ -195,7 +195,7 @@ class CartController extends Controller
             // Reload cart with relationships
             $cart->load([
                 // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
+                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -377,7 +377,7 @@ class CartController extends Controller
             $cart = $cartItem->cart;
             $cart->load([
                 // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
+                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -447,7 +447,7 @@ class CartController extends Controller
         // Reload cart
         $cart->load([
             // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-            'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
+            'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
             'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -577,7 +577,7 @@ class CartController extends Controller
             // Reload cart
             $cart->load([
                 // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,is_active',
+                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -680,6 +680,7 @@ class CartController extends Controller
                         'description_en' => $item->product->description_en,
                         'description_ar' => $item->product->description_ar,
                         'base_price' => $item->product->base_price,
+                        'offer_price' => $item->product->offer_price,
                         'is_active' => $item->product->is_active,
                         'primary_image' => $item->product->primaryImage ? [
                             'id' => $item->product->primaryImage->id,
