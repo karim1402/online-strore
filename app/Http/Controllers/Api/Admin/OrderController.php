@@ -353,4 +353,48 @@ class OrderController extends Controller
 
         return $orderNumber;
     }
+    public function markReadyToPick($id): JsonResponse
+    {
+        try {
+            $order = Order::find($id);
+
+            if (!$order) {
+                return $this->errorResponse('errors.order_not_found', [], 404);
+            }
+
+            $order->simple_status = 'ready_to_pick';
+            $order->save();
+
+            $order->load(['user', 'store', 'items.options', 'items.addons']);
+
+            return $this->successResponse($order, 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    public function cancel($id): JsonResponse
+    {
+        try {
+            $order = Order::whereNull('delivery_id')
+                ->find($id);
+
+            if (!$order) {
+                return $this->errorResponse('errors.order_not_found', [], 404);
+            }
+
+            if (!in_array($order->simple_status, ['in_progress', 'ready_to_pick'])) {
+                return $this->errorResponse('errors.order_cannot_cancel', [], 400);
+            }
+
+            $order->simple_status = 'cancelled';
+            $order->save();
+
+            $order->load(['user', 'store', 'items.options', 'items.addons']);
+
+            return $this->successResponse($order, 'order.cancelled_successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
 }
