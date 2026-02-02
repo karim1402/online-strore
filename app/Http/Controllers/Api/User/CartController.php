@@ -28,7 +28,8 @@ class CartController extends Controller
 
         $cart = Cart::with([
             // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-            'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
+            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
+            'items.product.category:id,module_id',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
             'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -272,7 +273,8 @@ class CartController extends Controller
         $cart = $cartItem->cart;
        $cart->load([
             // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-            'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
+            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
+            'items.product.category:id,module_id',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
             'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -447,7 +449,8 @@ class CartController extends Controller
         // Reload cart
         $cart->load([
             // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-            'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
+            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
+            'items.product.category:id,module_id',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
             'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -686,6 +689,7 @@ class CartController extends Controller
                             'id' => $item->product->primaryImage->id,
                             'image_url' => $item->product->primaryImage->image_url,
                         ] : null,
+                        'module_id' => $item->product->category ? $item->product->category->module_id : null,
                     ],
                     'quantity' => $item->quantity,
                     'selected_options' => $item->options->map(function ($option) use ($item) {
