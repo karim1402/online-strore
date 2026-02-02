@@ -12,6 +12,7 @@ use App\Services\LocalizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class CartController extends Controller
 {
@@ -66,6 +67,8 @@ class CartController extends Controller
      */
     public function addItem(Request $request)
     {
+
+        Log::info($request->all());
         $user = auth('api')->user();
 
         // Validation
