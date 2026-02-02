@@ -39,6 +39,9 @@ class NewOrderNotification extends Notification
               . "Total: {$this->order->total}\n"
               . "Payment: {$this->order->payment_method}";
 
+        // Load full order with relationships (like show method)
+        $orderWithRelations = $this->order->load(['user', 'store', 'items.options', 'items.addons', 'branch', 'vendorInvoice']);
+
         return [
             'title' => $title,
             'body' => $body,
@@ -49,7 +52,7 @@ class NewOrderNotification extends Notification
                 'total' => (string) $this->order->total,
                 'payment_method' => $this->order->payment_method,
                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
-                'order'=>$this->order,
+                'order' => $orderWithRelations,
             ],
         ];
     }
