@@ -34,6 +34,8 @@ Route::prefix('user')->group(function () {
         Route::post('change-password', 'changePassword')->middleware('auth:api')->name('user.change-password');
         Route::post('fcm-token', 'updateFcmToken')->middleware('auth:api')->name('user.fcm-token');
         Route::delete('delete-account', 'deleteAccount')->middleware('auth:api')->name('user.delete-account');
+        Route::post('verify-email', 'verifyEmail')->name('user.verify-email');
+        Route::post('resend-verification-code', 'resendVerificationCode')->name('user.resend-verification-code');
     });
 
     // Social Authentication routes
@@ -41,6 +43,12 @@ Route::prefix('user')->group(function () {
         Route::post('auth/google', 'loginWithGoogle')->name('user.auth.google');
         Route::post('auth/facebook', 'loginWithFacebook')->name('user.auth.facebook');
         Route::post('auth/apple', 'loginWithApple')->name('user.auth.apple');
+    });
+
+    // Forgot Password routes
+    Route::controller(\App\Http\Controllers\Api\User\ForgotPasswordController::class)->group(function () {
+        Route::post('forgot-password', 'sendResetCode')->name('user.forgot-password');
+        Route::post('reset-password', 'reset')->name('user.reset-password');
     });
 
     // Protected user routes
