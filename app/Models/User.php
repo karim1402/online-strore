@@ -30,6 +30,8 @@ class User extends Authenticatable implements JWTSubject
         'fcm_token',
         'social_provider',
         'social_id',
+        'verification_code',
+        'verification_code_expires_at',
     ];
 
     /**

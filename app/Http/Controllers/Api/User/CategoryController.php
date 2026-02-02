@@ -78,6 +78,7 @@ class CategoryController extends Controller
                             ->with(['primaryImage', 'store' => function($q) {
                                 $q->select('id', 'name_en', 'name_ar', 'status');
                             }])
+                            ->withExists('productOptions')
                             ->orderBy('sort_order', 'asc')
                             ->limit(20);
                     }])
@@ -117,6 +118,7 @@ class CategoryController extends Controller
                     'name_ar' => $product->name_ar,
                     'base_price' => $product->base_price,
                     'image_url' => $product->image_url,
+                    'has_option_group' => $product->product_options_exists,
                     'store' => $product->store ? [
                         'id' => $product->store->id,
                         'name_en' => $product->store->name_en,
@@ -142,6 +144,7 @@ class CategoryController extends Controller
                             'base_price' => $product->base_price,
                             'offer_price' => $product->offer_price,
                             'image_url' => $product->image_url,
+                            'has_option_group' => $product->product_options_exists,
                             'store' => $product->store ? [
                                 'id' => $product->store->id,
                                 'name_en' => $product->store->name_en,
@@ -195,6 +198,7 @@ class CategoryController extends Controller
         $subcategories->load(['products' => function ($q) {
             $q->active()
                 ->with(['primaryImage'])
+                ->withExists('productOptions')
                 ->orderBy('sort_order', 'asc');
         }]);
 
@@ -205,6 +209,7 @@ class CategoryController extends Controller
                 Product::active()
                     ->where('subcategory_id', $subcategory->id)
                     ->with(['primaryImage'])
+                    ->withExists('productOptions')
                     ->orderBy('sort_order', 'asc')
                     ->get()
             );
@@ -229,7 +234,7 @@ class CategoryController extends Controller
                         'base_price' => $product->base_price,
                         'offer_price' => $product->offer_price,
                         'image_url' => $product->image_url,
-                        
+                        'has_option_group' => $product->product_options_exists,
                     ];
                 }),
             ];
@@ -276,6 +281,7 @@ class CategoryController extends Controller
                         ->with(['primaryImage', 'store' => function($sq) {
                             $sq->select('id', 'name_en', 'name_ar', 'status');
                         }])
+                        ->withExists('productOptions')
                         ->orderBy('sort_order', 'asc')
                         ->limit(20);
                 }]);
@@ -301,6 +307,7 @@ class CategoryController extends Controller
                         'base_price' => $product->base_price,
                         'offer_price' => $product->offer_price,
                         'image_url' => $product->image_url,
+                        'has_option_group' => $product->product_options_exists,
                         'store' => $product->store ? [
                             'id' => $product->store->id,
                             'name_en' => $product->store->name_en,
@@ -324,6 +331,7 @@ class CategoryController extends Controller
                                 'name_ar' => $product->name_ar,
                                 'base_price' => $product->base_price,
                                 'image_url' => $product->image_url,
+                                'has_option_group' => $product->product_options_exists,
                                 'store' => $product->store ? [
                                     'id' => $product->store->id,
                                     'name_en' => $product->store->name_en,

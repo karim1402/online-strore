@@ -26,7 +26,7 @@ class ProductController extends Controller
             'category' => function ($query) {
                 $query->select('id', 'name_en', 'name_ar');
             }
-        ])->active();
+        ])->withExists('productOptions')->active();
 
         // Apply keyword search
         if (!empty($query)) {
@@ -78,6 +78,7 @@ class ProductController extends Controller
                 'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
                 'offer_price' => $product->offer_price,
+                'has_option_group' => $product->product_options_exists,
                 'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
                 'category' => $product->category ? [
                     'id' => $product->category->id,
@@ -112,6 +113,7 @@ class ProductController extends Controller
     {
         $products = Product::where('id', '!=', 74)
             ->with(['primaryImage'])
+            ->withExists('productOptions')
             ->active()
             ->where('is_best_seller', true)
             ->orderBy('sort_order', 'asc')
@@ -126,6 +128,7 @@ class ProductController extends Controller
                 'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
                 'offer_price' => $product->offer_price,
+                'has_option_group' => $product->product_options_exists,
                 'image' => $product->best_seller_image_url ?: ($product->primaryImage ? $product->primaryImage->image_url : null),
             ];
         })->toArray();
@@ -162,6 +165,7 @@ class ProductController extends Controller
             //     $query->select('id', 'status');
             // }
         ])
+        ->withExists('productOptions')
         ->active()
         // ->whereHas('store', function ($query) {
         //     $query->where('status', 'approved');
@@ -178,6 +182,7 @@ class ProductController extends Controller
                 'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
                 'offer_price' => $product->offer_price,
+                'has_option_group' => $product->product_options_exists,
                 'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
             ];
         })->toArray();

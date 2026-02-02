@@ -10,6 +10,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\AccountVerificationMail;
+use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
@@ -44,6 +48,20 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
         ]);
+
+        // Generate Verification Code
+        $code = rand(1000, 9999);
+        $user->verification_code = $code;
+        $user->verification_code_expires_at = Carbon::now()->addMinutes(15);
+        $user->save();
+
+        // Send Verification Email
+        try {
+            Mail::to($user->email)->send(new AccountVerificationMail($code));
+        } catch (\Exception $e) {
+            // Log error but don't fail registration
+            \Illuminate\Support\Facades\Log::error('Failed to send verification email: ' . $e->getMessage());
+        }
 
         // Log the registration activity
         activity('user')
@@ -169,6 +187,90 @@ class AuthController extends Controller
         $user->update(['fcm_token' => $request->fcm_token]);
 
         return $this->successResponse(null, 'success.fcm_token_updated');
+    }
+
+    /**
+     * Verify user email with OTP
+     */
+    public function verifyEmail(Request $request): JsonResponse
+    {
+        $validator = ValidationService::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'code' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorWithFirstMessage($validator);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->email_verified_at) {
+            return $this->errorResponse('errors.email_already_verified', [], 400);
+        }
+
+        if ($user->verification_code !== $request->code) {
+             return $this->errorResponse('errors.invalid_verification_code', [], 400);
+        }
+
+        if (Carbon::now()->gt($user->verification_code_expires_at)) {
+             return $this->errorResponse('errors.verification_code_expired', [], 400);
+        }
+
+        $user->email_verified_at = Carbon::now();
+        $user->verification_code = null;
+        $user->verification_code_expires_at = null;
+        $user->save();
+
+        // Log the verification
+        activity('user')
+            ->causedBy($user)
+            ->performedOn($user)
+            ->log('User verified email');
+
+        $token = Auth::guard('api')->login($user);
+
+        return $this->successResponse([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => 3600, // 1 hour
+            'user' => $user
+        ], 'success.email_verified');
+    }
+
+    /**
+     * Resend verification code
+     */
+    public function resendVerificationCode(Request $request): JsonResponse
+    {
+        $validator = ValidationService::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorWithFirstMessage($validator);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->email_verified_at) {
+            return $this->errorResponse('errors.email_already_verified', [], 400);
+        }
+
+        // Generate Verification Code
+        $code = rand(1000, 9999);
+        $user->verification_code = $code;
+        $user->verification_code_expires_at = Carbon::now()->addMinutes(15);
+        $user->save();
+
+        // Send Verification Email
+        try {
+            Mail::to($user->email)->send(new AccountVerificationMail($code));
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.email_sending_failed', [], 500);
+        }
+
+        return $this->successResponse(null, 'success.verification_code_resent');
     }
 
     /**
