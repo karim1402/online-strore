@@ -104,14 +104,4 @@ class Admin extends Authenticatable implements JWTSubject
             ->setDescriptionForEvent(fn(string $eventName) => "Admin {$eventName}")
             ->useLogName('admin');
     }
-    /**
-     * Route notifications for the FCM channel.
-     *
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @return string
-     */
-    public function routeNotificationForFcm($notification)
-    {
-        return $this->fcm_token;
-    }
 }

@@ -351,16 +351,6 @@ class OrderController extends Controller
 
             DB::commit();
 
-             // Notify Admins
-            try {
-                $admins = \App\Models\Admin::whereNotNull('fcm_token')->get();
-                if ($admins->isNotEmpty()) {
-                    \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewOrderNotification($order));
-                }
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Failed to send admin notification: ' . $e->getMessage());
-            }
-
             // Prepare response
             $response = [
                 'order' => $this->transformOrder($order->load(['items.options', 'items.addons'])),
