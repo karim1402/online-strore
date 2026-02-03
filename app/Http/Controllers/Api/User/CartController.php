@@ -706,7 +706,7 @@ class CartController extends Controller
                                 'value_ar' => $option->productOptionValue->optionValue->value_ar,
                                 'price_type' => $option->productOptionValue->price_type,
                                 'price_value' => $option->productOptionValue->price_value,
-                                'calculated_price' => $option->productOptionValue->calculatePrice($item->product->base_price),
+                                'calculated_price' => $option->productOptionValue->calculatePrice($item->product->effective_price),
                             ],
                         ];
                     })->toArray(),

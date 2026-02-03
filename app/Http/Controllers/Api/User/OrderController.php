@@ -207,7 +207,7 @@ class OrderController extends Controller
                     'name_ar' => $product->name_ar,
                     'description_en' => $product->description_en,
                     'description_ar' => $product->description_ar,
-                    'base_price' => $product->price,
+                    'base_price' => $product->effective_price,
                     'image_url' => $product->image_url ?? null,
                     'category_name_en' => $product->category->name_en ?? null,
                     'category_name_ar' => $product->category->name_ar ?? null,
@@ -240,7 +240,7 @@ class OrderController extends Controller
                         'option_value_name_ar' => $optionValue->name_ar,
                         'price_type' => $cartOption->productOptionValue->price_type,
                         'price_value' => $cartOption->productOptionValue->price_value,
-                        'calculated_price' => $this->calculateOptionPrice($product->price, $cartOption->productOptionValue),
+                        'calculated_price' => $this->calculateOptionPrice($product->effective_price, $cartOption->productOptionValue),
                     ];
 
                     OrderItemOption::create([
@@ -710,12 +710,13 @@ class OrderController extends Controller
      */
     private function calculateItemPrice($cartItem)
     {
-        $basePrice = $cartItem->product->base_price;
+        // Use effective_price which returns offer_price if available, otherwise base_price
+        $basePrice = $cartItem->product->effective_price;
 
         // Add option prices
         foreach ($cartItem->options as $option) {
             $basePrice += $this->calculateOptionPrice(
-                $cartItem->product->base_price,
+                $cartItem->product->effective_price,
                 $option->productOptionValue
             );
         }
