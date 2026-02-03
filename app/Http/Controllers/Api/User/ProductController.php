@@ -78,6 +78,7 @@ class ProductController extends Controller
                 'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
                 'offer_price' => $product->offer_price,
+                'quantity' => $product->quantity,
                 'has_option_group' => $product->product_options_exists,
                 'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
                 'category' => $product->category ? [
@@ -128,6 +129,7 @@ class ProductController extends Controller
                 'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
                 'offer_price' => $product->offer_price,
+                'quantity' => $product->quantity,
                 'has_option_group' => $product->product_options_exists,
                 'image' => $product->best_seller_image_url ?: ($product->primaryImage ? $product->primaryImage->image_url : null),
             ];
@@ -182,6 +184,7 @@ class ProductController extends Controller
                 'name_ar' => $product->name_ar,
                 'base_price' => $product->base_price,
                 'offer_price' => $product->offer_price,
+                'quantity' => $product->quantity,
                 'has_option_group' => $product->product_options_exists,
                 'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
             ];
@@ -267,6 +270,7 @@ class ProductController extends Controller
             // 'search_keywords' => $product->search_keywords,
             'base_price' => $product->base_price,
             'offer_price' => $product->offer_price,
+            'quantity' => $product->quantity,
             'is_active' => $product->is_active,
             'view_count' => $product->view_count,
             'sales_count' => $product->sales_count,
@@ -443,6 +447,7 @@ class ProductController extends Controller
             'description_ar' => $product->description_ar,
             'base_price' => $product->base_price,
             'offer_price' => $product->offer_price,
+            'quantity' => $product->quantity,
             'is_active' => $product->is_active,
             'view_count' => $product->view_count,
             'sales_count' => $product->sales_count,

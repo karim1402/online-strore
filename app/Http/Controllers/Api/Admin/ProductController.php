@@ -134,6 +134,9 @@ class ProductController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
+                'search_keywords' => 'nullable|string',
+                'quantity_en' => 'nullable|string|max:255',
+                'quantity_ar' => 'nullable|string|max:255',
                 'base_price' => 'required|numeric|min:0',
                 'offer_price' => 'nullable|numeric|min:0',
                 'is_active' => 'nullable|boolean',
@@ -197,6 +200,9 @@ class ProductController extends Controller
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
                 'search_keywords' => $request->search_keywords,
+                'search_keywords' => $request->search_keywords,
+                'quantity_en' => $request->quantity_en,
+                'quantity_ar' => $request->quantity_ar,
                 'base_price' => $request->base_price,
                 'offer_price' => ($request->offer_price < 1) ? null : $request->offer_price,
                 'is_active' => $request->boolean('is_active', true),
@@ -321,6 +327,9 @@ class ProductController extends Controller
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
+                'search_keywords' => 'nullable|string',
+                'quantity_en' => 'nullable|string|max:255',
+                'quantity_ar' => 'nullable|string|max:255',
                 'base_price' => 'nullable|numeric|min:0',
                 'offer_price' => 'nullable|numeric|min:0',
                 'is_active' => 'nullable|boolean',
@@ -397,6 +406,12 @@ class ProductController extends Controller
             }
             if ($request->has('search_keywords')) {
                 $product->search_keywords = $request->search_keywords;
+            }
+            if ($request->has('quantity_en')) {
+                $product->quantity_en = $request->quantity_en;
+            }
+            if ($request->has('quantity_ar')) {
+                $product->quantity_ar = $request->quantity_ar;
             }
             if ($request->filled('base_price')) {
                 $product->base_price = $request->base_price;

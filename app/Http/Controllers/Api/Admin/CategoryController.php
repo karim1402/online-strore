@@ -105,7 +105,7 @@ class CategoryController extends Controller
                 'name_ar' => 'required|string|max:255',
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
             ]);
