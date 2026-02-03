@@ -24,9 +24,9 @@ jobs:
            password: ${{ secrets.SFTP_PASSWORD }}
            server-dir: /public_html/
            exclude: |
-             */.git
-             */.git/**
-             */node_modules/*
-             */public/*
-             */vendor/*-+6
+             **/.git*
+             **/.git/**
+             **/node_modules/**
+             **/public/**
+             **/vendor/**
  
