@@ -34,6 +34,8 @@ class Product extends Model
         'is_best_seller',
         'best_seller_image',
         'offer_price',
+        'quantity_en',
+        'quantity_ar',
     ];
 
     protected $casts = [
@@ -47,7 +49,7 @@ class Product extends Model
         'sort_order' => 'integer',
     ];
 
-    protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url', 'effective_price'];
+    protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url', 'effective_price', 'quantity'];
 
     /**
      * Get the effective price (offer price if set, otherwise base price)
@@ -210,6 +212,15 @@ class Product extends Model
     }
 
     /**
+     * Get localized quantity attribute
+     */
+    public function getQuantityAttribute()
+    {
+        $locale = app()->getLocale();
+        return $locale === 'ar' ? $this->quantity_ar : $this->quantity_en;
+    }
+
+    /**
      * Increment view count
      */
     public function incrementViewCount()
@@ -233,7 +244,7 @@ class Product extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name_en', 'name_ar', 'description_en', 'description_ar', 'base_price', 'is_active', 'category_id', 'subcategory_id'])
+            ->logOnly(['name_en', 'name_ar', 'description_en', 'description_ar', 'base_price', 'is_active', 'category_id', 'subcategory_id', 'quantity_en', 'quantity_ar'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "Product {$eventName}")
