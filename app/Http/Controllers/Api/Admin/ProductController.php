@@ -17,6 +17,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ProductsImport;
 
 class ProductController extends Controller
 {
@@ -800,6 +802,28 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Import products from Excel
+     */
+    public function import(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            Excel::import(new ProductsImport, $request->file('file'));
+
+            return $this->successResponse(null, 'success.products_imported');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
         }
     }
 }
