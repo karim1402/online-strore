@@ -18,7 +18,6 @@ class FoodProductsImport implements ToModel, WithHeadingRow
     {
         $product = new Product([
             'category_id'     => $row['category_id'] ?? null,
-            'subcategory_id'  => $row['subcategory_id'] ?? null,
             'name_en'         => $row['name_en'] ?? null, 
             'name_ar'         => $row['name_ar'] ?? null,
             'description_en'  => $row['description_en'] ?? null,
