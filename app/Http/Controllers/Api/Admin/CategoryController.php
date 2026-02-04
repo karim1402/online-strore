@@ -293,7 +293,7 @@ class CategoryController extends Controller
     /**
      * Get categories for a specific module
      */
-    public function getModuleCategories($moduleId): JsonResponse
+    public function getModuleCategories(Request $request, $moduleId): JsonResponse
     {
         try {
             $module = Module::find($moduleId);
@@ -302,13 +302,38 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.module_not_found', [], 404);
             }
 
-            $categories = Category::with(['products' => function ($query) {
+            $query = Category::with([
+                'parent:id,name_en,name_ar',
+                'children',
+                'products' => function ($query) {
                     $query->orderBy('sort_order', 'asc');
-                }])
-                ->where('module_id', $moduleId)
-                ->orderBy('sort_order', 'asc')
+                }
+            ])->where('module_id', $moduleId);
+
+            // Filter by parent (null for top-level)
+            if ($request->has('parent_id')) {
+                $query->where('parent_id', $request->parent_id);
+            } elseif ($request->boolean('top_level_only')) {
+                $query->whereNull('parent_id');
+            }
+
+            // Filter by active status
+            if ($request->has('is_active')) {
+                $query->where('is_active', $request->boolean('is_active'));
+            }
+
+            // Search by name
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name_en', 'like', "%{$search}%")
+                        ->orWhere('name_ar', 'like', "%{$search}%");
+                });
+            }
+
+            $categories = $query->orderBy('sort_order', 'asc')
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->paginate($request->get('per_page', 15));
 
             return $this->successResponse([
                 'module' => $module,
