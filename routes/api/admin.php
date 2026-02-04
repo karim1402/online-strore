@@ -275,6 +275,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', 'store');
                 Route::post('/{id}/duplicate', 'duplicate');
                 Route::post('/import', 'import');
+                Route::post('/import-food', 'importFood');
             });
               Route::middleware('permission:stores.delete,admins')->group(function () {
                 Route::delete('/{id}', 'destroy');

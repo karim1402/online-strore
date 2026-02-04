@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductsImport;
+use App\Imports\FoodProductsImport;
 
 class ProductController extends Controller
 {
@@ -821,6 +822,28 @@ class ProductController extends Controller
             }
 
             Excel::import(new ProductsImport, $request->file('file'));
+
+            return $this->successResponse(null, 'success.products_imported');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Import food products from Excel (without images)
+     */
+    public function importFood(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            Excel::import(new FoodProductsImport, $request->file('file'));
 
             return $this->successResponse(null, 'success.products_imported');
         } catch (\Exception $e) {
