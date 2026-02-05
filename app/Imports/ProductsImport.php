@@ -27,7 +27,7 @@ class ProductsImport implements ToModel, WithHeadingRow
             'description_ar'  => $row['description_ar'] ?? null,
             'quantity_en'     => $row['quantity_en'] ?? null,
             'quantity_ar'     => $row['quantity_ar'] ?? null,
-            'base_price'      => $row['base_price'] ?? 0,
+            'base_price'      => $row['base_price'] ,
             'offer_price'     => $row['offer_price'] ?? null,
             'is_active'       => true,
         ]);
