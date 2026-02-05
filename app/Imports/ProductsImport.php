@@ -9,6 +9,8 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
+use Illuminate\Support\Facades\Log;
+
 class ProductsImport implements ToModel, WithHeadingRow
 {
     /**
@@ -18,6 +20,20 @@ class ProductsImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
+        // Sanitize base price
+        $basePrice = $row['base_price'];
+        // Remove commas if present and ensure it's a valid number format
+        if (is_string($basePrice)) {
+            $basePrice = str_replace(',', '', $basePrice);
+        }
+        $basePrice = floatval($basePrice);
+
+        Log::info('Importing Product Row:', [
+            'name' => $row['name_en'] ?? $row['description_en'],
+            'raw_price' => $row['base_price'],
+            'sanitized_price' => $basePrice
+        ]);
+
         $product = new Product([
             'category_id'     => $row['category_id'] ?? null,
             'subcategory_id'  => $row['subcategory_id'] ?? null,
@@ -27,7 +43,7 @@ class ProductsImport implements ToModel, WithHeadingRow
             'description_ar'  => $row['description_ar'] ?? null,
             'quantity_en'     => $row['quantity_en'] ?? null,
             'quantity_ar'     => $row['quantity_ar'] ?? null,
-            'base_price'      => $row['base_price'] ,
+            'base_price'      => $basePrice,
             'offer_price'     => $row['offer_price'] ?? null,
             'is_active'       => true,
         ]);
