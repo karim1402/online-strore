@@ -748,13 +748,22 @@ class OrderController extends Controller
     {
         $date = now()->format('Ymd');
         
+        // Use lockForUpdate to prevent race conditions
         $lastOrder = Order::whereDate('created_at', now())
             ->orderBy('id', 'desc')
+            ->lockForUpdate()
             ->first();
 
         $sequence = $lastOrder ? ((int)substr($lastOrder->order_number, -5)) + 1 : 1;
+        $orderNumber = sprintf('ORD-%s-%05d', $date, $sequence);
 
-        return sprintf('ORD-%s-%05d', $date, $sequence);
+        // Safety check ensures uniqueness even if lock fails or in edge cases
+        while (Order::where('order_number', $orderNumber)->exists()) {
+            $sequence++;
+            $orderNumber = sprintf('ORD-%s-%05d', $date, $sequence);
+        }
+
+        return $orderNumber;
     }
 
     /**
