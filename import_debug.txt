@@ -1,0 +1,328 @@
+{"name":"Lipton Tea  ","raw_price":62.5,"raw_type":"double","sanitized_price":62.5}
+{"name":"Lipton Tea  ","raw_price":33,"raw_type":"integer","sanitized_price":33}
+{"name":"Konor","raw_price":8.5,"raw_type":"double","sanitized_price":8.5}
+{"name":"Juhayna","raw_price":61,"raw_type":"integer","sanitized_price":61}
+{"name":"Lametna Pasta","raw_price":29,"raw_type":"integer","sanitized_price":29}
+{"name":"Lametna Pasta","raw_price":29,"raw_type":"integer","sanitized_price":29}
+{"name":"Lametna Pasta","raw_price":29,"raw_type":"integer","sanitized_price":29}
+{"name":"Lametna Pasta","raw_price":29,"raw_type":"integer","sanitized_price":29}
+{"name":"Lametna Pasta","raw_price":29,"raw_type":"integer","sanitized_price":29}
+{"name":"Lametna Pasta","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Lametna Pasta","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Lametna Pasta","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Lametna Pasta","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Lametna Pasta","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Hawaa Pasta","raw_price":15.5,"raw_type":"double","sanitized_price":15.5}
+{"name":"Hawaa Pasta","raw_price":15.5,"raw_type":"double","sanitized_price":15.5}
+{"name":"Hawaa Pasta","raw_price":15.5,"raw_type":"double","sanitized_price":15.5}
+{"name":"Hawaa Pasta","raw_price":15.5,"raw_type":"double","sanitized_price":15.5}
+{"name":"Hawaa Pasta","raw_price":15.5,"raw_type":"double","sanitized_price":15.5}
+{"name":"Hawaa Pasta","raw_price":15.5,"raw_type":"double","sanitized_price":15.5}
+{"name":"Hawaa Pasta","raw_price":15.5,"raw_type":"double","sanitized_price":15.5}
+{"name":"Hawaa Pasta","raw_price":32.5,"raw_type":"double","sanitized_price":32.5}
+{"name":"Hawaa Pasta","raw_price":32.5,"raw_type":"double","sanitized_price":32.5}
+{"name":"Tresemm\u00e9 Paraben Shampoo Colorants","raw_price":215,"raw_type":"integer","sanitized_price":215}
+{"name":"Comfort Fabric Softener Spring Dew (Blue) Sachets","raw_price":42,"raw_type":"integer","sanitized_price":42}
+{"name":"Comfort Fabric Softener Spring Dew (Blue)","raw_price":260,"raw_type":"integer","sanitized_price":260}
+{"name":"Comfort Orange Blossom & Aloe Fabric Softener","raw_price":240,"raw_type":"integer","sanitized_price":240}
+{"name":"Comfort Rose \u2013 Soft Floral Fabric Softener","raw_price":100,"raw_type":"integer","sanitized_price":100}
+{"name":"Rexona Men Extra Cool Deodorant","raw_price":45,"raw_type":"integer","sanitized_price":45}
+{"name":"Rexona Men Invisible Deodorant","raw_price":85,"raw_type":"integer","sanitized_price":85}
+{"name":"Rexona Men Extra Cool Deodorant","raw_price":90,"raw_type":"integer","sanitized_price":90}
+{"name":"Rexona Men Mint & Cedarwood Deodorant","raw_price":90,"raw_type":"integer","sanitized_price":90}
+{"name":"Rexona Men Charcoal Clean Deodorant","raw_price":90,"raw_type":"integer","sanitized_price":90}
+{"name":"Signal Gum Care Toothpaste (Anti-Bleeding)","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Camay Classic Soap","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Camay Classic Soap","raw_price":27.5,"raw_type":"double","sanitized_price":27.5}
+{"name":"Camay Vitality Soap","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Sunsilk Black Shine","raw_price":105,"raw_type":"integer","sanitized_price":105}
+{"name":"Sunsilk Black Shine Shampoo","raw_price":128,"raw_type":"integer","sanitized_price":128}
+{"name":"Sunsilk Strong & Shiny Shampoo","raw_price":50,"raw_type":"integer","sanitized_price":50}
+{"name":"Sunsilk Strong & Shiny Shampoo","raw_price":128,"raw_type":"integer","sanitized_price":128}
+{"name":"Sunsilk Smooth & Sleek Shampoo","raw_price":58,"raw_type":"integer","sanitized_price":58}
+{"name":"Sunsilk Thick & Long Shampoo","raw_price":56,"raw_type":"integer","sanitized_price":56}
+{"name":"Sunsilk Thick & Long Shampoo","raw_price":105,"raw_type":"integer","sanitized_price":105}
+{"name":"Axe Cookies Deodorant Body Spray","raw_price":165,"raw_type":"integer","sanitized_price":165}
+{"name":"Rexona Men Extra Cool Deodorant","raw_price":40,"raw_type":"integer","sanitized_price":40}
+{"name":"Rexona Men Invisible Deodorant","raw_price":86,"raw_type":"integer","sanitized_price":86}
+{"name":"Sunsilk Coconut Nourishment Shampoo","raw_price":132,"raw_type":"integer","sanitized_price":132}
+{"name":"Sunsilk Vital Hair Shampoo + Conditioner 170 Ml (25% Off)","raw_price":271.3,"raw_type":"double","sanitized_price":271.3}
+{"name":"Sunsilk Damaged Hair Shampoo","raw_price":128,"raw_type":"integer","sanitized_price":128}
+{"name":"Sunsilk Strong & Flexible Shampoo","raw_price":105,"raw_type":"integer","sanitized_price":105}
+{"name":"Sunsilk Hair Fall Solution Shampoo","raw_price":105,"raw_type":"integer","sanitized_price":105}
+{"name":"Sunsilk Instant Repair Shampoo (Damaged Hair)","raw_price":105,"raw_type":"integer","sanitized_price":105}
+{"name":"Sunsilk Strong & Flexible Shampoo + Conditioner 170 Ml","raw_price":217.3,"raw_type":"double","sanitized_price":217.3}
+{"name":"Dream Strawberry Jelly","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Dream Caramel Cream","raw_price":21,"raw_type":"integer","sanitized_price":21}
+{"name":"Dream Orange Cake Mix Powder","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Chocolate Cake Mix Powder","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Vanilla Cake Mix Powder","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Strawberry Cake Mix Powder","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Instant Dry Yeast","raw_price":6,"raw_type":"integer","sanitized_price":6}
+{"name":"Dream Baking Powder","raw_price":4,"raw_type":"integer","sanitized_price":4}
+{"name":"Dream Vanilla Sugar","raw_price":2,"raw_type":"integer","sanitized_price":2}
+{"name":"Dream Orange Vanilla","raw_price":8,"raw_type":"integer","sanitized_price":8}
+{"name":"Dream Chef Cake Mix","raw_price":7.5,"raw_type":"double","sanitized_price":7.5}
+{"name":"Dream White Cooking Chocolate (Raw)","raw_price":73,"raw_type":"integer","sanitized_price":73}
+{"name":"Dream Milk Cooking Chocolate","raw_price":73,"raw_type":"integer","sanitized_price":73}
+{"name":"Dream Dark Cooking Chocolate","raw_price":73,"raw_type":"integer","sanitized_price":73}
+{"name":"Dream Whipping Cream","raw_price":22,"raw_type":"integer","sanitized_price":22}
+{"name":"Dream Whipping Cream \u2013 Fresh Cream Flavor","raw_price":27,"raw_type":"integer","sanitized_price":27}
+{"name":"Alamia Turmeric","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Fish Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Bay Leaves","raw_price":17,"raw_type":"integer","sanitized_price":17}
+{"name":"Cloves","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Liver Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Local Cumin","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Garlic Powder","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Sudanese Black Chili Peppers","raw_price":17,"raw_type":"integer","sanitized_price":17}
+{"name":"Chicken Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Stuffed Vegetables Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Onion Powder","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Kabsa Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Ground Rosemary","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Meat Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Local Ground Coriander","raw_price":17,"raw_type":"integer","sanitized_price":17}
+{"name":"Alamia Indian Black Pepper","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Alamia Mixed Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Alamia Ground Cinnamon","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Alamia Ground Ginger","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Alamia Ground Turkish Thyme","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Alamia Indian Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Alamia Seven Spices","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Oman Coffee Hot Chocolate","raw_price":70,"raw_type":"integer","sanitized_price":70}
+{"name":"Coffee Break Classic Cappuccino","raw_price":10.5,"raw_type":"double","sanitized_price":10.5}
+{"name":"Coffee Break Vanilla Cappuccino","raw_price":10.5,"raw_type":"double","sanitized_price":10.5}
+{"name":"Coffee Break Mocha Cappuccino","raw_price":10.5,"raw_type":"double","sanitized_price":10.5}
+{"name":"Coffee Break Hazelnut Cappuccino","raw_price":10.5,"raw_type":"double","sanitized_price":10.5}
+{"name":"Lipton English Breakfast Tea 25 Tea Bags","raw_price":35,"raw_type":"integer","sanitized_price":35}
+{"name":"Black Tea Pellets","raw_price":80,"raw_type":"integer","sanitized_price":80}
+{"name":"Fine Black Tea","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Fine Black Tea","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Istikana Tea","raw_price":23,"raw_type":"integer","sanitized_price":23}
+{"name":"Istikana Tea","raw_price":50,"raw_type":"integer","sanitized_price":50}
+{"name":"Istikana Tea 250 G With Free Mug","raw_price":55,"raw_type":"integer","sanitized_price":55}
+{"name":"Al Arosa Black Tea","raw_price":23,"raw_type":"integer","sanitized_price":23}
+{"name":"Al Arosa Black Tea","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Al Arosa Black Tea","raw_price":57,"raw_type":"integer","sanitized_price":57}
+{"name":"Al Arosa Premium Black Tea","raw_price":50,"raw_type":"integer","sanitized_price":50}
+{"name":"Al Arosa Premium Black Tea","raw_price":99.5,"raw_type":"double","sanitized_price":99.5}
+{"name":"Al Arosa Premium Black Tea","raw_price":27,"raw_type":"integer","sanitized_price":27}
+{"name":"Al Arosa Black Tea","raw_price":70,"raw_type":"integer","sanitized_price":70}
+{"name":"Almarai Full Cream Milk 1 Liter","raw_price":55,"raw_type":"integer","sanitized_price":55}
+{"name":"Almarai Milk","raw_price":75,"raw_type":"integer","sanitized_price":75}
+{"name":"Bakhira Milk","raw_price":45,"raw_type":"integer","sanitized_price":45}
+{"name":"Bakhira Milk","raw_price":26,"raw_type":"integer","sanitized_price":26}
+{"name":"Juhayna Milk","raw_price":55,"raw_type":"integer","sanitized_price":55}
+{"name":"Lamar Full Cream Milk","raw_price":55,"raw_type":"integer","sanitized_price":55}
+{"name":"Juhayna Milk","raw_price":75,"raw_type":"integer","sanitized_price":75}
+{"name":"Juhayna","raw_price":12,"raw_type":"integer","sanitized_price":12}
+{"name":"Bety Juice","raw_price":35,"raw_type":"integer","sanitized_price":35}
+{"name":"Bety Juice","raw_price":35,"raw_type":"integer","sanitized_price":35}
+{"name":"Bety Juice","raw_price":35,"raw_type":"integer","sanitized_price":35}
+{"name":"Bety Juice","raw_price":35,"raw_type":"integer","sanitized_price":35}
+{"name":"Bety Juice","raw_price":35,"raw_type":"integer","sanitized_price":35}
+{"name":"Bety Juice","raw_price":35,"raw_type":"integer","sanitized_price":35}
+{"name":"Bety Juice","raw_price":10,"raw_type":"integer","sanitized_price":10}
+{"name":"Bety Juice","raw_price":10,"raw_type":"integer","sanitized_price":10}
+{"name":"Bety Juice","raw_price":10,"raw_type":"integer","sanitized_price":10}
+{"name":"Bety Juice","raw_price":10,"raw_type":"integer","sanitized_price":10}
+{"name":"Bety Juice","raw_price":12,"raw_type":"integer","sanitized_price":12}
+{"name":"Bety Juice","raw_price":12,"raw_type":"integer","sanitized_price":12}
+{"name":"Fruity Powder Drink","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Fruity Powder Drink","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Fruity Powder Drink","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Fruity Powder Drink","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Chobees","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Chobees","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Pepsi","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Pepsi","raw_price":18,"raw_type":"integer","sanitized_price":18}
+{"name":"Pepsi","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Pepsi","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"Dream","raw_price":14.5,"raw_type":"double","sanitized_price":14.5}
+{"name":"Dream","raw_price":14.5,"raw_type":"double","sanitized_price":14.5}
+{"name":"Dream Drink","raw_price":27,"raw_type":"integer","sanitized_price":27}
+{"name":"Dream Raw Cocoa","raw_price":91,"raw_type":"integer","sanitized_price":91}
+{"name":"Dream Jelly","raw_price":14.5,"raw_type":"double","sanitized_price":14.5}
+{"name":"Dream Jelly","raw_price":14.5,"raw_type":"double","sanitized_price":14.5}
+{"name":"Dream Jelly","raw_price":14.5,"raw_type":"double","sanitized_price":14.5}
+{"name":"Dream Jelly","raw_price":14.5,"raw_type":"double","sanitized_price":14.5}
+{"name":"Knorr Stock","raw_price":14.5,"raw_type":"double","sanitized_price":14.5}
+{"name":"Knorr Stock","raw_price":3.25,"raw_type":"double","sanitized_price":3.25}
+{"name":"Knorr Stock","raw_price":16,"raw_type":"integer","sanitized_price":16}
+{"name":"Knorr Stock","raw_price":16,"raw_type":"integer","sanitized_price":16}
+{"name":"Knorr Stock","raw_price":10,"raw_type":"integer","sanitized_price":10}
+{"name":"Knorr","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Knorr","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Knorr","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Knorr","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Knorr","raw_price":41,"raw_type":"integer","sanitized_price":41}
+{"name":"Knorr","raw_price":41,"raw_type":"integer","sanitized_price":41}
+{"name":"Knorr","raw_price":12.5,"raw_type":"double","sanitized_price":12.5}
+{"name":"Knorr","raw_price":17,"raw_type":"integer","sanitized_price":17}
+{"name":"Knorr","raw_price":6,"raw_type":"integer","sanitized_price":6}
+{"name":"Knorr","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"Knorr","raw_price":6,"raw_type":"integer","sanitized_price":6}
+{"name":"Knorr","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Knorr","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Knorr","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Knorr","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Knorr","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Knorr","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Knorr","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Knorr","raw_price":15,"raw_type":"integer","sanitized_price":15}
+{"name":"Knorr","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Knorr","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Knorr","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Knorr","raw_price":50,"raw_type":"integer","sanitized_price":50}
+{"name":"Knorr","raw_price":8,"raw_type":"integer","sanitized_price":8}
+{"name":"El Doha","raw_price":210,"raw_type":"integer","sanitized_price":210}
+{"name":"El Doha","raw_price":42,"raw_type":"integer","sanitized_price":42}
+{"name":"Crystal","raw_price":160,"raw_type":"integer","sanitized_price":160}
+{"name":"Abou Auf Coffee","raw_price":85,"raw_type":"integer","sanitized_price":85}
+{"name":"El Maleka Pasta","raw_price":36,"raw_type":"integer","sanitized_price":36}
+{"name":"El Maleka Pasta","raw_price":36,"raw_type":"integer","sanitized_price":36}
+{"name":"El Maleka Pasta","raw_price":36,"raw_type":"integer","sanitized_price":36}
+{"name":"El Maleka Pasta","raw_price":36,"raw_type":"integer","sanitized_price":36}
+{"name":"El Alamia","raw_price":17,"raw_type":"integer","sanitized_price":17}
+{"name":"El Alamia","raw_price":17,"raw_type":"integer","sanitized_price":17}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"El Alamia","raw_price":19,"raw_type":"integer","sanitized_price":19}
+{"name":"Bakhira Milk","raw_price":45,"raw_type":"integer","sanitized_price":45}
+{"name":"Bakhira Milk","raw_price":28,"raw_type":"integer","sanitized_price":28}
+{"name":"Juhayna Juice","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Juhayna Juice","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Juhayna Juice","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Juhayna Juice","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Juhayna Juice","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Juhayna Juice","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Juhayna Juice","raw_price":40,"raw_type":"integer","sanitized_price":40}
+{"name":"Juhayna Juice","raw_price":40,"raw_type":"integer","sanitized_price":40}
+{"name":"Juhayna Juice","raw_price":40,"raw_type":"integer","sanitized_price":40}
+{"name":"Juhayna Juice","raw_price":40,"raw_type":"integer","sanitized_price":40}
+{"name":"Juhayna Juice","raw_price":40,"raw_type":"integer","sanitized_price":40}
+{"name":"Juhayna Pure Juice","raw_price":64,"raw_type":"integer","sanitized_price":64}
+{"name":"Juhayna Milk","raw_price":73,"raw_type":"integer","sanitized_price":73}
+{"name":"Lamtna Pasta","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Lamtna Pasta","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Lamtna Pasta","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Lamtna Pasta","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Lamtna Pasta","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Lamtna Pasta","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Lamtna Pasta","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Lamtna Pasta","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Lamtna Pasta","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Lamtna Pasta","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Lamtna Pasta","raw_price":30,"raw_type":"integer","sanitized_price":30}
+{"name":"Lamar Milk","raw_price":55,"raw_type":"integer","sanitized_price":55}
+{"name":"El Matbakh Pasta","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"El Matbakh Pasta","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"El Matbakh Pasta","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"El Matbakh Pasta","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"El Matbakh Pasta","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Nestl\u00e9","raw_price":6,"raw_type":"integer","sanitized_price":6}
+{"name":"Heinz","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Cake Mix","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Cake Mix","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Cake Mix","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Cake Mix","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Dream Raw Mix","raw_price":65,"raw_type":"integer","sanitized_price":65}
+{"name":"Dream Raw Mix","raw_price":65,"raw_type":"integer","sanitized_price":65}
+{"name":"Dream Raw Mix","raw_price":65,"raw_type":"integer","sanitized_price":65}
+{"name":"Dream Choco","raw_price":27,"raw_type":"integer","sanitized_price":27}
+{"name":"Fruity Powder Drink","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Fruity Powder Drink","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Fruity Powder Drink","raw_price":5,"raw_type":"integer","sanitized_price":5}
+{"name":"Dream Jelly","raw_price":13.5,"raw_type":"double","sanitized_price":13.5}
+{"name":"Dream Jelly","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Dream Jelly","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Dream Jelly","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Dream Jelly","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Dream Jelly","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Dream Jelly","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Dream Jelly","raw_price":38,"raw_type":"integer","sanitized_price":38}
+{"name":"Dream","raw_price":37,"raw_type":"integer","sanitized_price":37}
+{"name":"Dream","raw_price":21,"raw_type":"integer","sanitized_price":21}
+{"name":"Dream","raw_price":3.5,"raw_type":"double","sanitized_price":3.5}
+{"name":"Dream","raw_price":4.5,"raw_type":"double","sanitized_price":4.5}
+{"name":"Dream","raw_price":1.5,"raw_type":"double","sanitized_price":1.5}
+{"name":"Dream","raw_price":2.5,"raw_type":"double","sanitized_price":2.5}
+{"name":"Dream","raw_price":7,"raw_type":"integer","sanitized_price":7}
+{"name":"Dream","raw_price":90,"raw_type":"integer","sanitized_price":90}
+{"name":"Dream","raw_price":22.5,"raw_type":"double","sanitized_price":22.5}
+{"name":"Dream","raw_price":20,"raw_type":"integer","sanitized_price":20}
+{"name":"Dream","raw_price":22,"raw_type":"integer","sanitized_price":22}
+{"name":"Dream","raw_price":6.5,"raw_type":"double","sanitized_price":6.5}
+{"name":"Al Arosa Tea","raw_price":58.5,"raw_type":"double","sanitized_price":58.5}
+{"name":"Al Arosa Tea","raw_price":36,"raw_type":"integer","sanitized_price":36}
+{"name":"Al Arosa Tea","raw_price":16,"raw_type":"integer","sanitized_price":16}
+{"name":"Al Arosa Premium Tea","raw_price":97.5,"raw_type":"double","sanitized_price":97.5}
+{"name":"Al Arosa Tea","raw_price":67,"raw_type":"integer","sanitized_price":67}
+{"name":"Al Arosa Tea","raw_price":26,"raw_type":"integer","sanitized_price":26}
+{"name":"Al Arosa Tea","raw_price":50,"raw_type":"integer","sanitized_price":50}
+{"name":"Lipton Tea","raw_price":77,"raw_type":"integer","sanitized_price":77}
+{"name":"Lipton Tea","raw_price":14,"raw_type":"integer","sanitized_price":14}
+{"name":"Lipton Tea","raw_price":37,"raw_type":"integer","sanitized_price":37}
+{"name":"Lipton Tea","raw_price":39,"raw_type":"integer","sanitized_price":39}
+{"name":"Lipton Tea","raw_price":39,"raw_type":"integer","sanitized_price":39}
+{"name":"Lipton Tea","raw_price":67,"raw_type":"integer","sanitized_price":67}
+{"name":"Lipton Tea","raw_price":67,"raw_type":"integer","sanitized_price":67}
+{"name":"Lipton Tea","raw_price":21,"raw_type":"integer","sanitized_price":21}
+{"name":"Lipton Tea","raw_price":21,"raw_type":"integer","sanitized_price":21}
+{"name":"Lipton Tea","raw_price":70,"raw_type":"integer","sanitized_price":70}
+{"name":"Lipton Tea","raw_price":39,"raw_type":"integer","sanitized_price":39}
+{"name":"Oman Powdered Juice","raw_price":64,"raw_type":"integer","sanitized_price":64}
+{"name":"Oman Powdered Juice","raw_price":64,"raw_type":"integer","sanitized_price":64}
+{"name":"Oman Powdered Juice","raw_price":64,"raw_type":"integer","sanitized_price":64}
+{"name":"Oman Powdered Juice","raw_price":64,"raw_type":"integer","sanitized_price":64}
+{"name":"Oman Powdered Juice","raw_price":62,"raw_type":"integer","sanitized_price":62}
+{"name":"Oman Powdered Juice","raw_price":8,"raw_type":"integer","sanitized_price":8}
+{"name":"Oman Powdered Juice","raw_price":8,"raw_type":"integer","sanitized_price":8}
+{"name":"Oman Powdered Juice","raw_price":8,"raw_type":"integer","sanitized_price":8}
+{"name":"Oman Powdered Juice","raw_price":104,"raw_type":"integer","sanitized_price":104}
+{"name":"Oman Powdered Juice","raw_price":11,"raw_type":"integer","sanitized_price":11}
+{"name":"Oman Powdered Juice","raw_price":9,"raw_type":"integer","sanitized_price":9}
+{"name":"Crystal Oil","raw_price":85,"raw_type":"integer","sanitized_price":85}
+{"name":"Crystal Oil","raw_price":115,"raw_type":"integer","sanitized_price":115}
+{"name":"Crystal Oil","raw_price":188,"raw_type":"integer","sanitized_price":188}
+{"name":"Crystal Oil","raw_price":236,"raw_type":"integer","sanitized_price":236}
+{"name":"Crystal Oil","raw_price":67,"raw_type":"integer","sanitized_price":67}
+{"name":"Crystal Oil","raw_price":95,"raw_type":"integer","sanitized_price":95}
+{"name":"Crystal Oil","raw_price":160,"raw_type":"integer","sanitized_price":160}
+{"name":"Crystal Oil","raw_price":200,"raw_type":"integer","sanitized_price":200}
+{"name":"El Momtaz Oil","raw_price":80,"raw_type":"integer","sanitized_price":80}
+{"name":"El Momtaz Oil","raw_price":55,"raw_type":"integer","sanitized_price":55}
+{"name":"Crystal Ghee","raw_price":80,"raw_type":"integer","sanitized_price":80}
+{"name":"Crystal Ghee","raw_price":150,"raw_type":"integer","sanitized_price":150}
+{"name":"Crystal Ghee","raw_price":205,"raw_type":"integer","sanitized_price":205}
+{"name":"Halawa Oil","raw_price":60,"raw_type":"integer","sanitized_price":60}
+{"name":"Halawa Oil","raw_price":75,"raw_type":"integer","sanitized_price":75}
+{"name":"Rawabi Ghee","raw_price":150,"raw_type":"integer","sanitized_price":150}
+{"name":"Ganna Ghee","raw_price":150,"raw_type":"integer","sanitized_price":150}
+{"name":"Ganna Ghee","raw_price":85,"raw_type":"integer","sanitized_price":85}
+{"name":"Rawabi Ghee","raw_price":85,"raw_type":"integer","sanitized_price":85}
+{"name":"Afia Oil","raw_price":225,"raw_type":"integer","sanitized_price":225}
+{"name":"Slaite Oil","raw_price":65,"raw_type":"integer","sanitized_price":65}
+{"name":"Slaite Oil","raw_price":185,"raw_type":"integer","sanitized_price":185}
+{"name":"Almarai","raw_price":13,"raw_type":"integer","sanitized_price":13}
+{"name":"Juhayna","raw_price":13,"raw_type":"integer","sanitized_price":13}
