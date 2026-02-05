@@ -20,8 +20,8 @@ class UpdateProductImagesImport implements ToModel, WithHeadingRow
     public function model(array $row)
     {
         // Get name columns from the row
-        $nameEn = $row['name_en'] ?? $row['description_en'] ?? null;
-        $nameAr = $row['name_ar'] ?? $row['description_ar'] ?? null;
+        $nameEn = $row['description_en'];
+        $nameAr = $row['description_ar'];
         
         if (!$nameEn && !$nameAr) {
             Log::warning('UpdateProductImagesImport: No name found in row', $row);
