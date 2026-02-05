@@ -28,20 +28,13 @@ class ProductsImport implements ToModel, WithHeadingRow
         }
         $basePrice = floatval($basePrice);
 
-        // Direct debug debugging to a file we can access
-        $debugLine = json_encode([
-            'name' => $row['name_en'] ?? $row['description_en'],
-            'raw_price' => $row['base_price'],
-            'raw_type' => gettype($row['base_price']),
-            'sanitized_price' => $basePrice
-        ]) . "\n";
-        file_put_contents('c:\Users\Administrator\Desktop\makook\makook\import_debug.txt', $debugLine, FILE_APPEND);
-
         Log::info('Importing Product Row:', [
             'name' => $row['name_en'] ?? $row['description_en'],
             'raw_price' => $row['base_price'],
             'sanitized_price' => $basePrice
         ]);
+
+
 
         $product = new Product([
             'category_id'     => $row['category_id'] ?? null,
@@ -52,11 +45,12 @@ class ProductsImport implements ToModel, WithHeadingRow
             'description_ar'  => $row['description_ar'] ?? null,
             'quantity_en'     => $row['quantity_en'] ?? null,
             'quantity_ar'     => $row['quantity_ar'] ?? null,
-            'base_price'      => $basePrice,
+            // 'base_price'      => $basePrice, // Moved to explicit assignment below
             'offer_price'     => $row['offer_price'] ?? null,
             'is_active'       => true,
         ]);
 
+        $product->base_price = $basePrice;
         $product->save();
 
         // Handle image matching by N (number) column
