@@ -28,6 +28,15 @@ class ProductsImport implements ToModel, WithHeadingRow
         }
         $basePrice = floatval($basePrice);
 
+        // Direct debug debugging to a file we can access
+        $debugLine = json_encode([
+            'name' => $row['name_en'] ?? $row['description_en'],
+            'raw_price' => $row['base_price'],
+            'raw_type' => gettype($row['base_price']),
+            'sanitized_price' => $basePrice
+        ]) . "\n";
+        file_put_contents('c:\Users\Administrator\Desktop\makook\makook\import_debug.txt', $debugLine, FILE_APPEND);
+
         Log::info('Importing Product Row:', [
             'name' => $row['name_en'] ?? $row['description_en'],
             'raw_price' => $row['base_price'],
