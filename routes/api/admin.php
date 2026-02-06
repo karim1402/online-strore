@@ -275,6 +275,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', 'store');
                 Route::post('/{id}/duplicate', 'duplicate');
                 Route::post('/import', 'import');
+                Route::post('/import-check-missing', 'checkMissingProducts');
                 Route::post('/import-food', 'importFood');
                 Route::post('/update-images', 'updateImages');
             });
