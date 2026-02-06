@@ -831,6 +831,37 @@ class ProductController extends Controller
     }
 
     /**
+     * Check for missing products from Excel and generate report
+     */
+    public function checkMissingProducts(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            // Clear previous report
+            Storage::disk('local')->delete('missing_products.txt');
+
+            Excel::import(new \App\Imports\CheckMissingProductsImport, $request->file('file'));
+
+            if (Storage::disk('local')->exists('missing_products.txt')) {
+                $content = Storage::disk('local')->get('missing_products.txt');
+                $missingList = array_filter(explode("\n", $content));
+                return $this->successResponse(['missing_products' => array_values($missingList)], 'success.missing_products_checked');
+            }
+
+            return $this->successResponse(['missing_products' => []], 'success.no_missing_products');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Import food products from Excel (without images)
      */
     public function importFood(Request $request): JsonResponse
