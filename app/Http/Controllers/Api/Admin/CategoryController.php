@@ -333,7 +333,7 @@ class CategoryController extends Controller
 
             $categories = $query->orderBy('sort_order', 'asc')
                 ->orderBy('created_at', 'desc')
-                ->paginate($request->get('per_page', 15));
+                ->paginate($request->get('per_page', 1500));
 
             return $this->successResponse([
                 'module' => $module,
