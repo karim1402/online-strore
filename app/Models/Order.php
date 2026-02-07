@@ -8,10 +8,19 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 use App\Services\LocalizationService;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class Order extends Model
 {
     use HasFactory, LogsActivity, SoftDeletes;
+
+    /**
+     * Serialize dates without converting to UTC
+     */
+    protected function serializeDate(DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
     protected $fillable = [
         'order_number',
