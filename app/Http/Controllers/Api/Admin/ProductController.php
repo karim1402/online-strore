@@ -45,6 +45,13 @@ class ProductController extends Controller
                 $query->where('category_id', $request->category_id);
             }
 
+            // Filter by module (through category)
+            if ($request->filled('module_id')) {
+                $query->whereHas('category', function ($q) use ($request) {
+                    $q->where('module_id', $request->module_id);
+                });
+            }
+
             // Filter by active status
             if ($request->has('is_active')) {
                 $query->where('is_active', $request->boolean('is_active'));
