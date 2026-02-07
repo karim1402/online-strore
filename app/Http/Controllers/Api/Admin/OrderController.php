@@ -367,9 +367,55 @@ class OrderController extends Controller
 
             $order->load(['user', 'store', 'items.options', 'items.addons']);
 
+            // Send FCM notification to all available delivery users
+            $this->notifyDeliveryUsers($order);
+
             return $this->successResponse($order, 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Send FCM notifications to all available delivery users
+     */
+    private function notifyDeliveryUsers(Order $order): void
+    {
+        try {
+            // Get all available delivery users with FCM tokens
+            $deliveryUsers = \App\Models\Delivery::where('status', true)
+                ->where('availability', true)
+                ->whereNotNull('fcm_token')
+                ->get();
+
+            if ($deliveryUsers->isEmpty()) {
+                \Illuminate\Support\Facades\Log::info('No available delivery users to notify for order: ' . $order->order_number);
+                return;
+            }
+
+            $tokens = $deliveryUsers->pluck('fcm_token')->toArray();
+
+            $fcmService = app(\App\Services\FcmService::class);
+
+            $title = 'New Order Ready for Pickup!';
+            $body = "Order #{$order->order_number} is ready to pick from " . ($order->store->name_en ?? 'store');
+
+            $data = [
+                'type' => 'order_ready_to_pick',
+                'order_id' => (string) $order->id,
+                'order_number' => $order->order_number,
+                'store_id' => (string) $order->store_id,
+            ];
+
+            $result = $fcmService->sendToMultiple($tokens, $title, $body, $data);
+
+            \Illuminate\Support\Facades\Log::info('Delivery notification sent for order: ' . $order->order_number, [
+                'tokens_count' => count($tokens),
+                'success' => $result['success'] ?? 0,
+                'failure' => $result['failure'] ?? 0,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send delivery notification: ' . $e->getMessage());
         }
     }
 
