@@ -145,6 +145,9 @@ class OrderController extends Controller
 
             $order->load(['store', 'branch', 'user', 'items.options', 'items.addons', 'delivery']);
 
+            // Notify client that order has been picked up
+            $this->notifyClientOrderPicked($order, $delivery);
+
             return $this->successResponse($order, 'order.picked_successfully');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -231,6 +234,42 @@ class OrderController extends Controller
             ], 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Send FCM notification to the client when order is picked up
+     */
+    private function notifyClientOrderPicked(Order $order, $delivery): void
+    {
+        try {
+            // Check if the order has a user with FCM token
+            if (!$order->user || !$order->user->fcm_token) {
+                \Illuminate\Support\Facades\Log::info('No FCM token for client of order: ' . $order->order_number);
+                return;
+            }
+
+            $fcmService = app(\App\Services\FcmService::class);
+
+            $title = 'Your Order is On The Way!';
+            $body = "Order #{$order->order_number} has been picked up by {$delivery->name} and is on the way to you.";
+
+            $data = [
+                'type' => 'order_picked',
+                'order_id' => (string) $order->id,
+                'order_number' => $order->order_number,
+                'delivery_name' => $delivery->name,
+            ];
+
+            $success = $fcmService->sendNotification($order->user->fcm_token, $title, $body, $data);
+
+            \Illuminate\Support\Facades\Log::info('Client notification sent for order pickup: ' . $order->order_number, [
+                'user_id' => $order->user->id,
+                'delivery_id' => $delivery->id,
+                'success' => $success,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send client pickup notification: ' . $e->getMessage());
         }
     }
 }

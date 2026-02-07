@@ -370,6 +370,9 @@ class OrderController extends Controller
             // Send FCM notification to all available delivery users
             $this->notifyDeliveryUsers($order);
 
+            // Send FCM notification to the client (order user)
+            $this->notifyClient($order);
+
             return $this->successResponse($order, 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -416,6 +419,40 @@ class OrderController extends Controller
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send delivery notification: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Send FCM notification to the client (order user)
+     */
+    private function notifyClient(Order $order): void
+    {
+        try {
+            // Check if the order has a user with FCM token
+            if (!$order->user || !$order->user->fcm_token) {
+                \Illuminate\Support\Facades\Log::info('No FCM token for client of order: ' . $order->order_number);
+                return;
+            }
+
+            $fcmService = app(\App\Services\FcmService::class);
+
+            $title = 'Your Order is Ready!';
+            $body = "Order #{$order->order_number} is ready and will be picked up soon.";
+
+            $data = [
+                'type' => 'order_ready',
+                'order_id' => (string) $order->id,
+                'order_number' => $order->order_number,
+            ];
+
+            $success = $fcmService->sendNotification($order->user->fcm_token, $title, $body, $data);
+
+            \Illuminate\Support\Facades\Log::info('Client notification sent for order: ' . $order->order_number, [
+                'user_id' => $order->user->id,
+                'success' => $success,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send client notification: ' . $e->getMessage());
         }
     }
 
