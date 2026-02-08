@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -29,7 +30,7 @@ class ChatController extends Controller
             return $this->errorResponse('errors.validation_failed', $validator->errors(), 422);
         }
 
-        $order = Order::where('id', $orderId)
+        $order = Order::with('user')->where('id', $orderId)
             ->where('delivery_id', $delivery->id)
             ->first();
 
@@ -50,6 +51,47 @@ class ChatController extends Controller
             $delivery->name
         ))->toOthers();
 
+        // Send FCM notification to user
+        $this->notifyUser($order, $delivery, $request->message);
+
         return $this->successResponse(null, 'Message sent successfully');
+    }
+
+    /**
+     * Send FCM notification to the user
+     */
+    private function notifyUser(Order $order, $delivery, string $message): void
+    {
+        try {
+            if (!$order->user || !$order->user->fcm_token) {
+                Log::info('No FCM token for user of order: ' . $order->order_number);
+                return;
+            }
+
+            $fcmService = app(\App\Services\FcmService::class);
+
+            $title = "Message from {$delivery->name}";
+            $body = mb_strlen($message) > 100 ? mb_substr($message, 0, 100) . '...' : $message;
+
+            $data = [
+                'type' => 'chat_message',
+                'order_id' => (string) $order->id,
+                'order_number' => $order->order_number,
+                'channel_id' => 'order.' . $order->id,
+                'sender_type' => 'delivery',
+                'sender_id' => (string) $delivery->id,
+                'sender_name' => $delivery->name,
+                'message' => $message,
+            ];
+
+            $success = $fcmService->sendNotification($order->user->fcm_token, $title, $body, $data);
+
+            Log::info('Chat notification sent to user for order: ' . $order->order_number, [
+                'user_id' => $order->user->id,
+                'success' => $success,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to send chat notification to user: ' . $e->getMessage());
+        }
     }
 }
