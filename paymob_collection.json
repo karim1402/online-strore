@@ -23,7 +23,7 @@
                 ],
                 "body": {
                     "mode": "raw",
-                    "raw": "{\n    \"address_id\": 1\n}",
+                    "raw": "{\n    \"address_id\": 1,\n    \"voucher_code\": \"\"\n}",
                     "options": {
                         "raw": {
                             "language": "json"
