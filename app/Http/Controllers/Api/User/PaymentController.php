@@ -107,7 +107,7 @@ class PaymentController extends Controller
                 'items' => $items,
                 'billing_data' => $billingData,
                 'special_reference' => $specialReference,
-                'notification_url' => route('api.user.payments.webhook'),
+                'notification_url' => route('user.payments.webhook'),
             ];
 
             $result = $this->paymobService->createPaymentIntention($paymentData);
