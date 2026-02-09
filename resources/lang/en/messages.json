@@ -139,7 +139,8 @@
         "invalid_verification_code": "Invalid verification code",
         "verification_code_expired": "Verification code expired",
         "current_password_incorrect": "Current password incorrect",
-        "invalid_voucher": "Invalid voucher code"
+        "invalid_voucher": "Invalid voucher code",
+        "address_outside_service_area": "Sorry, we do not currently deliver to this area."
     },
     "validation": {
         "required": "The :attribute field is required",

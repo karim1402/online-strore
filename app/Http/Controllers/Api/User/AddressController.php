@@ -16,6 +16,41 @@ class AddressController extends Controller
 {
     use ApiResponse;
 
+    // Service area center coordinates and radius
+    private const SERVICE_CENTER_LAT = 30.79080633963492;
+    private const SERVICE_CENTER_LNG = 30.997924804687504;
+    private const SERVICE_RADIUS_METERS = 6953.652886824231;
+
+    /**
+     * Check if coordinates are within the service area
+     * Uses Haversine formula to calculate distance
+     */
+    private function isWithinServiceArea(?float $lat, ?float $lng): bool
+    {
+        if ($lat === null || $lng === null) {
+            return true; // Allow addresses without coordinates
+        }
+
+        $earthRadius = 6371000; // Earth's radius in meters
+
+        $latFrom = deg2rad(self::SERVICE_CENTER_LAT);
+        $lonFrom = deg2rad(self::SERVICE_CENTER_LNG);
+        $latTo = deg2rad($lat);
+        $lonTo = deg2rad($lng);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $a = sin($latDelta / 2) * sin($latDelta / 2) +
+             cos($latFrom) * cos($latTo) *
+             sin($lonDelta / 2) * sin($lonDelta / 2);
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        $distance = $earthRadius * $c;
+
+        return $distance <= self::SERVICE_RADIUS_METERS;
+    }
+
     /**
      * Get all addresses for the authenticated user
      */
@@ -102,6 +137,11 @@ class AddressController extends Controller
 
             if ($validator->fails()) {
                 return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            // Check if address is within service area
+            if (!$this->isWithinServiceArea($request->latitude, $request->longitude)) {
+                return $this->errorResponse('errors.address_outside_service_area', [], 422);
             }
 
             DB::beginTransaction();
@@ -192,6 +232,15 @@ class AddressController extends Controller
 
             if ($validator->fails()) {
                 return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            // Check if address is within service area (only if coordinates are being updated)
+            if ($request->has('latitude') || $request->has('longitude')) {
+                $lat = $request->latitude ?? $address->latitude;
+                $lng = $request->longitude ?? $address->longitude;
+                if (!$this->isWithinServiceArea($lat, $lng)) {
+                    return $this->errorResponse('errors.address_outside_service_area', [], 422);
+                }
             }
 
             DB::beginTransaction();

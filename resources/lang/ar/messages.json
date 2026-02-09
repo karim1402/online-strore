@@ -139,7 +139,8 @@
         "invalid_verification_code": "رمز التحقق غير صالح",
         "verification_code_expired": "انتهت صلاحية رمز التحقق",
         "current_password_incorrect": "كلمة المرور الحالية غير صحيحة",
-        "invalid_voucher": "رمز القسيمة غير صالح"
+        "invalid_voucher": "رمز القسيمة غير صالح",
+        "address_outside_service_area": "عذراً، نحن لا نوفر خدمة التوصيل لهذه المنطقة حالياً."
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
