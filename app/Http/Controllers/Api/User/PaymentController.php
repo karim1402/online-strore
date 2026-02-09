@@ -261,7 +261,7 @@ class PaymentController extends Controller
 
         // Calculate Totals
         $subtotal = $this->calculateCartTotal($cart);
-        $deliveryFee = 10.00;
+        $deliveryFee = 0.00;
         $tax = 0.00;
         
         // Re-apply voucher logic
