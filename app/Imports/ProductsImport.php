@@ -21,61 +21,79 @@ class ProductsImport implements ToModel, WithHeadingRow, WithCalculatedFormulas
     */
     public function model(array $row)
     {
-        // Sanitize base price
-        $basePrice = $row['base_price'];
-        // Remove commas if present and ensure it's a valid number format
-        if (is_string($basePrice)) {
-            $basePrice = str_replace(',', '', $basePrice);
-        }
-        $basePrice = floatval($basePrice);
-
-        Log::info('Importing Product Row:', [
-            'name' => $row['name_en'] ?? $row['description_en'],
-            'raw_price' => $row['base_price'],
-            'sanitized_price' => $basePrice
-        ]);
-
-
-
-        $product = new Product([
-            'category_id'     => $row['category_id'] ?? null,
-            'subcategory_id'  => $row['subcategory_id'] ?? null,
-            'name_en'         => $row['description_en'] ?? $row['name_en'] ?? null, 
-            'name_ar'         => $row['description_ar'] ?? $row['name_ar'] ?? null,
-            'description_en'  => $row['description_en'] ?? null,
-            'description_ar'  => $row['description_ar'] ?? null,
-            'quantity_en'     => $row['quantity_en'] ?? null,
-            'quantity_ar'     => $row['quantity_ar'] ?? null,
-            // 'base_price'      => $basePrice, // Moved to explicit assignment below
-            'offer_price'     => $row['offer_price'] ?? null,
-            'is_active'       => true,
-        ]);
-
-        $product->base_price = $basePrice;
-        $product->save();
-
-        // Handle image matching by N (number) column
-        $number = $row['n'] ?? null;
-        $storagePath = 'products/LLlZrhjVe9XKJYitHQ9WHSKPXtoKC9NG8siomwl8.jpg'; // Default fallback image
-        
-        if ($number) {
-            $imagePath = base_path('images2/' . $number . '.png');
-            
-            if (File::exists($imagePath)) {
-                // Copy image to storage
-                $storagePath = 'products/' . $number . '.png';
-                Storage::disk('public')->put($storagePath, File::get($imagePath));
+        try {
+            // Sanitize base price
+            $basePrice = $row['base_price'];
+            // Remove commas if present and ensure it's a valid number format
+            if (is_string($basePrice)) {
+                $basePrice = str_replace(',', '', $basePrice);
             }
-        }
-        
-        // Create ProductImage record (uses matched image or fallback)
-        ProductImage::create([
-            'product_id' => $product->id,
-            'image_path' => $storagePath,
-            'is_primary' => true,
-            'sort_order' => 0,
-        ]);
+            $basePrice = floatval($basePrice);
 
-        return null; // Return null since we already saved the product
+            // Sanitize offer price
+            $offerPrice = $row['offer_price'] ?? null;
+            if ($offerPrice !== null && $offerPrice !== '') {
+                $offerPrice = str_replace(',', '', (string)$offerPrice);
+                if (!is_numeric($offerPrice)) {
+                    $offerPrice = null; // Invalid price (e.g. text), treat as no offer
+                } else {
+                    $offerPrice = floatval($offerPrice);
+                }
+            } else {
+                $offerPrice = null;
+            }
+
+            Log::info('Importing Product Row:', [
+                'name' => $row['name_en'] ?? $row['description_en'],
+                'raw_price' => $row['base_price'],
+                'sanitized_price' => $basePrice,
+                'offer_price' => $offerPrice
+            ]);
+
+            $product = new Product([
+                'category_id'     => (isset($row['category_id']) && $row['category_id'] !== '') ? $row['category_id'] : null,
+                'subcategory_id'  => (isset($row['subcategory_id']) && $row['subcategory_id'] !== '') ? $row['subcategory_id'] : null,
+                'name_en'         => $row['description_en'] ,
+                'name_ar'         => $row['description_ar'] ,
+                'description_en'  => $row['description_en'] ,
+                'description_ar'  => $row['description_ar'] ,
+                'quantity_en'     => $row['quantity_en'] ?? null,
+                'quantity_ar'     => $row['quantity_ar'] ?? null,
+                // 'base_price'      => $basePrice, // Moved to explicit assignment below
+                'offer_price'     => $offerPrice ?? null,
+                'is_active'       => true,
+            ]);
+
+            $product->base_price = $basePrice;
+            $product->save();
+
+            // Handle image matching by N (number) column
+            $number = $row['n'] ?? null;
+            $storagePath = 'products/LLlZrhjVe9XKJYitHQ9WHSKPXtoKC9NG8siomwl8.jpg'; // Default fallback image
+            
+            if ($number) {
+                $imagePath = base_path('images2/' . $number . '.png');
+                
+                if (File::exists($imagePath)) {
+                    // Copy image to storage
+                    $storagePath = 'products/' . $number . '.png';
+                    Storage::disk('public')->put($storagePath, File::get($imagePath));
+                }
+            }
+            
+            // Create ProductImage record (uses matched image or fallback)
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => $storagePath,
+                'is_primary' => true,
+                'sort_order' => 0,
+            ]);
+
+            return null; // Return null since we already saved the product
+
+        } catch (\Throwable $e) {
+            Log::error('Product Import Failed at Row: ' . json_encode($row) . ' Error: ' . $e->getMessage());
+            throw $e;
+        }
     }
 }
