@@ -37,13 +37,13 @@ class OrderController extends Controller
                 });
             }
 
-            $perPage = (int) $request->get('per_page', 15);
-            if ($perPage <= 0) {
-                $perPage = 15;
-            }
-            if ($perPage > 100) {
-                $perPage = 100;
-            }
+            $perPage = (int) $request->get('per_page', 15) ?? 15;
+            // if ($perPage <= 0) {
+            //     $perPage = 15;
+            // }
+            // if ($perPage > 100) {
+            //     $perPage = 100;
+            // }
 
             $orders = $query->paginate($perPage);
 
