@@ -87,7 +87,7 @@ class PaymobService
             'is_refunded',
             'is_standalone_payment',
             'is_voided',
-            'order',
+            'order.id',
             'owner',
             'pending',
             'source_data.pan',
