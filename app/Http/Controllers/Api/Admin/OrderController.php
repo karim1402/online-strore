@@ -12,6 +12,32 @@ class OrderController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * Get order statistics for dashboard
+     */
+    public function statistics(): JsonResponse
+    {
+        try {
+            $totalOrders = Order::count();
+            $pendingOrders = Order::where('simple_status', 'in_progress')->count();
+            $processingOrders = Order::where('simple_status', 'ready_to_pick')->count();
+            $deliveredOrders = Order::where('simple_status', 'delivered')->count();
+            $revenue = Order::where('simple_status', 'delivered')
+                // ->where('payment_status', 'paid')
+                ->sum('total');
+
+            return $this->successResponse([
+                'total_orders' => $totalOrders,
+                'pending' => $pendingOrders,
+                'processing' => $processingOrders,
+                'delivered' => $deliveredOrders,
+                'revenue' => round($revenue, 2),
+            ], 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
