@@ -52,6 +52,33 @@ class AddressController extends Controller
     }
 
     /**
+     * Check if coordinates are within the service area
+     */
+    public function checkServiceArea(Request $request): JsonResponse
+    {
+        $validator = ValidationService::make($request->all(), [
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->validationErrorWithFirstMessage($validator);
+        }
+
+        $isWithinArea = $this->isWithinServiceArea(
+            (float) $request->latitude,
+            (float) $request->longitude
+        );
+
+        return $this->successResponse([
+            'is_within_service_area' => $isWithinArea,
+            'message' => $isWithinArea 
+                ? __('messages.success.location_within_service_area')
+                : __('messages.errors.address_outside_service_area')
+        ], 'success.data_retrieved');
+    }
+
+    /**
      * Get all addresses for the authenticated user
      */
     public function index(Request $request): JsonResponse

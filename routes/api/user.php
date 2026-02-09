@@ -137,6 +137,9 @@ Route::prefix('user')->group(function () {
     // Home Ads route (public)
     Route::get('home-ads', [\App\Http\Controllers\Api\User\HomeAdController::class, 'index'])->name('user.home-ads.index');
     
+    // Check Service Area (public)
+    Route::post('check-service-area', [AddressController::class, 'checkServiceArea'])->name('user.check-service-area');
+    
     // Test route without authentication
     Route::get('test', function () {
         $message = \App\Services\LocalizationService::getMessage('success.api_working');
