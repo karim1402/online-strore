@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'client_app' => [
+        'public_key' => env('PUBLIC_KEY'),
+        'client_secret' => env('CLIENT_SECRET'),
+    ],
+
 ];

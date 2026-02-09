@@ -139,6 +139,9 @@ Route::prefix('user')->group(function () {
     
     // Check Service Area (public)
     Route::post('check-service-area', [AddressController::class, 'checkServiceArea'])->name('user.check-service-area');
+
+    // App Settings (public)
+    Route::get('settings', [\App\Http\Controllers\Api\User\SettingsController::class, 'index'])->name('user.settings');
     
     // Test route without authentication
     Route::get('test', function () {
