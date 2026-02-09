@@ -12,7 +12,9 @@ use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Support\Facades\Log;
 
-class ProductsImport implements ToModel, WithHeadingRow, WithCalculatedFormulas
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+
+class ProductsImport implements ToModel, WithHeadingRow, WithCalculatedFormulas, SkipsOnError
 {
     /**
     * @param array $row
@@ -40,10 +42,10 @@ class ProductsImport implements ToModel, WithHeadingRow, WithCalculatedFormulas
         $product = new Product([
             'category_id'     => $row['category_id'] ?? null,
             'subcategory_id'  => $row['subcategory_id'] ?? null,
-            'name_en'         => $row['description_en'] ?? $row['name_en'] ?? null, 
-            'name_ar'         => $row['description_ar'] ?? $row['name_ar'] ?? null,
-            'description_en'  => $row['description_en'] ?? null,
-            'description_ar'  => $row['description_ar'] ?? null,
+            'name_en'         => $row['description_en'] ,
+            'name_ar'         => $row['description_ar'] ,
+            'description_en'  => $row['description_en'] ,
+            'description_ar'  => $row['description_ar'] ,
             'quantity_en'     => $row['quantity_en'] ?? null,
             'quantity_ar'     => $row['quantity_ar'] ?? null,
             // 'base_price'      => $basePrice, // Moved to explicit assignment below
@@ -77,5 +79,9 @@ class ProductsImport implements ToModel, WithHeadingRow, WithCalculatedFormulas
         ]);
 
         return null; // Return null since we already saved the product
+    }
+    public function onError(\Throwable $e)
+    {
+        Log::error('Product Import Error: ' . $e->getMessage());
     }
 }
