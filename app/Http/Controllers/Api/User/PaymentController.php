@@ -92,6 +92,26 @@ class PaymentController extends Controller
                 ];
             }
 
+            // Add Delivery Fee item
+            if ($deliveryFee > 0) {
+                $items[] = [
+                    'name' => 'Delivery Fee',
+                    'amount' => (int) ($deliveryFee * 100),
+                    'description' => 'Delivery Fee',
+                    'quantity' => 1,
+                ];
+            }
+
+            // Add Tax item
+            if ($tax > 0) {
+                $items[] = [
+                    'name' => 'Tax',
+                    'amount' => (int) ($tax * 100),
+                    'description' => 'Tax',
+                    'quantity' => 1,
+                ];
+            }
+
             // Special reference includes user_id and address_id for reconstruction in webhook
             // Format: USER-{id}-ADDR-{id}-TS-{timestamp}
             $specialReference = sprintf(
