@@ -24,7 +24,7 @@ class PaymobService
      * Create a payment intention
      * 
      * @param array $data Order data
-     * @return arrayResponse from Paymob
+     * @return array from Paymob
      */
     public function createPaymentIntention(array $data)
     {
@@ -41,7 +41,7 @@ class PaymobService
                 'billing_data' => $data['billing_data'],
                 'special_reference' => $data['special_reference'] ?? null,
                 'notification_url' => $data['notification_url'] ?? route('api.payments.webhook'),
-                'redirection_url' => $data['redirection_url'] ?? 'https://www.google.com/', // Frontend URL
+                'redirection_url' => $data['redirection_url'] ?? 'https://makook.devdigitalvibes.com/payment/order', // User provided URL
             ];
 
             Log::info('Creating Paymob intention payload:', $payload);
