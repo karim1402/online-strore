@@ -1,0 +1,145 @@
+{
+    "info": {
+        "_postman_id": "paymob-integration-v1",
+        "name": "Paymob Integration - Makook",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create Payment Intention",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{user_token}}",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"address_id\": 1\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/user/payments/create-intention",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "user",
+                        "payments",
+                        "create-intention"
+                    ]
+                },
+                "description": "Initiates a payment intention. Creates a Paymob order from the user's current cart and returns the client secret."
+            },
+            "response": []
+        },
+        {
+            "name": "Webhook (Simulate Success)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"obj\": {\n        \"id\": 123456789,\n        \"success\": true,\n        \"amount_cents\": 15000,\n        \"currency\": \"EGP\",\n        \"order\": {\n            \"id\": 987654321,\n            \"merchant_order_id\": \"USER-1-ADDR-1-TS-1707515000\"\n        },\n        \"source_data\": {\n            \"type\": \"card\",\n            \"pan\": \"2345\",\n            \"sub_type\": \"Visa\"\n        },\n        \"data\": {\n            \"message\": \"Approved\"\n        }\n    }\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/user/payments/webhook?hmac={{mock_hmac}}",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "user",
+                        "payments",
+                        "webhook"
+                    ],
+                    "query": [
+                        {
+                            "key": "hmac",
+                            "value": "{{mock_hmac}}"
+                        }
+                    ]
+                },
+                "description": "Simulates a successful payment webhook from Paymob. \n\n**Note:** You must update the `merchant_order_id` in the body to match the `special_reference` returned from the Create Intention request for this to work correctly (format: `USER-{id}-ADDR-{id}-TS-{timestamp}`)."
+            },
+            "response": []
+        },
+        {
+            "name": "Webhook (Simulate Failure)",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"obj\": {\n        \"id\": 123456790,\n        \"success\": false,\n        \"amount_cents\": 15000,\n        \"currency\": \"EGP\",\n        \"order\": {\n            \"id\": 987654322,\n            \"merchant_order_id\": \"USER-1-ADDR-1-TS-1707515000\"\n        },\n        \"source_data\": {\n            \"type\": \"card\",\n            \"pan\": \"2345\",\n            \"sub_type\": \"Visa\"\n        },\n        \"data\": {\n            \"message\": \"Declined\"\n        }\n    }\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "{{base_url}}/api/user/payments/webhook",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "user",
+                        "payments",
+                        "webhook"
+                    ]
+                },
+                "description": "Simulates a failed payment webhook from Paymob."
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        },
+        {
+            "key": "user_token",
+            "value": "YOUR_BEARER_TOKEN_HERE",
+            "type": "string"
+        },
+        {
+            "key": "mock_hmac",
+            "value": "mock_hmac_value",
+            "type": "string"
+        }
+    ]
+}
