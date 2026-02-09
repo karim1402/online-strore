@@ -59,7 +59,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithCalculatedFormulas
         $storagePath = 'products/LLlZrhjVe9XKJYitHQ9WHSKPXtoKC9NG8siomwl8.jpg'; // Default fallback image
         
         if ($number) {
-            $imagePath = base_path('images/' . $number . '.png');
+            $imagePath = base_path('images2/' . $number . '.png');
             
             if (File::exists($imagePath)) {
                 // Copy image to storage
