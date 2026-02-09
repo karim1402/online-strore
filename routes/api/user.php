@@ -140,6 +140,10 @@ Route::prefix('user')->group(function () {
     // Check Service Area (public)
     Route::post('check-service-area', [AddressController::class, 'checkServiceArea'])->name('user.check-service-area');
 
+    // Payment Routes (public/protected)
+    Route::post('payments/webhook', [\App\Http\Controllers\Api\User\PaymentController::class, 'webhook'])->name('user.payments.webhook');
+    Route::middleware('auth:api')->post('payments/create-intention', [\App\Http\Controllers\Api\User\PaymentController::class, 'createIntention'])->name('user.payments.create-intention');
+
     // App Settings (public)
     Route::get('settings', [\App\Http\Controllers\Api\User\SettingsController::class, 'index'])->name('user.settings');
     
