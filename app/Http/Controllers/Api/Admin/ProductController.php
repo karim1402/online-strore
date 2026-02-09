@@ -45,6 +45,11 @@ class ProductController extends Controller
                 $query->where('category_id', $request->category_id);
             }
 
+            // Filter by subcategory
+            if ($request->filled('subcategory_id')) {
+                $query->where('subcategory_id', $request->subcategory_id);
+            }
+
             // Filter by module (through category)
             if ($request->filled('module_id')) {
                 $query->whereHas('category', function ($q) use ($request) {
