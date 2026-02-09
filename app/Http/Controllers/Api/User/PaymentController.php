@@ -76,9 +76,22 @@ class PaymentController extends Controller
 
             // Calculate total
             $subtotal = $this->calculateCartTotal($cart);
-            $deliveryFee = 10.00; // Placeholder
+            $deliveryFee = 0.00; // Placeholder
             $tax = 0.00;
-            $total = $subtotal + $deliveryFee + $tax;
+
+            // Apply Voucher
+            $discount = 0.00;
+            $voucher = null;
+            if ($request->filled('voucher_code')) {
+                $voucher = \App\Models\Voucher::where('code', $request->voucher_code)->first();
+                if ($voucher && $voucher->isValidForUser($user, $subtotal)) {
+                    $discount = $voucher->getDiscountAmount($subtotal);
+                } else {
+                     return $this->errorResponse('errors.voucher_invalid', [], 422);
+                }
+            }
+
+            $total = max(0, $subtotal + $deliveryFee + $tax - $discount);
             $amountCents = (int) ($total * 100);
 
             // Prepare items data
@@ -112,12 +125,24 @@ class PaymentController extends Controller
                 ];
             }
 
-            // Special reference includes user_id and address_id for reconstruction in webhook
-            // Format: USER-{id}-ADDR-{id}-TS-{timestamp}
+            // Add Discount item (Negative)
+            if ($discount > 0) {
+                $items[] = [
+                    'name' => 'Discount',
+                    'amount' => -((int) ($discount * 100)),
+                    'description' => 'Voucher Discount',
+                    'quantity' => 1,
+                ];
+            }
+
+            // Special reference includes user_id, address_id, and voucher_id
+            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}
+            $voucherId = $voucher ? $voucher->id : 0;
             $specialReference = sprintf(
-                'USER-%d-ADDR-%d-TS-%d',
+                'USER-%d-ADDR-%d-VOUCHER-%d-TS-%d',
                 $user->id,
                 $address->id,
+                $voucherId,
                 time()
             );
 
@@ -137,6 +162,7 @@ class PaymentController extends Controller
                 'client_secret' => $result['client_secret'],
                 'intention_order_id' => $result['intention_order_id'],
                 'amount_cents' => $amountCents,
+                'discount' => $discount,
             ], 'success.payment_intention_created');
 
         } catch (\Exception $e) {
@@ -167,15 +193,21 @@ class PaymentController extends Controller
             $transactionId = $obj['id'];
             $specialReference = $obj['order']['merchant_order_id'] ?? null;
 
-            // 2. Parse Special Reference to get User and Address
-            // Format: USER-{id}-ADDR-{id}-TS-{timestamp}
-            if (!preg_match('/USER-(\d+)-ADDR-(\d+)-TS-(\d+)/', $specialReference, $matches)) {
+            // 2. Parse Special Reference
+            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}
+            // Fallback for old format without voucher: USER-{id}-ADDR-{id}-TS-{timestamp}
+            $voucherId = 0;
+            if (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)/', $specialReference, $matches)) {
+                $userId = $matches[1];
+                $addressId = $matches[2];
+                $voucherId = $matches[3];
+            } elseif (preg_match('/USER-(\d+)-ADDR-(\d+)-TS-(\d+)/', $specialReference, $matches)) {
+                $userId = $matches[1];
+                $addressId = $matches[2];
+            } else {
                 Log::error('Paymob Webhook: Invalid special reference ' . $specialReference);
                 return response()->json(['success' => false, 'message' => 'Invalid reference'], 400);
             }
-
-            $userId = $matches[1];
-            $addressId = $matches[2];
 
             // 3. Check duplicate transaction
             if (Payment::where('transaction_id', $transactionId)->exists()) {
@@ -187,7 +219,7 @@ class PaymentController extends Controller
                 DB::beginTransaction();
 
                 // 4. Create Order
-                $order = $this->createOrderFromCart($userId, $addressId, $transactionId, $obj);
+                $order = $this->createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $obj);
 
                 if (!$order) {
                     DB::rollBack();
@@ -216,7 +248,7 @@ class PaymentController extends Controller
     /**
      * Create Order Logic (Moved from OrderController)
      */
-    private function createOrderFromCart($userId, $addressId, $transactionId, $paymentObj)
+    private function createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $paymentObj)
     {
         $user = \App\Models\User::find($userId);
         $cart = Cart::with(['items.product', 'items.options', 'items.addons'])->where('user_id', $userId)->first();
@@ -231,7 +263,18 @@ class PaymentController extends Controller
         $subtotal = $this->calculateCartTotal($cart);
         $deliveryFee = 10.00;
         $tax = 0.00;
-        $total = $subtotal + $deliveryFee + $tax;
+        
+        // Re-apply voucher logic
+        $discount = 0.00;
+        $voucher = null;
+        if ($voucherId > 0) {
+            $voucher = \App\Models\Voucher::find($voucherId);
+            if ($voucher && $voucher->isValidForUser($user, $subtotal)) {
+                $discount = $voucher->getDiscountAmount($subtotal);
+            }
+        }
+
+        $total = max(0, $subtotal + $deliveryFee + $tax - $discount);
 
         // Create Order
         $order = Order::create([
@@ -247,9 +290,22 @@ class PaymentController extends Controller
             'subtotal' => $subtotal,
             'delivery_fee' => $deliveryFee,
             'tax' => $tax,
+            'discount' => $discount,
             'total' => $total,
             'is_cash_handed_over' => false, // Online payment already captured
         ]);
+
+        // Record Voucher Usage
+        if ($voucher && $discount > 0) {
+            \App\Models\VoucherUsage::create([
+                'user_id' => $user->id,
+                'voucher_id' => $voucher->id,
+                'order_id' => $order->id,
+                'discount_amount' => $discount,
+            ]);
+            
+            $voucher->increment('usage_count');
+        }
 
         // Create Order Items
         foreach ($cart->items as $cartItem) {
