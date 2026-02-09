@@ -6,12 +6,13 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 use Illuminate\Support\Facades\Log;
 
-class ProductsImport implements ToModel, WithHeadingRow
+class ProductsImport implements ToModel, WithHeadingRow, WithCalculatedFormulas
 {
     /**
     * @param array $row
