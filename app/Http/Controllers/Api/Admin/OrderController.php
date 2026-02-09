@@ -59,7 +59,12 @@ class OrderController extends Controller
             if ($request->filled('search')) {
                 $search = $request->search;
                 $query->where(function ($q) use ($search) {
-                    $q->where('order_number', 'like', "%{$search}%");
+                    $q->where('order_number', 'like', "%{$search}%")
+                      ->orWhereHas('user', function ($userQuery) use ($search) {
+                          $userQuery->where('name', 'like', "%{$search}%")
+                                    ->orWhere('email', 'like', "%{$search}%")
+                                    ->orWhere('phone', 'like', "%{$search}%");
+                      });
                 });
             }
 
@@ -82,7 +87,7 @@ class OrderController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $order = Order::with(['user', 'store', 'items.options', 'items.addons','branch', 'vendorInvoice'])
+            $order = Order::with(['user', 'store', 'items.product.images', 'items.options', 'items.addons', 'branch', 'vendorInvoice'])
                 ->find($id);
 
             if (!$order) {
