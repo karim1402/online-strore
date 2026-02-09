@@ -76,7 +76,8 @@
         "password_changed": "تم تغيير كلمة المرور بنجاح",
         "password_reset_successful": "تم إعادة تعيين كلمة المرور بنجاح",
         "reset_code_sent": "تم إرسال رمز إعادة التعيين بنجاح",
-        "module_ads_retrieved": "تم استرجاع إعلانات الوحدة بنجاح"
+        "module_ads_retrieved": "تم استرجاع إعلانات الوحدة بنجاح",
+        "location_within_service_area": "رائع! نحن نوفر خدمة التوصيل لهذه المنطقة"
     },
     "errors": {
         "no_users_with_tokens": "لم يتم العثور على مستخدمين لديهم رموز إشعارات نشطة",

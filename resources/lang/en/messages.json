@@ -76,7 +76,8 @@
         "password_changed": "Password changed successfully",
         "password_reset_successful": "Password reset successfully",
         "reset_code_sent": "Reset code sent successfully",
-        "module_ads_retrieved": "Module ads retrieved successfully"
+        "module_ads_retrieved": "Module ads retrieved successfully",
+        "location_within_service_area": "Great! We deliver to this area"
     },
     "errors": {
         "no_users_with_tokens": "No users found with active push notification tokens",
