@@ -41,7 +41,7 @@ class PaymobService
                 'billing_data' => $data['billing_data'],
                 'special_reference' => $data['special_reference'] ?? null,
                 'notification_url' => $data['notification_url'] ?? route('api.payments.webhook'),
-                'redirection_url' => $data['redirection_url'] ?? route('user.payments.result'), // Dynamically generated URL
+                'redirection_url' => $data['redirection_url'] ?? 'https://makook.devdigitalvibes.com/payment/order', // User provided URL
             ];
 
             Log::info('Creating Paymob intention payload:', $payload);
