@@ -7,5 +7,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/payment/order', [PaymentResultController::class, 'show'])->name('user.payments.result');
+
 
  
