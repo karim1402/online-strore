@@ -8,3 +8,4 @@ Route::get('/', function () {
 });
 
 
+Route::get('/payment/order', [PaymentResultController::class, 'show'])->name('user.payments.result');
