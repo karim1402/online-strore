@@ -21,6 +21,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     require base_path('routes/api/delivery.php');
                 });
         }
+        then: function ($router) {
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(function () {
+                    require base_path('routes/api/user.php');
+                    require base_path('routes/api/store.php');
+                    require base_path('routes/api/admin.php');
+                    require base_path('routes/api/delivery.php');
+                });
+        }
     )
     ->withMiddleware(function (Middleware $middleware): void {
         // Force JSON responses for API routes
