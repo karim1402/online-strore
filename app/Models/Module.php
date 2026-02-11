@@ -20,6 +20,7 @@ class Module extends Model
         'description_en',
         'description_ar',
         'image',
+        'image_ar',
         'status',
         'sort_order',
     ];
@@ -29,7 +30,7 @@ class Module extends Model
         'sort_order' => 'integer',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'image_ar_url'];
 
     public function stores()
     {
@@ -68,6 +69,14 @@ class Module extends Model
     {
         if ($this->image) {
             return Storage::disk('public')->url($this->image);
+        }
+        return null;
+    }
+
+    public function getImageArUrlAttribute()
+    {
+        if ($this->image_ar) {
+            return Storage::disk('public')->url($this->image_ar);
         }
         return null;
     }
