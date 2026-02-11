@@ -49,7 +49,7 @@ class Product extends Model
         'sort_order' => 'integer',
     ];
 
-    protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url', 'effective_price', 'quantity'];
+    protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url', 'effective_price', 'quantity', 'module_id'];
 
     /**
      * Get the effective price (offer price if set, otherwise base price)
@@ -77,6 +77,14 @@ class Product extends Model
              return \Illuminate\Support\Facades\Storage::disk('public')->url($this->best_seller_image);
         }
         return null;
+    }
+
+    /**
+     * Get the module id
+     */
+    public function getModuleIdAttribute()
+    {
+        return $this->category->module_id ?? null;
     }
 
     /**
