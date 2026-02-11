@@ -71,7 +71,7 @@
             @endif
         @endif
 
-        <a href="makook://payment/callback?success={{ $success ? 'true' : 'false' }}&id={{ $transactionId }}" 
+        <a id="return-app-btn" href="makook://payment?success={{ $success ? 'true' : 'false' }}&id={{ $transactionId }}" 
            class="inline-block w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200">
             Return to App
         </a>
@@ -84,8 +84,17 @@
     <!-- Auto-redirect script for mobile app deep linking -->
     <script>
         setTimeout(function() {
-            window.location.href = "makook://payment/callback?success={{ $success ? 'true' : 'false' }}&id={{ $transactionId }}";
-        }, 3000);
+            var url = "makook://payment?success={{ $success ? 'true' : 'false' }}&id={{ $transactionId }}";
+            
+            // Priority 1: Use window.location.replace (standard)
+            window.location.replace(url);
+            
+            // Priority 2: Fallback to simulated click if replace is ignored
+            setTimeout(function() {
+                var btn = document.getElementById('return-app-btn');
+                if (btn) btn.click();
+            }, 500);
+        }, 1000);
     </script>
 </body>
 </html>

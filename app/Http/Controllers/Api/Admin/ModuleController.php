@@ -66,6 +66,7 @@ class ModuleController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image_ar' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'status' => 'boolean',
                 'sort_order' => 'integer|min:0'
             ]);
@@ -80,6 +81,12 @@ class ModuleController extends Controller
             if ($request->hasFile('image')) {
                 $imagePath = $request->file('image')->store('modules', 'public');
                 $data['image'] = $imagePath;
+            }
+
+            // Handle Arabic image upload
+            if ($request->hasFile('image_ar')) {
+                $imageArPath = $request->file('image_ar')->store('modules', 'public');
+                $data['image_ar'] = $imageArPath;
             }
 
             $module = Module::create($data);
@@ -127,6 +134,7 @@ class ModuleController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'image' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image_ar' => 'nullable|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'status' => 'boolean',
                 'sort_order' => 'integer|min:0'
             ]);
@@ -146,6 +154,17 @@ class ModuleController extends Controller
                 
                 $imagePath = $request->file('image')->store('modules', 'public');
                 $data['image'] = $imagePath;
+            }
+
+            // Handle Arabic image upload
+            if ($request->hasFile('image_ar') && $request->file('image_ar')->isValid()) {
+                // Delete old image if exists
+                if ($module->image_ar && Storage::disk('public')->exists($module->image_ar)) {
+                    Storage::disk('public')->delete($module->image_ar);
+                }
+                
+                $imageArPath = $request->file('image_ar')->store('modules', 'public');
+                $data['image_ar'] = $imageArPath;
             }
 
             $module->update($data);
@@ -171,6 +190,11 @@ class ModuleController extends Controller
             // Delete associated image if exists
             if ($module->image && Storage::disk('public')->exists($module->image)) {
                 Storage::disk('public')->delete($module->image);
+            }
+
+            // Delete associated Arabic image if exists
+            if ($module->image_ar && Storage::disk('public')->exists($module->image_ar)) {
+                Storage::disk('public')->delete($module->image_ar);
             }
 
             $module->delete();
