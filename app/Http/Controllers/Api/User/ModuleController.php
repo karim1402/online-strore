@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Module;
 use App\Services\LocalizationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 
 class ModuleController extends Controller
 {
@@ -31,7 +32,7 @@ class ModuleController extends Controller
                 'name_ar' => $module->name_ar,
                 'description_en' => $module->description_en,
                 'description_ar' => $module->description_ar,
-                'image_url' => $module->image_url,
+                'image_url' => (App::getLocale() === 'ar' && $module->image_ar) ? $module->image_ar_url : $module->image_url,
                 'status' => $module->status,
                 'sort_order' => $module->sort_order,
             ];
@@ -77,7 +78,7 @@ class ModuleController extends Controller
             'name_ar' => $module->name_ar,
             'description_en' => $module->description_en,
             'description_ar' => $module->description_ar,
-            'image_url' => $module->image_url,
+            'image_url' => (App::getLocale() === 'ar' && $module->image_ar) ? $module->image_ar_url : $module->image_url,
             'status' => $module->status,
             'sort_order' => $module->sort_order,
         ];
