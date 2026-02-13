@@ -22,7 +22,7 @@ class ActivityLogController extends Controller
 
             // Filter by log name (e.g., admin, user, store, product, etc.)
             if ($request->has('log_name')) {
-                $query->where('log_name', $request->log_name);
+                $query->where('log_name', $request->log_name); 
             }
 
             // Filter by event type (created, updated, deleted, etc.)
