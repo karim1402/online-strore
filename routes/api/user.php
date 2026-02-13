@@ -144,6 +144,9 @@ Route::prefix('user')->group(function () {
     Route::post('payments/webhook', [\App\Http\Controllers\Api\User\PaymentController::class, 'webhook'])->name('user.payments.webhook');
     Route::middleware('auth:api')->post('payments/create-intention', [\App\Http\Controllers\Api\User\PaymentController::class, 'createIntention'])->name('user.payments.create-intention');
 
+    // Working Hours check (public)
+    Route::get('working-hours', [\App\Http\Controllers\Api\User\WorkingHoursController::class, 'index'])->name('user.working-hours');
+
     // App Settings (public)
     Route::get('settings', [\App\Http\Controllers\Api\User\SettingsController::class, 'index'])->name('user.settings');
     
