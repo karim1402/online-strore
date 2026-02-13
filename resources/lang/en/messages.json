@@ -262,5 +262,9 @@
         "no_delivery_person": "No delivery person assigned to this order yet",
         "chat_closed": "Chat is closed for this order",
         "message_sent": "Message sent successfully"
+    },
+    "working_hours": {
+        "service_available": "The service is available now",
+        "service_not_available": "The service is not available now. Working hours: :opening_time - :closing_time"
     }
 }

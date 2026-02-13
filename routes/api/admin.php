@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\Admin\ActivityLogController;
 use App\Http\Controllers\Api\Admin\DeliveryUserController; 
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\VendorInvoiceController;
+use App\Http\Controllers\Api\Admin\AppSettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -497,6 +498,12 @@ Route::prefix('admin')->group(function () {
             Route::get('/', 'index');
             Route::get('/{id}', 'show');
             Route::post('/{id}/pay', 'markAsPaid');
+        });
+
+        // App Settings routes (working hours)
+        Route::controller(AppSettingController::class)->prefix('app-settings')->group(function () {
+            Route::get('/working-hours', 'getWorkingHours');
+            Route::put('/working-hours', 'updateWorkingHours');
         });
     });
 });

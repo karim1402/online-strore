@@ -260,5 +260,9 @@
         "no_delivery_person": "لم يتم تعيين مندوب توصيل لهذا الطلب بعد",
         "chat_closed": "المحادثة مغلقة لهذا الطلب",
         "message_sent": "تم إرسال الرسالة بنجاح"
+    },
+    "working_hours": {
+        "service_available": "الخدمة متاحة الآن",
+        "service_not_available": "الخدمة غير متاحة الآن. ساعات العمل: :opening_time - :closing_time"
     }
 }
