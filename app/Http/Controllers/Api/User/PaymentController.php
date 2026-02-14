@@ -39,7 +39,10 @@ class PaymentController extends Controller
 
             $request->validate([
                 'address_id' => 'required|exists:user_addresses,id',
+                'is_delivery' => 'nullable|boolean',
             ]);
+
+            $isDelivery = $request->boolean('is_delivery', true);
 
             // Get cart
             $cart = Cart::with(['items.product', 'items.options', 'items.addons'])
@@ -136,14 +139,16 @@ class PaymentController extends Controller
             }
 
             // Special reference includes user_id, address_id, and voucher_id
-            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}
+            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}-DEL-{1/0}
             $voucherId = $voucher ? $voucher->id : 0;
+            $delFlag = $isDelivery ? 1 : 0;
             $specialReference = sprintf(
-                'USER-%d-ADDR-%d-VOUCHER-%d-TS-%d',
+                'USER-%d-ADDR-%d-VOUCHER-%d-TS-%d-DEL-%d',
                 $user->id,
                 $address->id,
                 $voucherId,
-                time()
+                time(),
+                $delFlag
             );
 
             $paymentData = [
@@ -195,10 +200,18 @@ class PaymentController extends Controller
             $specialReference = $obj['order']['merchant_order_id'] ?? null;
 
             // 2. Parse Special Reference
-            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}
-            // Fallback for old format without voucher: USER-{id}-ADDR-{id}-TS-{timestamp}
+            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}-DEL-{0|1}
+            // Fallback for old format
             $voucherId = 0;
-            if (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)/', $specialReference, $matches)) {
+            $isDelivery = true; // Default
+
+            if (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)-DEL-(\d+)/', $specialReference, $matches)) {
+                $userId = $matches[1];
+                $addressId = $matches[2];
+                $voucherId = $matches[3];
+                // TS = $matches[4]
+                $isDelivery = (bool) $matches[5];
+            } elseif (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)/', $specialReference, $matches)) {
                 $userId = $matches[1];
                 $addressId = $matches[2];
                 $voucherId = $matches[3];
@@ -220,7 +233,7 @@ class PaymentController extends Controller
                 DB::beginTransaction();
 
                 // 4. Create Order
-                $order = $this->createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $obj);
+                $order = $this->createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $obj, $isDelivery);
 
                 if (!$order) {
                     DB::rollBack();
@@ -249,7 +262,7 @@ class PaymentController extends Controller
     /**
      * Create Order Logic (Moved from OrderController)
      */
-    private function createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $paymentObj)
+    private function createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $paymentObj, $isDelivery = true)
     {
         $user = \App\Models\User::find($userId);
         $cart = Cart::with(['items.product', 'items.options', 'items.addons'])->where('user_id', $userId)->first();
@@ -293,6 +306,7 @@ class PaymentController extends Controller
             'tax' => $tax,
             'discount' => $discount,
             'total' => $total,
+            'is_delivery' => $isDelivery,
             'is_cash_handed_over' => false, // Online payment already captured
         ]);
 

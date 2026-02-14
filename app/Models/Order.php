@@ -28,6 +28,7 @@ class Order extends Model
         'store_id',
         'branch_id',
         'delivery_id',
+        'is_delivery',
         'address_id',
         'address_snapshot',
         'payment_method',
@@ -57,6 +58,7 @@ class Order extends Model
         'total' => 'decimal:2',
         'is_cash_handed_over' => 'boolean',
         'is_paid_to_vendor' => 'boolean',
+        'is_delivery' => 'boolean',
     ];
 
     /**
