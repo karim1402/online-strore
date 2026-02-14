@@ -301,7 +301,7 @@ class AuthController extends Controller
     public function resendVerificationCode(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
         ]);
 
         if ($validator->fails()) {
@@ -309,20 +309,34 @@ class AuthController extends Controller
         }
 
         $user = User::where('email', $request->email)->first();
-
-        if ($user->email_verified_at) {
-            return $this->errorResponse('errors.email_already_verified', [], 400);
-        }
-
+        
         // Generate Verification Code
         $code = rand(1000, 9999);
-        $user->verification_code = $code;
-        $user->verification_code_expires_at = Carbon::now()->addMinutes(15);
-        $user->save();
+
+        if ($user) {
+            if ($user->email_verified_at) {
+                return $this->errorResponse('errors.email_already_verified', [], 400);
+            }
+
+            $user->verification_code = $code;
+            $user->verification_code_expires_at = Carbon::now()->addMinutes(15);
+            $user->save();
+        } else {
+            // User does not exist, treat as registration resend (email_verifications)
+            \Illuminate\Support\Facades\DB::table('email_verifications')->updateOrInsert(
+                ['email' => $request->email],
+                [
+                    'code' => $code,
+                    'expires_at' => Carbon::now()->addMinutes(15),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]
+            );
+        }
 
         // Send Verification Email
         try {
-            Mail::to($user->email)->send(new AccountVerificationMail($code));
+            Mail::to($request->email)->send(new AccountVerificationMail($code));
         } catch (\Exception $e) {
             return $this->errorResponse('errors.email_sending_failed', [], 500);
         }
