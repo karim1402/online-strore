@@ -16,7 +16,7 @@ class HomeAdController extends Controller
      */
     public function index(): JsonResponse
     {
-        $ads = HomeAd::active()->with(['module', 'products'])->ordered()->get();
+        $ads = HomeAd::active()->ordered()->get();
 
         $data = [
             'banners' => $ads->where('type', 'banner')->values(),
@@ -24,5 +24,56 @@ class HomeAdController extends Controller
         ];
 
         return $this->successResponse($data);
+    }
+
+    /**
+     * Get products associated with a home ad.
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function showProducts($id): JsonResponse
+    {
+        $ad = HomeAd::with(['products' => function($q) {
+            $q->active()
+              ->with([
+                  'primaryImage', 
+                  'category' => function ($query) {
+                      $query->select('id', 'name_en', 'name_ar');
+                  }
+              ])
+              ->withExists('productOptions');
+        }])->active()->find($id);
+
+        if (!$ad) {
+            return $this->errorResponse('errors.not_found', ['resource' => 'Home Ad'], 404);
+        }
+
+        // Transform the data
+        $productsData = $ad->products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
+                'base_price' => $product->base_price,
+                'offer_price' => $product->offer_price,
+                'quantity' => $product->quantity,
+                'has_option_group' => $product->product_options_exists,
+                'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
+                'category' => $product->category ? [
+                    'id' => $product->category->id,
+                    'name_en' => $product->category->name_en,
+                    'name_ar' => $product->category->name_ar,
+                ] : null,
+            ];
+        })->toArray();
+
+        // Localize the data
+        $localizedProducts = \App\Services\LocalizationService::localizeCollection($productsData, ['name']);
+
+        return $this->successResponse([
+            'products' => $localizedProducts,
+            'count' => count($localizedProducts),
+        ]);
     }
 }
