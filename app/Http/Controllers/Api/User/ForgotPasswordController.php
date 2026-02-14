@@ -50,7 +50,9 @@ class ForgotPasswordController extends Controller
             ], 500);
         }
 
-        return $this->successResponse(null, 'success.reset_code_sent');
+        return $this->successResponse([
+            'code' => $code,
+        ], 'success.reset_code_sent');
     }
 
     public function reset(Request $request): JsonResponse
