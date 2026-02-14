@@ -29,8 +29,8 @@ class WorkingHoursController extends Controller
         $replace = $isOpen
             ? []
             : [
-                'opening_time' => Carbon::parse($hours['opening_time'])->format('g:i A'),
-                'closing_time' => Carbon::parse($hours['closing_time'])->format('g:i A'),
+                'opening_time' => Carbon::parse($hours['opening_time'])->locale(\Illuminate\Support\Facades\App::getLocale())->translatedFormat('h:i A'),
+                'closing_time' => Carbon::parse($hours['closing_time'])->locale(\Illuminate\Support\Facades\App::getLocale())->translatedFormat('h:i A'),
             ];
 
         return $this->successResponse([
