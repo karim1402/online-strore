@@ -28,6 +28,7 @@ class OrderController extends Controller
         $validator = Validator::make($request->all(), [
             'address_id' => 'required|exists:user_addresses,id',
             'payment_method' => 'required|in:cash,online',
+            'is_delivery' => 'nullable|boolean',
             'notes' => 'nullable|string|max:500',
             // Payment details (flat fields, required if payment_method is online)
             'transaction_id' => 'required_if:payment_method,online|string',
@@ -169,6 +170,7 @@ class OrderController extends Controller
                 'branch_id' => $branchId,
                 'address_id' => $address->id,
                 'address_snapshot' => $addressSnapshot,
+                'is_delivery' => $request->boolean('is_delivery', true),
                 'payment_method' => $request->payment_method,
                 'payment_status' => $paymentStatus,
                 'payment_reference' => $paymentReference,
