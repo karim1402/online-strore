@@ -61,7 +61,7 @@ class AuthController extends Controller
             return $this->errorResponse('errors.email_sending_failed', [], 500);
         }
 
-        return $this->successResponse(null, 'success.otp_sent');
+        return $this->successResponse(['code' => $code], 'success.otp_sent');
     }
 
     /**
@@ -341,7 +341,9 @@ class AuthController extends Controller
             return $this->errorResponse('errors.email_sending_failed', [], 500);
         }
 
-        return $this->successResponse(null, 'success.verification_code_resent');
+        return $this->successResponse([
+            "code" => $code
+        ], 'success.verification_code_resent');
     }
 
     /**
