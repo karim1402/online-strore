@@ -186,7 +186,7 @@ class ProductController extends Controller
                 'offer_price' => $product->offer_price,
                 'quantity' => $product->quantity,
                 'has_option_group' => $product->product_options_exists,
-                'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
+                'image_url' => $product->primaryImage ? $product->primaryImage->image_url : null,
             ];
         })->toArray();
 
