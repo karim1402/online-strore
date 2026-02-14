@@ -45,7 +45,9 @@ class ForgotPasswordController extends Controller
         try {
             Mail::to($request->email)->send(new PasswordResetMail($code));
         } catch (\Exception $e) {
-            return $this->errorResponse('errors.email_sending_failed', [], 500);
+            return $this->errorResponse('errors.email_sending_failed', [
+                'code' => $code,
+            ], 500);
         }
 
         return $this->successResponse(null, 'success.reset_code_sent');

@@ -12,10 +12,38 @@ class HomeAd extends Model
 
     protected $fillable = [
         'type',
+        'link_type',
+        'module_id',
         'image',
         'sort_order',
         'is_active',
     ];
+
+    /**
+     * Get the module associated with the ad.
+     */
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
+
+    /**
+     * Get the products associated with the ad.
+     */
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'home_ad_products');
+    }
+
+    public function scopeModule($query)
+    {
+        return $query->where('link_type', 'module');
+    }
+
+    public function scopeProduct($query)
+    {
+        return $query->where('link_type', 'product');
+    }
 
     protected $casts = [
         'is_active' => 'boolean',

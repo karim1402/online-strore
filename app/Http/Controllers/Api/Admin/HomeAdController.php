@@ -19,7 +19,7 @@ class HomeAdController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = HomeAd::query()->ordered();
+        $query = HomeAd::query()->with(['module', 'products'])->ordered();
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
@@ -41,6 +41,10 @@ class HomeAdController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'type' => 'required|in:banner,offer',
+            'link_type' => 'required|in:module,product',
+            'module_id' => 'required_if:link_type,module|nullable|exists:modules,id',
+            'product_ids' => 'required_if:link_type,product|nullable|array',
+            'product_ids.*' => 'exists:products,id',
             'image' => 'required|image|max:2048', // Max 2MB
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
@@ -60,7 +64,11 @@ class HomeAdController extends Controller
 
         $ad = HomeAd::create($data);
 
-        return $this->successResponse($ad, 'success.created', [], 201);
+        if ($request->link_type === 'product' && $request->has('product_ids')) {
+            $ad->products()->sync($request->product_ids);
+        }
+
+        return $this->successResponse($ad->load(['module', 'products']), 'success.created', [], 201);
     }
 
     /**
@@ -68,7 +76,7 @@ class HomeAdController extends Controller
      */
     public function show($id): JsonResponse
     {
-        $ad = HomeAd::find($id);
+        $ad = HomeAd::with(['module', 'products'])->find($id);
 
         if (!$ad) {
             return $this->notFoundResponse();
@@ -90,6 +98,10 @@ class HomeAdController extends Controller
 
         $validator = Validator::make($request->all(), [
             'type' => 'nullable|in:banner,offer',
+            'link_type' => 'nullable|in:module,product',
+            'module_id' => 'required_if:link_type,module|nullable|exists:modules,id',
+            'product_ids' => 'required_if:link_type,product|nullable|array',
+            'product_ids.*' => 'exists:products,id',
             'image' => 'nullable|image|max:2048',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
@@ -113,7 +125,27 @@ class HomeAdController extends Controller
 
         $ad->update($data);
 
-        return $this->successResponse($ad, 'success.updated');
+        if ($request->has('link_type')) {
+            if ($request->link_type === 'product') {
+                if ($request->has('product_ids')) {
+                    $ad->products()->sync($request->product_ids);
+                } else {
+                     // If link_type changed to product but no product_ids sent (maybe partial update?), 
+                     // we might keep existing or clear. 
+                     // Given validation 'required_if', usually we expect them.
+                     // But for 'nullable' rules in update, it's tricky. 
+                     // Let's assume if provided, we sync.
+                }
+            } else {
+                // If changed to module, remove products
+                $ad->products()->detach();
+            }
+        } elseif ($ad->link_type === 'product' && $request->has('product_ids')) {
+            // If link_type didn't change (or wasn't sent) but it IS product, and we have IDs
+            $ad->products()->sync($request->product_ids);
+        }
+
+        return $this->successResponse($ad->load(['module', 'products']), 'success.updated');
     }
 
     /**
@@ -149,6 +181,6 @@ class HomeAdController extends Controller
 
         $ad->update(['is_active' => !$ad->is_active]);
 
-        return $this->successResponse($ad, 'success.updated');
+        return $this->successResponse($ad->load(['module', 'products']), 'success.updated');
     }
 }

@@ -17,6 +17,11 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{admin_token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
                             }
                         ],
                         "url": {
@@ -34,7 +39,7 @@
                     "response": []
                 },
                 {
-                    "name": "Create Ad",
+                    "name": "Create Ad (Banner - No Link)",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -89,6 +94,147 @@
                     "response": []
                 },
                 {
+                    "name": "Create Ad (Module Link)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "type",
+                                    "value": "banner",
+                                    "type": "text",
+                                    "description": "Visual type: banner or offer"
+                                },
+                                {
+                                    "key": "link_type",
+                                    "value": "module",
+                                    "type": "text",
+                                    "description": "Action type: module"
+                                },
+                                {
+                                    "key": "module_id",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Required if link_type is module"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "sort_order",
+                                    "value": "2",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/home-ads",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "home-ads"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Ad (Product Link)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "type",
+                                    "value": "offer",
+                                    "type": "text",
+                                    "description": "Visual type: banner or offer"
+                                },
+                                {
+                                    "key": "link_type",
+                                    "value": "product",
+                                    "type": "text",
+                                    "description": "Action type: product"
+                                },
+                                {
+                                    "key": "product_ids[0]",
+                                    "value": "1",
+                                    "type": "text",
+                                    "description": "Required if link_type is product"
+                                },
+                                {
+                                    "key": "product_ids[1]",
+                                    "value": "2",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "image",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "sort_order",
+                                    "value": "3",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "is_active",
+                                    "value": "1",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/home-ads",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "home-ads"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
                     "name": "Update Ad",
                     "request": {
                         "method": "POST",
@@ -115,6 +261,16 @@
                                 {
                                     "key": "type",
                                     "value": "offer",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "link_type",
+                                    "value": "product",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "product_ids[0]",
+                                    "value": "3",
                                     "type": "text"
                                 },
                                 {
@@ -148,6 +304,11 @@
                                 "key": "Authorization",
                                 "value": "Bearer {{admin_token}}",
                                 "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
                             }
                         ],
                         "url": {
@@ -173,6 +334,11 @@
                             {
                                 "key": "Authorization",
                                 "value": "Bearer {{admin_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
                                 "type": "text"
                             }
                         ],
