@@ -42,7 +42,7 @@ class AppSettingController extends Controller
             'closing_time' => 'required|date_format:H:i',
         ];
 
-        $validator = Validator::make($request->all(), $rules, ValidationService::messages($rules));
+        $validator = ValidationService::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return $this->validationErrorResponse($validator);

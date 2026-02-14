@@ -16,7 +16,7 @@ class HomeAdController extends Controller
      */
     public function index(): JsonResponse
     {
-        $ads = HomeAd::active()->ordered()->get();
+        $ads = HomeAd::active()->with(['module', 'products'])->ordered()->get();
 
         $data = [
             'banners' => $ads->where('type', 'banner')->values(),
