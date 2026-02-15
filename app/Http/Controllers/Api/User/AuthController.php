@@ -74,7 +74,7 @@ class AuthController extends Controller
             'email' => 'required|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
             'phone' => 'required|string|min:10|unique:users,phone',
-            'otp' => 'required|string|size:4',
+            // 'otp' => 'required|string|size:4',
         ]);
 
         if ($validator->fails()) {
@@ -82,21 +82,21 @@ class AuthController extends Controller
         }
 
         // Verify OTP from email_verifications table
-        $verification = \Illuminate\Support\Facades\DB::table('email_verifications')
-            ->where('email', $request->email)
-            ->first();
+        // $verification = \Illuminate\Support\Facades\DB::table('email_verifications')
+        //     ->where('email', $request->email)
+        //     ->first();
 
-        if (!$verification) {
-            return $this->errorResponse('errors.otp_not_found', [], 400);
-        }
+        // if (!$verification) {
+        //     return $this->errorResponse('errors.otp_not_found', [], 400);
+        // }
 
-        if ($verification->code !== $request->otp) {
-            return $this->errorResponse('errors.invalid_otp', [], 400);
-        }
+        // if ($verification->code !== $request->otp) {
+        //     return $this->errorResponse('errors.invalid_otp', [], 400);
+        // }
 
-        if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
-            return $this->errorResponse('errors.otp_expired', [], 400);
-        }
+        // if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
+        //     return $this->errorResponse('errors.otp_expired', [], 400);
+        // }
 
         // Create user with verified email
         $user = User::create([
@@ -108,9 +108,9 @@ class AuthController extends Controller
         ]);
 
         // Delete the verification record
-        \Illuminate\Support\Facades\DB::table('email_verifications')
-            ->where('email', $request->email)
-            ->delete();
+        // \Illuminate\Support\Facades\DB::table('email_verifications')
+        //     ->where('email', $request->email)
+        //     ->delete();
 
         // Log the registration activity
         activity('user')
