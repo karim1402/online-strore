@@ -381,7 +381,7 @@ class AuthController extends Controller
 
         $validator = ValidationService::make($request->all(), [
             'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users,email,' . $user->id,
+            // 'email' => 'required|string|email|max:100|unique:users,email,' . $user->id,
         ]);
 
         if ($validator->fails()) {
@@ -390,7 +390,7 @@ class AuthController extends Controller
 
         $user->update([
             'name' => $request->name,
-            'email' => $request->email,
+            // 'email' => $request->email,
         ]);
 
         // Log the profile update activity
