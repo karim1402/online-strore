@@ -71,7 +71,7 @@ class AuthController extends Controller
     {
         $validator = ValidationService::make($request->all(), [
             'name' => 'required|string|between:2,100',
-            'email' => 'required|string|email|max:100|unique:users',
+            'email' => 'nullable|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
             'phone' => 'required|string|min:10|unique:users,phone',
             // 'otp' => 'required|string|size:4',
@@ -101,7 +101,7 @@ class AuthController extends Controller
         // Create user with verified email
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'email' => $request->email??null,
             'password' => Hash::make($request->password),
             'phone' => $request->phone,
             'email_verified_at' => Carbon::now(),
