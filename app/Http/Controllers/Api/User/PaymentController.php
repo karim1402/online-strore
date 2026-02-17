@@ -247,14 +247,14 @@ class PaymentController extends Controller
                 $this->clearUserCart($userId);
 
                 // Send FCM notification to all admins
-                try {
-                    $admins = \App\Models\Admin::whereNotNull('fcm_token')->get();
-                    if ($admins->isNotEmpty()) {
-                        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewOrderNotification($order));
-                    }
-                } catch (\Exception $e) {
-                    Log::error('Failed to send admin notification: ' . $e->getMessage());
-                }
+                // try {
+                //     $admins = \App\Models\Admin::whereNotNull('fcm_token')->get();
+                //     if ($admins->isNotEmpty()) {
+                //         \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewOrderNotification($order));
+                //     }
+                // } catch (\Exception $e) {
+                //     Log::error('Failed to send admin notification: ' . $e->getMessage());
+                // }
 
                 // Broadcast via Pusher to admin channel
                 try {
