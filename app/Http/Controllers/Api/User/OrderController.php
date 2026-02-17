@@ -363,6 +363,13 @@ class OrderController extends Controller
                 \Illuminate\Support\Facades\Log::error('Failed to send admin notification: ' . $e->getMessage());
             }
 
+            // Broadcast via Pusher to admin channel
+            try {
+                event(new \App\Events\NewOrderEvent($order));
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Failed to broadcast new order event: ' . $e->getMessage());
+            }
+
             // Prepare response
             $response = [
                 'order' => $this->transformOrder($order->load(['items.options', 'items.addons'])),
