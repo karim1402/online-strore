@@ -76,6 +76,7 @@ class OrderController extends Controller
             $query = Order::with(['store', 'branch', 'user', 'items'])
                 ->whereNull('delivery_id')
                 ->where('simple_status', 'ready_to_pick')
+                ->where('is_delivery', true)
                 ->orderBy('created_at', 'desc');
 
             $perPage = (int) $request->get('per_page', 15);
