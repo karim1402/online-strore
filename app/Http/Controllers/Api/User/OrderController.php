@@ -354,13 +354,20 @@ class OrderController extends Controller
             DB::commit();
 
             // Send FCM notification to all admins
+            // try {
+            //     $admins = \App\Models\Admin::whereNotNull('fcm_token')->get();
+            //     if ($admins->isNotEmpty()) {
+            //         \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewOrderNotification($order));
+            //     }
+            // } catch (\Exception $e) {
+            //     \Illuminate\Support\Facades\Log::error('Failed to send admin notification: ' . $e->getMessage());
+            // }
+
+            // Broadcast via Pusher to admin channel
             try {
-                $admins = \App\Models\Admin::whereNotNull('fcm_token')->get();
-                if ($admins->isNotEmpty()) {
-                    \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewOrderNotification($order));
-                }
+                event(new \App\Events\NewOrderEvent($order));
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Failed to send admin notification: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error('Failed to broadcast new order event: ' . $e->getMessage());
             }
 
             // Prepare response
