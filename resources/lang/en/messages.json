@@ -82,7 +82,7 @@
     "errors": {
         "no_users_with_tokens": "No users found with active push notification tokens",
         "validation_failed": "Validation failed",
-        "invalid_credentials": "Invalid email or password",
+        "invalid_credentials": "The phone number or password is incorrect",
         "account_disabled": "Account is disabled",
         "unauthenticated": "Unauthenticated. Please login first",
         "access_denied": "Access denied. You do not have permission to perform this action",
