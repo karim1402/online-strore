@@ -28,23 +28,45 @@ class UserController extends Controller
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-                      
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
                 });
             }
 
             // Filter by date range
-            if ($request->has('start_date')) {
-                $query->whereDate('created_at', '>=', $request->start_date);
+            if ($request->filled('from_date')) {
+                $query->whereDate('created_at', '>=', $request->from_date);
             }
 
-            if ($request->has('end_date')) {
-                $query->whereDate('created_at', '<=', $request->end_date);
+            if ($request->filled('to_date')) {
+                $query->whereDate('created_at', '<=', $request->to_date);
             }
 
             $users = $query->paginate($perPage);
 
-            return $this->successResponse($users, 'success.users_retrieved');
+            // Statistics
+            $now = \Carbon\Carbon::now();
+            $statistics = [
+                'total_users' => [
+                    'value' => User::count(),
+                    'label' => 'All registered customers',
+                ],
+                'new_this_month' => [
+                    'value' => User::where('created_at', '>=', $now->copy()->startOfMonth())->count(),
+                    'label' => 'All registered customers',
+                ],
+                'verified_accounts' => [
+                    'value' => User::whereNotNull('email_verified_at')->count(),
+                    'label' => 'Email verified',
+                ],
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => \App\Services\LocalizationService::getMessage('success.users_retrieved'),
+                'data' => $users,
+                'statistics' => $statistics,
+            ]);
         } catch (\Throwable $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
