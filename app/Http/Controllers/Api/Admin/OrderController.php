@@ -63,7 +63,8 @@ class OrderController extends Controller
                       ->orWhereHas('user', function ($userQuery) use ($search) {
                           $userQuery->where('name', 'like', "%{$search}%")
                                     ->orWhere('email', 'like', "%{$search}%")
-                                    ->orWhere('phone', 'like', "%{$search}%");
+                                    ->orWhere('phone', 'like', "%{$search}%")
+                                    ->orWhere('id', "{$search}");
                       });
                 });
             }
