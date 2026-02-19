@@ -222,10 +222,18 @@ class CartController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Cart addItem error', [
+                'user_id' => $user->id ?? null,
+                'request' => $request->all(),
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => LocalizationService::getMessage('errors.server_error'),
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -401,10 +409,19 @@ class CartController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Cart updateItem error', [
+                'user_id' => $user->id ?? null,
+                'item_id' => $itemId,
+                'request' => $request->all(),
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => LocalizationService::getMessage('errors.server_error'),
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }
@@ -601,10 +618,18 @@ class CartController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Cart replace error', [
+                'user_id' => $user->id ?? null,
+                'request' => $request->all(),
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => LocalizationService::getMessage('errors.server_error'),
-                'error' => $e->getMessage(),
+                'error' => config('app.debug') ? $e->getMessage() : null,
             ], 500);
         }
     }

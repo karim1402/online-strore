@@ -22,6 +22,7 @@ class OrderController extends Controller
      */
     public function checkout(Request $request)
     {
+
         $user = auth('api')->user();
 
         // Validation
@@ -394,6 +395,15 @@ class OrderController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+
+            \Illuminate\Support\Facades\Log::error('Checkout error', [
+                'user_id' => $user->id ?? null,
+                'request' => $request->except(['password']),
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             
             return response()->json([
                 'success' => false,
