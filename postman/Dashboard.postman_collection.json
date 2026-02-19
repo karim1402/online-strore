@@ -1,0 +1,278 @@
+{
+    "info": {
+        "_postman_id": "dashboard-collection",
+        "name": "Dashboard",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "KPI Stats",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/dashboard/stats",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "dashboard",
+                        "stats"
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Orders Distribution",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/dashboard/orders-distribution?period=week",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "dashboard",
+                        "orders-distribution"
+                    ],
+                    "query": [
+                        {
+                            "key": "period",
+                            "value": "week",
+                            "description": "today, week, month, year, custom"
+                        },
+                        {
+                            "key": "start_date",
+                            "value": "2026-01-01",
+                            "description": "For custom period only",
+                            "disabled": true
+                        },
+                        {
+                            "key": "end_date",
+                            "value": "2026-02-19",
+                            "description": "For custom period only",
+                            "disabled": true
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Revenue Chart - Week",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/dashboard/revenue-chart?period=week",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "dashboard",
+                        "revenue-chart"
+                    ],
+                    "query": [
+                        {
+                            "key": "period",
+                            "value": "week",
+                            "description": "week, month, year"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Revenue Chart - Month",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/dashboard/revenue-chart?period=month",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "dashboard",
+                        "revenue-chart"
+                    ],
+                    "query": [
+                        {
+                            "key": "period",
+                            "value": "month"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Revenue Chart - Year",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/dashboard/revenue-chart?period=year",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "dashboard",
+                        "revenue-chart"
+                    ],
+                    "query": [
+                        {
+                            "key": "period",
+                            "value": "year"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Module Performance",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/dashboard/module-performance?period=month",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "dashboard",
+                        "module-performance"
+                    ],
+                    "query": [
+                        {
+                            "key": "period",
+                            "value": "month",
+                            "description": "week, month, year"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Recent Orders",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{admin_token}}",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "{{base_url}}/api/admin/dashboard/recent-orders?limit=5",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "api",
+                        "admin",
+                        "dashboard",
+                        "recent-orders"
+                    ],
+                    "query": [
+                        {
+                            "key": "limit",
+                            "value": "5",
+                            "description": "Number of orders (default: 5, max: 50)"
+                        }
+                    ]
+                }
+            },
+            "response": []
+        }
+    ]
+}

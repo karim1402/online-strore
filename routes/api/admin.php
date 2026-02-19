@@ -56,6 +56,15 @@ Route::prefix('admin')->group(function () {
                 'guard' => 'admins'
             ]);
         });
+
+        // Dashboard Statistics endpoints
+        Route::controller(\App\Http\Controllers\Api\Admin\DashboardController::class)->prefix('dashboard')->group(function () {
+            Route::get('/stats', 'stats');
+            Route::get('/orders-distribution', 'ordersDistribution');
+            Route::get('/revenue-chart', 'revenueChart');
+            Route::get('/module-performance', 'modulePerformance');
+            Route::get('/recent-orders', 'recentOrders');
+        });
         
         // Regular Users CRUD routes (permission-based)
         Route::controller(UserController::class)->prefix('users')->group(function () {
