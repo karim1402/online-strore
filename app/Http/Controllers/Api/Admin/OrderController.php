@@ -21,17 +21,33 @@ class OrderController extends Controller
             $totalOrders = Order::count();
             $pendingOrders = Order::where('simple_status', 'in_progress')->count();
             $processingOrders = Order::where('simple_status', 'ready_to_pick')->count();
+            $inDeliveryOrders = Order::where('simple_status', 'in_delivery')->count();
             $deliveredOrders = Order::where('simple_status', 'delivered')->count();
-            $revenue = Order::where('simple_status', 'delivered')
-                // ->where('payment_status', 'paid')
-                ->sum('total');
+            $cancelledOrders = Order::where('simple_status', 'cancelled')->count();
+
+            // Revenue per status
+            $pendingRevenue = Order::where('simple_status', 'in_progress')->sum('total');
+            $processingRevenue = Order::where('simple_status', 'ready_to_pick')->sum('total');
+            $inDeliveryRevenue = Order::where('simple_status', 'in_delivery')->sum('total');
+            $deliveredRevenue = Order::where('simple_status', 'delivered')->sum('total');
+            $cancelledRevenue = Order::where('simple_status', 'cancelled')->sum('total');
+            $totalRevenue = Order::sum('total');
 
             return $this->successResponse([
                 'total_orders' => $totalOrders,
                 'pending' => $pendingOrders,
                 'processing' => $processingOrders,
+                'in_delivery' => $inDeliveryOrders,
                 'delivered' => $deliveredOrders,
-                'revenue' => round($revenue, 2),
+                'cancelled' => $cancelledOrders,
+                'revenue' => [
+                    'total' => round($totalRevenue, 2),
+                    'pending' => round($pendingRevenue, 2),
+                    'processing' => round($processingRevenue, 2),
+                    'in_delivery' => round($inDeliveryRevenue, 2),
+                    'delivered' => round($deliveredRevenue, 2),
+                    'cancelled' => round($cancelledRevenue, 2),
+                ],
             ], 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
