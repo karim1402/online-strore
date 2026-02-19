@@ -136,16 +136,16 @@ class CartController extends Controller
                 $newQuantity = $existingItem->quantity + $request->quantity;
                 
                 // Check if new quantity exceeds maximum
-                if ($newQuantity > 99) {
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => LocalizationService::getMessage('cart.quantity_limit_exceeded'),
-                        'errors' => [
-                            'quantity' => [LocalizationService::getMessage('cart.max_quantity_per_item')],
-                        ],
-                    ], 422);
-                }
+                // if ($newQuantity > 99) {
+                //     DB::rollBack();
+                //     return response()->json([
+                //         'success' => false,
+                //         'message' => LocalizationService::getMessage('cart.quantity_limit_exceeded'),
+                //         'errors' => [
+                //             'quantity' => [LocalizationService::getMessage('cart.max_quantity_per_item')],
+                //         ],
+                //     ], 422);
+                // }
                 
                 $existingItem->update(['quantity' => $newQuantity]);
                 $cartItem = $existingItem;
