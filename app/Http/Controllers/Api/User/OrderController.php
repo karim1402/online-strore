@@ -28,26 +28,28 @@ class OrderController extends Controller
         // Validation
         $validator = Validator::make($request->all(), [
             'address_id' => 'required|exists:user_addresses,id',
-            'payment_method' => 'required|in:cash,online',
+            // 'payment_method' => 'required|in:cash,online',
             'is_delivery' => 'nullable|boolean',
             'notes' => 'nullable|string|max:500',
             // Payment details (flat fields, required if payment_method is online)
-            'transaction_id' => 'required_if:payment_method,online|string',
-            'gateway_order_id' => 'required_if:payment_method,online|string',
-            'amount_cents' => 'required_if:payment_method,online|integer',
-            'currency' => 'nullable|string',
-            'success' => 'required_if:payment_method,online|in:0,1,true,false',
-            'is_3d_secure' => 'nullable|in:0,1,true,false',
-            'card_type' => 'nullable|string',
-            'card_pan' => 'nullable|string',
-            'gateway_response' => 'nullable|string',
-            'txn_response_code' => 'nullable|string',
-            'integration_id' => 'nullable|integer',
-            'hmac' => 'nullable|string',
-            'payment_created_at' => 'nullable|string',
-            'merchant_commission' => 'nullable|numeric',
-            'accept_fees' => 'nullable|numeric',
+            // 'transaction_id' => 'required_if:payment_method,online|string',
+            // 'gateway_order_id' => 'required_if:payment_method,online|string',
+            // 'amount_cents' => 'required_if:payment_method,online|integer',
+            // 'currency' => 'nullable|string',
+            // 'success' => 'required_if:payment_method,online|in:0,1,true,false',
+            // 'is_3d_secure' => 'nullable|in:0,1,true,false',
+            // 'card_type' => 'nullable|string',
+            // 'card_pan' => 'nullable|string',
+            // 'gateway_response' => 'nullable|string',
+            // 'txn_response_code' => 'nullable|string',
+            // 'integration_id' => 'nullable|integer',
+            // 'hmac' => 'nullable|string',
+            // 'payment_created_at' => 'nullable|string',
+            // 'merchant_commission' => 'nullable|numeric',
+            // 'accept_fees' => 'nullable|numeric',
         ]);
+
+        $request->payment_method = 'cash';
 
         if ($validator->fails()) {
             return response()->json([
