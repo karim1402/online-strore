@@ -67,17 +67,14 @@ class NotificationController extends Controller
                 $imageUrl = asset('storage/' . $path);
             }
 
-            // Fetch Tokens
-            $query = User::whereNotNull('fcm_token');
-            
+            // Fetch Tokens from fcm_tokens table
             if (!empty($data['user_ids'])) {
-                $query->whereIn('id', $data['user_ids']);
+                $tokens = \App\Models\FcmToken::getAllUserTokens($data['user_ids']);
                 $targetType = 'specific_users';
             } else {
+                $tokens = \App\Models\FcmToken::getAllUserTokens();
                 $targetType = 'all_users';
             }
-
-            $tokens = $query->pluck('fcm_token')->toArray();
 
             if (empty($tokens)) {
                 return $this->errorResponse('errors.no_users_with_tokens', [], 404);

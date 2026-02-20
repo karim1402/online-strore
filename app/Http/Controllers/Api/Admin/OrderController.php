@@ -31,7 +31,7 @@ class OrderController extends Controller
             $inDeliveryRevenue = Order::where('simple_status', 'in_delivery')->sum('total');
             $deliveredRevenue = Order::where('simple_status', 'delivered')->sum('total');
             $cancelledRevenue = Order::where('simple_status', 'cancelled')->sum('total');
-            $totalRevenue = Order::sum('total');
+            $totalRevenue = Order::where('simple_status', '!=', 'cancelled')->sum('total');
 
             return $this->successResponse([
                 'total_orders' => $totalOrders,
@@ -485,9 +485,15 @@ class OrderController extends Controller
     private function notifyClient(Order $order): void
     {
         try {
-            // Check if the order has a user with FCM token
-            if (!$order->user || !$order->user->fcm_token) {
-                \Illuminate\Support\Facades\Log::info('No FCM token for client of order: ' . $order->order_number);
+            if (!$order->user) {
+                \Illuminate\Support\Facades\Log::info('No user for order: ' . $order->order_number);
+                return;
+            }
+
+            $tokens = \App\Models\FcmToken::getTokensForUser(\App\Models\User::class, $order->user->id);
+
+            if (empty($tokens)) {
+                \Illuminate\Support\Facades\Log::info('No FCM tokens for client of order: ' . $order->order_number);
                 return;
             }
 
@@ -502,11 +508,13 @@ class OrderController extends Controller
                 'order_number' => $order->order_number,
             ];
 
-            $success = $fcmService->sendNotification($order->user->fcm_token, $title, $body, $data);
+            $result = $fcmService->sendToMultiple($tokens, $title, $body, $data);
 
             \Illuminate\Support\Facades\Log::info('Client notification sent for order: ' . $order->order_number, [
                 'user_id' => $order->user->id,
-                'success' => $success,
+                'tokens_count' => count($tokens),
+                'success' => $result['success'] ?? 0,
+                'failure' => $result['failure'] ?? 0,
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send client notification: ' . $e->getMessage());

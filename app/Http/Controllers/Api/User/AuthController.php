@@ -233,7 +233,9 @@ class AuthController extends Controller
     public function updateFcmToken(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'fcm_token' => 'required|string|max:255',
+            'device_id' => 'required|string|max:255',
+            'fcm_token' => 'required|string',
+            'platform' => 'nullable|string|in:ios,android,web',
         ]);
 
         if ($validator->fails()) {
@@ -241,7 +243,16 @@ class AuthController extends Controller
         }
 
         $user = Auth::guard('api')->user();
-        $user->update(['fcm_token' => $request->fcm_token]);
+
+        \App\Models\FcmToken::updateOrCreate(
+            ['device_id' => $request->device_id],
+            [
+                'token' => $request->fcm_token,
+                'tokenable_id' => $user ? $user->id : null,
+                'tokenable_type' => $user ? get_class($user) : null,
+                'platform' => $request->platform,
+            ]
+        );
 
         return $this->successResponse(null, 'success.fcm_token_updated');
     }
