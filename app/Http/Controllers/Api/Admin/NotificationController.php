@@ -72,8 +72,8 @@ class NotificationController extends Controller
                 $tokens = \App\Models\FcmToken::getAllUserTokens($data['user_ids']);
                 $targetType = 'specific_users';
             } else {
-                $tokens = \App\Models\FcmToken::getAllUserTokens();
-                $targetType = 'all_users';
+                $tokens = \App\Models\FcmToken::getAllTokens();
+                $targetType = 'all_devices';
             }
 
             if (empty($tokens)) {
