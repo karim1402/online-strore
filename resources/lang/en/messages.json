@@ -116,6 +116,7 @@
         "address_not_found": "Selected address not found",
         "order_not_found": "Order not found",
         "order_cannot_cancel": "Order cannot be cancelled in current status",
+        "order_cancel_time_exceeded": "You can only cancel orders within 15 minutes of placing them",
         "delivery_has_active_order": "You already have an active order. Please complete or cancel it before picking a new one",
         "delivery_not_available": "You are currently marked as unavailable. Please change your status to available to pick orders",
         "store_not_approved": "Your store is not yet approved. Please contact support",

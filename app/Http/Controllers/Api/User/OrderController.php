@@ -524,6 +524,14 @@ class OrderController extends Controller
             ], 400);
         }
 
+        // Check if order was created more than 15 minutes ago
+        if ($order->created_at->diffInMinutes(now()) > 15) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.order_cancel_time_exceeded'),
+            ], 400);
+        }
+
         $order->simple_status  = 'cancelled';
         $order->save();
 
