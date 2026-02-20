@@ -42,6 +42,23 @@ class PaymentController extends Controller
                 'is_delivery' => 'nullable|boolean',
             ]);
 
+            // Check working hours
+            if (!\App\Models\AppSetting::isOpen()) {
+                $hours = \App\Models\AppSetting::getWorkingHours();
+                return response()->json([
+                    'success' => false,
+                    'message' => LocalizationService::getMessage('working_hours.service_not_available', [
+                        'opening_time' => \Carbon\Carbon::parse($hours['opening_time'])->format('g:i A'),
+                        'closing_time' => \Carbon\Carbon::parse($hours['closing_time'])->format('g:i A'),
+                    ]),
+                    'data' => [
+                        'is_open' => false,
+                        'opening_time' => $hours['opening_time'],
+                        'closing_time' => $hours['closing_time'],
+                    ],
+                ], 403);
+            }
+
             $isDelivery = $request->boolean('is_delivery', true);
 
             // Get cart
