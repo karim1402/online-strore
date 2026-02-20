@@ -59,6 +59,23 @@ class OrderController extends Controller
             ], 422);
         }
 
+        // Check working hours
+        if (!\App\Models\AppSetting::isOpen()) {
+            $hours = \App\Models\AppSetting::getWorkingHours();
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('working_hours.service_not_available', [
+                    'opening_time' => \Carbon\Carbon::parse($hours['opening_time'])->format('g:i A'),
+                    'closing_time' => \Carbon\Carbon::parse($hours['closing_time'])->format('g:i A'),
+                ]),
+                'data' => [
+                    'is_open' => false,
+                    'opening_time' => $hours['opening_time'],
+                    'closing_time' => $hours['closing_time'],
+                ],
+            ], 403);
+        }
+
         // Get cart with all items
         $cart = $user->cart()->with([
             // 'items.product.store',
@@ -798,6 +815,7 @@ class OrderController extends Controller
         }
 
         // Get all active branches for the store with valid coordinates
+        /** @var \Illuminate\Database\Eloquent\Collection|\App\Models\Branch[] $branches */
         $branches = \App\Models\Branch::where('store_id', $storeId)
             ->where('is_active', true)
             ->whereNotNull('latitude')
