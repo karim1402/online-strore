@@ -53,7 +53,7 @@ class FcmToken extends Model
     }
 
     /**
-     * Get all FCM tokens belonging to Users (for broadcast notifications).
+     * Get all FCM tokens belonging to Users (for user-specific notifications).
      *
      * @param array|null $userIds  Optional filter by specific user IDs
      * @return array
@@ -67,5 +67,15 @@ class FcmToken extends Model
         }
 
         return $query->pluck('token')->toArray();
+    }
+
+    /**
+     * Get ALL FCM tokens in the table (for broadcast to all devices including guests).
+     *
+     * @return array
+     */
+    public static function getAllTokens(): array
+    {
+        return static::pluck('token')->toArray();
     }
 }
