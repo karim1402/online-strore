@@ -63,8 +63,15 @@ class ChatController extends Controller
     private function notifyUser(Order $order, $delivery, string $message): void
     {
         try {
-            if (!$order->user || !$order->user->fcm_token) {
-                Log::info('No FCM token for user of order: ' . $order->order_number);
+            if (!$order->user) {
+                Log::info('No user for order: ' . $order->order_number);
+                return;
+            }
+
+            $tokens = \App\Models\FcmToken::getTokensForUser(\App\Models\User::class, $order->user->id);
+
+            if (empty($tokens)) {
+                Log::info('No FCM tokens for user of order: ' . $order->order_number);
                 return;
             }
 
@@ -84,11 +91,13 @@ class ChatController extends Controller
                 'message' => $message,
             ];
 
-            $success = $fcmService->sendNotification($order->user->fcm_token, $title, $body, $data);
+            $result = $fcmService->sendToMultiple($tokens, $title, $body, $data);
 
             Log::info('Chat notification sent to user for order: ' . $order->order_number, [
                 'user_id' => $order->user->id,
-                'success' => $success,
+                'tokens_count' => count($tokens),
+                'success' => $result['success'] ?? 0,
+                'failure' => $result['failure'] ?? 0,
             ]);
         } catch (\Exception $e) {
             Log::error('Failed to send chat notification to user: ' . $e->getMessage());

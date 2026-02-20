@@ -244,9 +244,15 @@ class OrderController extends Controller
     private function notifyClientOrderPicked(Order $order, $delivery): void
     {
         try {
-            // Check if the order has a user with FCM token
-            if (!$order->user || !$order->user->fcm_token) {
-                \Illuminate\Support\Facades\Log::info('No FCM token for client of order: ' . $order->order_number);
+            if (!$order->user) {
+                \Illuminate\Support\Facades\Log::info('No user for order: ' . $order->order_number);
+                return;
+            }
+
+            $tokens = \App\Models\FcmToken::getTokensForUser(\App\Models\User::class, $order->user->id);
+
+            if (empty($tokens)) {
+                \Illuminate\Support\Facades\Log::info('No FCM tokens for client of order: ' . $order->order_number);
                 return;
             }
 
@@ -262,12 +268,14 @@ class OrderController extends Controller
                 'delivery_name' => $delivery->name,
             ];
 
-            $success = $fcmService->sendNotification($order->user->fcm_token, $title, $body, $data);
+            $result = $fcmService->sendToMultiple($tokens, $title, $body, $data);
 
             \Illuminate\Support\Facades\Log::info('Client notification sent for order pickup: ' . $order->order_number, [
                 'user_id' => $order->user->id,
                 'delivery_id' => $delivery->id,
-                'success' => $success,
+                'tokens_count' => count($tokens),
+                'success' => $result['success'] ?? 0,
+                'failure' => $result['failure'] ?? 0,
             ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Failed to send client pickup notification: ' . $e->getMessage());
