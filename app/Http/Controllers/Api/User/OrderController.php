@@ -963,6 +963,7 @@ class OrderController extends Controller
             'delivery_fee' => number_format($order->delivery_fee, 2),
             'tax' => number_format($order->tax, 2),
             'total' => number_format($order->total, 2),
+            'discount' => number_format($order->discount, 2),
             'notes' => $order->notes,
             'created_at' => $order->created_at->toISOString(),
             'updated_at' => $order->updated_at->toISOString(),
