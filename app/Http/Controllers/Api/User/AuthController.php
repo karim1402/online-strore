@@ -232,6 +232,8 @@ class AuthController extends Controller
      */
     public function updateFcmToken(Request $request): JsonResponse
     {
+
+        Log::info( $request->all());
         $validator = ValidationService::make($request->all(), [
             'device_id' => 'required|string|max:255',
             'fcm_token' => 'required|string',
