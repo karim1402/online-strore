@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\CartItem;
 use App\Models\ProductImage;
 use App\Models\ProductOption;
 use App\Models\ProductOptionValue;
@@ -557,6 +558,15 @@ class ProductController extends Controller
             }
 
             DB::beginTransaction();
+
+            // Remove this product from all user carts
+            $cartItems = CartItem::where('product_id', $product->id)->get();
+            foreach ($cartItems as $cartItem) {
+                // Delete related options and addons
+                $cartItem->options()->delete();
+                $cartItem->addons()->delete();
+                $cartItem->delete();
+            }
 
             // Soft delete the product
             $product->delete();

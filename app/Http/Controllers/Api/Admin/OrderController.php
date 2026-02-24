@@ -212,7 +212,8 @@ class OrderController extends Controller
                     ], 422);
                 }
 
-                $itemPrice = $product->base_price;
+                $baseProductPrice = $product->offer_price ?? $product->base_price;
+                $itemPrice = $baseProductPrice;
                 $itemSubtotal = 0;
 
                 // Validate and calculate option prices
@@ -228,12 +229,19 @@ class OrderController extends Controller
                             ], 422);
                         }
 
-                        $optionPrice = $optionValue->calculatePrice($product->base_price);
-                        $itemPrice = $optionPrice;
+                        $calcPrice = $optionValue->calculatePrice($baseProductPrice);
+                        
+                        if ($optionValue->price_type === 'fixed') {
+                            $calculatedOptionPrice = $calcPrice;
+                        } else {
+                            $calculatedOptionPrice = $calcPrice - $baseProductPrice;
+                        }
+                        
+                        $itemPrice += $calculatedOptionPrice;
 
                         $validatedOptions[] = [
                             'product_option_value_id' => $optionValue->id,
-                            'price' => $optionPrice,
+                            'price' => $calculatedOptionPrice,
                         ];
                     }
                 }
@@ -333,6 +341,7 @@ class OrderController extends Controller
                             'name_en' => $itemData['product']->name_en,
                             'name_ar' => $itemData['product']->name_ar,
                             'base_price' => $itemData['product']->base_price,
+                            'offer_price' => $itemData['product']->offer_price,
                         ],
                         'quantity' => $itemData['quantity'],
                         'unit_price' => $itemData['price'],
