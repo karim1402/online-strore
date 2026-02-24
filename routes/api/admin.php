@@ -66,6 +66,49 @@ Route::prefix('admin')->group(function () {
             Route::get('/recent-orders', 'recentOrders');
         });
         
+        // Comprehensive Reporting endpoints
+        Route::controller(\App\Http\Controllers\Api\Admin\ReportsController::class)->prefix('reports')->group(function () {
+            // 1. Sales & Revenue
+            Route::get('/revenue/total', 'totalRevenue');
+            Route::get('/revenue/over-time', 'revenueOverTime');
+            Route::get('/revenue/by-module', 'revenueByModule');
+            Route::get('/revenue/by-category', 'revenueByCategory');
+            Route::get('/revenue/by-store', 'revenueByStore');
+            Route::get('/revenue/by-payment-method', 'revenueByPaymentMethod');
+            Route::get('/revenue/discounts-impact', 'discountImpact');
+
+            // 2. Orders
+            Route::get('/orders/distribution', 'orderDistribution');
+            Route::get('/orders/cancellations', 'orderCancellations');
+            Route::get('/orders/average-value', 'averageOrderValue');
+            Route::get('/orders/admin-created', 'adminCreatedOrders');
+
+            // 3. Products
+            Route::get('/products/top-selling', 'topSellingProducts');
+            Route::get('/products/most-viewed', 'mostViewedProducts');
+            Route::get('/products/best-sellers', 'bestSellersFlagged');
+            Route::get('/products/with-offers', 'productsWithOffers');
+
+            // 4. Users
+            Route::get('/users/growth', 'userGrowth');
+            Route::get('/users/top-customers', 'topCustomers');
+            Route::get('/users/inactive', 'inactiveUsers');
+
+            // 5. Delivery
+            Route::get('/delivery/driver-performance', 'driverPerformance');
+            Route::get('/delivery/availability', 'driverAvailability');
+
+            // 6. Vouchers
+            Route::get('/vouchers/usage', 'voucherUsageAndEffectiveness');
+
+            // 7. Payments
+            Route::get('/payments/success-rate', 'paymentSuccessRate');
+            Route::get('/payments/merchant-fees', 'merchantFees');
+
+            // 8. Stores
+            Route::get('/stores/status-overview', 'storeStatusOverview');
+        });
+        
         // Regular Users CRUD routes (permission-based)
         Route::controller(UserController::class)->prefix('users')->group(function () {
             Route::middleware('permission:users.view,admins')->group(function () {
