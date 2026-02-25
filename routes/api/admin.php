@@ -77,6 +77,10 @@ Route::prefix('admin')->group(function () {
             Route::get('/revenue/by-payment-method', 'revenueByPaymentMethod');
             Route::get('/revenue/discounts-impact', 'discountImpact');
 
+            // 1b. Sales Charts
+            Route::get('/sales/revenue-trend', 'revenueTrend');
+            Route::get('/sales/payment-methods', 'paymentMethodsBreakdown');
+
             // 2. Orders
             Route::get('/orders/distribution', 'orderDistribution');
             Route::get('/orders/cancellations', 'orderCancellations');
@@ -97,6 +101,7 @@ Route::prefix('admin')->group(function () {
             // 5. Delivery
             Route::get('/delivery/driver-performance', 'driverPerformance');
             Route::get('/delivery/availability', 'driverAvailability');
+            Route::get('/delivery/deliveries-per-day', 'deliveriesPerDay');
 
             // 6. Vouchers
             Route::get('/vouchers/usage', 'voucherUsageAndEffectiveness');
@@ -104,6 +109,7 @@ Route::prefix('admin')->group(function () {
             // 7. Payments
             Route::get('/payments/success-rate', 'paymentSuccessRate');
             Route::get('/payments/merchant-fees', 'merchantFees');
+            Route::get('/payments/monthly-trend', 'monthlyPaymentTrend');
 
             // 8. Stores
             Route::get('/stores/status-overview', 'storeStatusOverview');

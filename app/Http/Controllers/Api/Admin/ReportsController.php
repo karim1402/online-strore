@@ -73,14 +73,26 @@ class ReportsController extends Controller
 
         $this->applyQueryFilter($query, $request, 'orders');
 
-        $data = $query->select(
+        $rows = $query->select(
             'modules.name_en as module',
-            DB::raw('COUNT(DISTINCT orders.id) as order_count'),
+            DB::raw('COUNT(DISTINCT orders.id) as orders'),
             DB::raw('SUM(order_items.total_price) as revenue')
         )
         ->groupBy('modules.id', 'modules.name_en')
         ->orderBy('revenue', 'desc')
         ->get();
+
+        $totalRevenue = $rows->sum('revenue');
+
+        $data = $rows->map(function ($row) use ($totalRevenue) {
+            return [
+                'module'     => strtolower(str_replace(' ', '_', $row->module)),
+                'label'      => $row->module,
+                'orders'     => (int) $row->orders,
+                'revenue'    => round((float) $row->revenue, 2),
+                'percentage' => $totalRevenue > 0 ? round(((float) $row->revenue / $totalRevenue) * 100, 1) : 0,
+            ];
+        });
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
@@ -164,6 +176,92 @@ class ReportsController extends Controller
 
 
     // ──────────────────────────────────────────
+    // 1b. SALES CHART ENDPOINTS
+    // ──────────────────────────────────────────
+
+    public function revenueTrend(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered');
+
+        // Apply start_date / end_date filters
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+        }
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+        }
+
+        $period = $request->input('period', 'day');
+        switch ($period) {
+            case 'week':
+                $format = '%x-W%v';   // ISO year-week
+                break;
+            case 'month':
+                $format = '%Y-%m';
+                break;
+            case 'year':
+                $format = '%Y';
+                break;
+            default: // day
+                $format = '%Y-%m-%d';
+                break;
+        }
+
+        $data = $query->select(
+            DB::raw("DATE_FORMAT(created_at, '{$format}') as date"),
+            DB::raw('SUM(total) as gross_revenue'),
+            DB::raw('SUM(subtotal) as net_revenue')
+        )
+        ->groupBy('date')
+        ->orderBy('date', 'asc')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'date'          => $row->date,
+                'gross_revenue' => round((float) $row->gross_revenue, 2),
+                'net_revenue'   => round((float) $row->net_revenue, 2),
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+    public function paymentMethodsBreakdown(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered');
+
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+        }
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+        }
+
+        $rows = $query->select('payment_method', DB::raw('COUNT(id) as count'))
+            ->groupBy('payment_method')
+            ->get();
+
+        $total = $rows->sum('count');
+
+        $labels = [
+            'cash'   => 'Cash on Delivery',
+            'online' => 'Online Payment',
+        ];
+
+        $data = $rows->map(function ($row) use ($total, $labels) {
+            return [
+                'method'     => $row->payment_method,
+                'label'      => $labels[$row->payment_method] ?? ucfirst($row->payment_method),
+                'count'      => (int) $row->count,
+                'percentage' => $total > 0 ? round(((int) $row->count / $total) * 100, 1) : 0,
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+
+    // ──────────────────────────────────────────
     // 2. ORDER REPORTS
     // ──────────────────────────────────────────
 
@@ -172,11 +270,33 @@ class ReportsController extends Controller
         $query = Order::query();
         $this->applyPeriodFilter($query, $request);
 
-        $data = $query->select('simple_status', DB::raw('COUNT(id) as count'))
+        $rows = $query->select('simple_status', DB::raw('COUNT(id) as count'))
             ->groupBy('simple_status')
             ->get();
 
-        return $this->successResponse($data, 'success.data_retrieved');
+        $total = $rows->sum('count');
+
+        $statusLabels = [
+            'in_progress'   => 'In Progress',
+            'ready_to_pick' => 'Ready to Pick',
+            'in_delivery'   => 'Out for Delivery',
+            'delivered'     => 'Completed',
+            'cancelled'     => 'Cancelled',
+        ];
+
+        $statuses = $rows->map(function ($row) use ($total, $statusLabels) {
+            return [
+                'status'     => $row->simple_status,
+                'label'      => $statusLabels[$row->simple_status] ?? ucfirst(str_replace('_', ' ', $row->simple_status)),
+                'count'      => (int) $row->count,
+                'percentage' => $total > 0 ? round(((int) $row->count / $total) * 100, 1) : 0,
+            ];
+        });
+
+        return $this->successResponse([
+            'total'    => $total,
+            'statuses' => $statuses,
+        ], 'success.data_retrieved');
     }
 
     public function orderCancellations(Request $request): JsonResponse
@@ -402,6 +522,38 @@ class ReportsController extends Controller
         return $this->successResponse($data, 'success.data_retrieved');
     }
 
+    public function deliveriesPerDay(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered')
+            ->where('is_delivery', true);
+
+        if ($request->filled('start_date')) {
+            $query->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+        }
+        if ($request->filled('end_date')) {
+            $query->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+        }
+
+        $data = $query->select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(id) as deliveries')
+        )
+        ->groupBy('date')
+        ->orderBy('date', 'asc')
+        ->get()
+        ->map(function ($row) {
+            $carbonDate = Carbon::parse($row->date);
+            return [
+                'date'                      => $row->date,
+                'day_label'                 => $carbonDate->format('D'),
+                'deliveries'                => (int) $row->deliveries,
+                'avg_delivery_time_minutes' => null, // No delivered_at timestamp available
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
 
     // ──────────────────────────────────────────
     // 6. VOUCHER REPORTS
@@ -451,10 +603,19 @@ class ReportsController extends Controller
             SUM(CASE WHEN success = 1 THEN amount_cents ELSE 0 END) / 100 as total_collected
         ')->first();
 
-        $successRate = $data->total_attempts > 0 ? ($data->successful_payments / $data->total_attempts) * 100 : 0;
-        
-        $response = array_merge((array)$data, ['success_rate_percentage' => round($successRate, 2)]);
-        return $this->successResponse($response, 'success.data_retrieved');
+        $totalAttempts = (int) $data->total_attempts;
+        $successfulPayments = (int) $data->successful_payments;
+        $failedPayments = (int) $data->failed_payments;
+        $totalCollected = round((float) $data->total_collected, 2);
+        $successRate = $totalAttempts > 0 ? round(($successfulPayments / $totalAttempts) * 100, 2) : 0;
+
+        return $this->successResponse([
+            'success_rate_percentage' => $successRate,
+            'total_attempts'         => $totalAttempts,
+            'successful_payments'    => $successfulPayments,
+            'failed_payments'        => $failedPayments,
+            'total_collected'        => $totalCollected,
+        ], 'success.data_retrieved');
     }
 
     public function merchantFees(Request $request): JsonResponse
@@ -467,6 +628,44 @@ class ReportsController extends Controller
             SUM(merchant_commission) as total_commission,
             SUM(accept_fees) as total_gateway_fees
         ')->first();
+
+        return $this->successResponse([
+            'total_processed'    => round((float) ($data->total_processed ?? 0), 2),
+            'total_commission'   => round((float) ($data->total_commission ?? 0), 2),
+            'total_gateway_fees' => round((float) ($data->total_gateway_fees ?? 0), 2),
+        ], 'success.data_retrieved');
+    }
+
+    public function monthlyPaymentTrend(Request $request): JsonResponse
+    {
+        $query = Payment::query();
+
+        if ($request->filled('start_date')) {
+            $query->where('payment_created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+        }
+        if ($request->filled('end_date')) {
+            $query->where('payment_created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+        }
+
+        $data = $query->select(
+            DB::raw("DATE_FORMAT(payment_created_at, '%Y-%m') as month"),
+            DB::raw("DATE_FORMAT(payment_created_at, '%b') as month_label"),
+            DB::raw('SUM(CASE WHEN success = 1 THEN 1 ELSE 0 END) as successful'),
+            DB::raw('SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as failed'),
+            DB::raw('COUNT(id) as total')
+        )
+        ->groupBy('month', 'month_label')
+        ->orderBy('month', 'asc')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'month'       => $row->month,
+                'month_label' => $row->month_label,
+                'successful'  => (int) $row->successful,
+                'failed'      => (int) $row->failed,
+                'total'       => (int) $row->total,
+            ];
+        });
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
