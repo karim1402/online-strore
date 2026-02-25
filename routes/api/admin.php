@@ -68,6 +68,9 @@ Route::prefix('admin')->group(function () {
         
         // Comprehensive Reporting endpoints
         Route::controller(\App\Http\Controllers\Api\Admin\ReportsController::class)->prefix('reports')->group(function () {
+            // 0. General Export
+            Route::get('/export', 'export');
+
             // 1. Sales & Revenue
             Route::get('/revenue/total', 'totalRevenue');
             Route::get('/revenue/over-time', 'revenueOverTime');

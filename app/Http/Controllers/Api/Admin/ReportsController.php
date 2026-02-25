@@ -17,6 +17,8 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ReportExport;
 
 class ReportsController extends Controller
 {
@@ -755,5 +757,123 @@ class ReportsController extends Controller
             return '%Y-%m'; // Group by month
         }
         return '%Y-%m-%d'; // Group by day
+    }
+
+    // ──────────────────────────────────────────
+    // 9. EVENTUAL EXPORT FOR ALL REPORTS
+    // ──────────────────────────────────────────
+
+    public function export(Request $request)
+    {
+        $reportType = $request->input('report_type');
+        $headings = [];
+        $mapper = null;
+        $data = [];
+
+        // Force a large limit for paginated queries during export
+        $request->merge(['per_page' => 100000]);
+
+        switch ($reportType) {
+            case 'revenue_by_module':
+                $data = $this->revenueByModule($request)->getData(true)['data'] ?? [];
+                $headings = ['Module', 'Orders', 'Revenue', 'Percentage %'];
+                $mapper = fn($row) => [$row['label'], $row['orders'], $row['revenue'], $row['percentage']];
+                break;
+            case 'revenue_by_category':
+                $data = $this->revenueByCategory($request)->getData(true)['data'] ?? [];
+                $headings = ['Category', 'Orders', 'Revenue'];
+                $mapper = fn($row) => [$row['category'], $row['order_count'], $row['revenue']];
+                break;
+            case 'revenue_by_store':
+                $data = $this->revenueByStore($request)->getData(true)['data'] ?? [];
+                $headings = ['Store ID', 'Store Name', 'Orders', 'Revenue'];
+                $mapper = fn($row) => [$row['store_id'], $row['store_name'], $row['order_count'], $row['revenue']];
+                break;
+            case 'revenue_by_payment_method':
+                $data = $this->revenueByPaymentMethod($request)->getData(true)['data'] ?? [];
+                $headings = ['Payment Method', 'Orders', 'Revenue'];
+                $mapper = fn($row) => [$row['payment_method'], $row['order_count'], $row['revenue']];
+                break;
+            case 'revenue_trend':
+                $data = $this->revenueTrend($request)->getData(true)['data'] ?? [];
+                $headings = ['Date', 'Gross Revenue', 'Net Revenue'];
+                $mapper = fn($row) => [$row['date'], $row['gross_revenue'], $row['net_revenue']];
+                break;
+            case 'payment_methods':
+                $data = $this->paymentMethodsBreakdown($request)->getData(true)['data'] ?? [];
+                $headings = ['Method', 'Label', 'Count', 'Percentage %'];
+                $mapper = fn($row) => [$row['method'], $row['label'], $row['count'], $row['percentage']];
+                break;
+            case 'order_distribution':
+                $data = $this->orderDistribution($request)->getData(true)['data']['statuses'] ?? [];
+                $headings = ['Status', 'Label', 'Count', 'Percentage %'];
+                $mapper = fn($row) => [$row['status'], $row['label'], $row['count'], $row['percentage']];
+                break;
+            case 'deliveries_per_day':
+                $data = $this->deliveriesPerDay($request)->getData(true)['data'] ?? [];
+                $headings = ['Date', 'Day', 'Deliveries'];
+                $mapper = fn($row) => [$row['date'], $row['day_label'], $row['deliveries']];
+                break;
+            case 'monthly_payment_trend':
+                $data = $this->monthlyPaymentTrend($request)->getData(true)['data'] ?? [];
+                $headings = ['Month', 'Label', 'Successful', 'Failed', 'Total'];
+                $mapper = fn($row) => [$row['month'], $row['month_label'], $row['successful'], $row['failed'], $row['total']];
+                break;
+            case 'top_selling_products':
+                $data = $this->topSellingProducts($request)->getData(true)['data'] ?? [];
+                $headings = ['Product ID', 'Product Name', 'Units Sold', 'Revenue'];
+                $mapper = fn($row) => [$row['id'], $row['name_en'], $row['units_sold'], $row['revenue']];
+                break;
+            case 'most_viewed_products':
+                $data = $this->mostViewedProducts()->getData(true)['data'] ?? [];
+                $headings = ['Product ID', 'Product Name', 'Views', 'Active'];
+                $mapper = fn($row) => [$row['id'], $row['name_en'], $row['view_count'], $row['is_active'] ? 'Yes' : 'No'];
+                break;
+            case 'best_sellers':
+                $data = $this->bestSellersFlagged()->getData(true)['data'] ?? [];
+                $headings = ['Product ID', 'Product Name', 'Category', 'Base Price', 'Offer Price'];
+                $mapper = fn($row) => [$row['id'], $row['name_en'], $row['category']['name_en'] ?? '', $row['base_price'], $row['offer_price']];
+                break;
+            case 'products_with_offers':
+                $data = $this->productsWithOffers()->getData(true)['data'] ?? [];
+                $headings = ['Product ID', 'Product Name', 'Base Price', 'Offer Price', 'Discount %'];
+                $mapper = fn($row) => [$row['id'], $row['name_en'], $row['base_price'], $row['offer_price'], $row['discount_percentage']];
+                break;
+            case 'top_customers':
+                $data = $this->topCustomers($request)->getData(true)['data'] ?? [];
+                $headings = ['Customer ID', 'Name', 'Email', 'Phone', 'Orders', 'Total Spend'];
+                $mapper = fn($row) => [$row['id'], $row['name'], $row['email'], $row['phone'], $row['order_count'], $row['total_spend']];
+                break;
+            case 'inactive_users':
+                $paginated = $this->inactiveUsers($request)->getData(true)['data'] ?? [];
+                $data = $paginated['data'] ?? [];
+                $headings = ['User ID', 'Name', 'Email', 'Registered At'];
+                $mapper = fn($row) => [$row['id'], $row['name'], $row['email'], Carbon::parse($row['created_at'])->format('Y-m-d')];
+                break;
+            case 'driver_performance':
+                $data = $this->driverPerformance($request)->getData(true)['data'] ?? [];
+                $headings = ['Driver ID', 'Name', 'Vehicle Type', 'Successful Deliveries', 'Failed Deliveries'];
+                $mapper = fn($row) => [$row['id'], $row['name'], $row['vehicle_type'], $row['successful_deliveries'], $row['failed_deliveries']];
+                break;
+            case 'driver_availability':
+                $data = $this->driverAvailability()->getData(true)['data'] ?? [];
+                $headings = ['Status', 'Availability', 'Count'];
+                $mapper = fn($row) => [$row['status'], $row['availability'], $row['count']];
+                break;
+            case 'voucher_usage':
+                $data = $this->voucherUsageAndEffectiveness($request)->getData(true)['data'] ?? [];
+                $headings = ['Voucher ID', 'Code', 'Type', 'Value', 'Active', 'Usages', 'Total Discount Given', 'Usage Limit', 'Utilization %'];
+                $mapper = fn($row) => [$row['id'], $row['code'], $row['type'], $row['value'], $row['is_active'] ? 'Yes' : 'No', $row['usage_count'], $row['total_discount_given'], $row['limit'] ?? 'Unlimited', $row['utilization_percentage']];
+                break;
+            case 'store_status_overview':
+                $data = $this->storeStatusOverview()->getData(true)['data'] ?? [];
+                $headings = ['Status', 'Count'];
+                $mapper = fn($row) => [$row['status'], $row['count']];
+                break;
+            default:
+                return response()->json(['success' => false, 'message' => 'Invalid report type for export'], 400);
+        }
+
+        return Excel::download(new ReportExport(collect($data), $headings, $mapper), "{$reportType}_export_" . now()->format('YmdHis') . ".xlsx");
     }
 }
