@@ -319,6 +319,7 @@ class OrderController extends Controller
                     'discount' => $discount,
                     'total' => $total,
                     'notes' => $request->notes,
+                    'is_delivery' => 0,
                 ]);
 
                 // Create order items
@@ -550,6 +551,26 @@ class OrderController extends Controller
             $order->load(['user', 'store', 'items.options', 'items.addons']);
 
             return $this->successResponse($order, 'order.cancelled_successfully');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    public function markDelivered($id): JsonResponse
+    {
+        try {
+            $order = Order::find($id);
+
+            if (!$order) {
+                return $this->errorResponse('errors.order_not_found', [], 404);
+            }
+
+            $order->simple_status = 'delivered';
+            $order->save();
+
+            $order->load(['user', 'store', 'items.options', 'items.addons']);
+
+            return $this->successResponse($order, 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }

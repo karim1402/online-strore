@@ -525,6 +525,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/', 'store');
             Route::get('/{id}', 'show');
             Route::post('/{id}/mark-ready', 'markReadyToPick');
+            Route::post('/{id}/mark-delivered', 'markDelivered');
             Route::post('/{id}/cancel', 'cancel');
         });
         // Notification Management routes
