@@ -150,6 +150,7 @@ Route::prefix('user')->group(function () {
 
     // App Settings (public)
     Route::get('settings', [\App\Http\Controllers\Api\User\SettingsController::class, 'index'])->name('user.settings');
+    Route::get('app-version', [\App\Http\Controllers\Api\User\SettingsController::class, 'appVersion'])->name('user.app-version');
     
     // Test route without authentication
     Route::get('test', function () {

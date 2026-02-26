@@ -61,4 +61,50 @@ class AppSettingController extends Controller
             'timezone' => AppSetting::TIMEZONE,
         ], 'success.operation_successful');
     }
+
+    /**
+     * Get app version settings for a given platform.
+     * GET /admin/app-settings/app-version/{platform}
+     */
+    public function getAppVersion(string $platform): JsonResponse
+    {
+        $platform = strtolower($platform);
+        if (!in_array($platform, ['android', 'ios'])) {
+            return $this->errorResponse('Platform must be android or ios.', 422);
+        }
+
+        return $this->successResponse([
+            $platform => AppSetting::getAppVersion($platform),
+        ], 'success.operation_successful');
+    }
+
+    /**
+     * Update app version settings for a given platform.
+     * PUT /admin/app-settings/app-version/{platform}
+     */
+    public function updateAppVersion(Request $request, string $platform): JsonResponse
+    {
+        $platform = strtolower($platform);
+        if (!in_array($platform, ['android', 'ios'])) {
+            return $this->errorResponse('Platform must be android or ios.', 422);
+        }
+
+        $rules = [
+            'minimum_version'         => 'sometimes|string|max:20',
+            'latest_version'          => 'sometimes|string|max:20',
+            'force_update_message'    => 'sometimes|string|max:500',
+            'optional_update_message' => 'sometimes|string|max:500',
+        ];
+
+        $validator = ValidationService::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator);
+        }
+
+        AppSetting::setAppVersion($platform, $request->only(array_keys($rules)));
+
+        return $this->successResponse([
+            $platform => AppSetting::getAppVersion($platform),
+        ], 'success.operation_successful');
+    }
 }

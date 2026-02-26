@@ -562,10 +562,12 @@ Route::prefix('admin')->group(function () {
             Route::post('/{id}/pay', 'markAsPaid');
         });
 
-        // App Settings routes (working hours)
+        // App Settings routes (working hours, app version)
         Route::controller(AppSettingController::class)->prefix('app-settings')->group(function () {
             Route::get('/working-hours', 'getWorkingHours');
             Route::put('/working-hours', 'updateWorkingHours');
+            Route::get('/app-version/{platform}', 'getAppVersion');
+            Route::put('/app-version/{platform}', 'updateAppVersion');
         });
     });
 });
