@@ -267,6 +267,187 @@ class ReportsController extends Controller
     // 2. ORDER REPORTS
     // ──────────────────────────────────────────
 
+    public function itemsSummary(Request $request): JsonResponse
+    {
+        $query = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->leftJoin('stores', 'orders.store_id', '=', 'stores.id')
+            ->where('orders.simple_status', 'delivered')
+            ->whereNull('orders.deleted_at');
+
+        $this->applyQueryFilter($query, $request, 'orders');
+
+        if ($request->filled('module_id')) {
+            $query->where('categories.module_id', $request->input('module_id'));
+        }
+        if ($request->filled('category_id')) {
+            $query->where('categories.id', $request->input('category_id'));
+        }
+        if ($request->filled('store_id')) {
+            $query->where('orders.store_id', $request->input('store_id'));
+        }
+
+        $items = $query->select(
+            'products.id as product_id',
+            'products.name_en as product_name',
+            'categories.name_en as category_name',
+            'modules.name_en as module_name',
+            DB::raw('SUM(order_items.quantity) as quantity_sold'),
+            DB::raw('MAX(order_items.unit_price) as unit_price'),
+            DB::raw('SUM(order_items.total_price) as revenue')
+        )
+        ->join('modules', 'categories.module_id', '=', 'modules.id')
+        ->groupBy(
+            'products.id',
+            'products.name_en',
+            'categories.name_en',
+            'modules.name_en'
+        )
+        ->orderBy('revenue', 'desc')
+        ->get();
+
+        $totalItemsSold = $items->sum('quantity_sold');
+        $totalRevenue = $items->sum('revenue');
+
+        return $this->successResponse([
+            'total_items_sold' => (int) $totalItemsSold,
+            'total_revenue'    => round((float) $totalRevenue, 2),
+            'items'            => $items->map(function ($item) {
+                return [
+                    'product_id'    => $item->product_id,
+                    'product_name'  => $item->product_name,
+                    'category_name' => $item->category_name,
+                    'module_name'   => $item->module_name,
+                    'quantity_sold' => (int) $item->quantity_sold,
+                    'unit_price'    => round((float) $item->unit_price, 2),
+                    'revenue'       => round((float) $item->revenue, 2),
+                ];
+            })
+        ], 'success.data_retrieved');
+    }
+
+    public function ordersByStore(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered')->with('store:id,name_en');
+        $this->applyPeriodFilter($query, $request);
+
+        if ($request->filled('module_id')) {
+            $query->whereHas('items.product.category', function ($q) use ($request) {
+                $q->where('module_id', $request->module_id);
+            });
+        }
+
+        $rows = $query->select('store_id', DB::raw('COUNT(id) as orders_count'), DB::raw('SUM(total) as revenue'))
+            ->groupBy('store_id')
+            ->orderBy('orders_count', 'desc')
+            ->get();
+
+        $totalOrders = $rows->sum('orders_count');
+
+        $data = $rows->map(function ($row) use ($totalOrders) {
+            return [
+                'store_id'     => $row->store_id,
+                'store_name'   => collect($row->store)->get('name_en', 'Unknown'),
+                'orders_count' => (int) $row->orders_count,
+                'revenue'      => round((float) $row->revenue, 2),
+                'percentage'   => $totalOrders > 0 ? round(((int) $row->orders_count / $totalOrders) * 100, 1) : 0,
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+    public function ordersByModule(Request $request): JsonResponse
+    {
+        $query = DB::table('orders')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->join('products', 'order_items.product_id', '=', 'products.id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->join('modules', 'categories.module_id', '=', 'modules.id')
+            ->where('orders.simple_status', 'delivered')
+            ->whereNull('orders.deleted_at');
+
+        $this->applyQueryFilter($query, $request, 'orders');
+
+        $rows = $query->select(
+            'modules.id as module_id',
+            'modules.name_en as module_name',
+            DB::raw('COUNT(DISTINCT orders.id) as orders_count'),
+            DB::raw('SUM(order_items.total_price) as revenue')
+        )
+        ->groupBy('modules.id', 'modules.name_en')
+        ->orderBy('orders_count', 'desc')
+        ->get();
+
+        $totalOrders = $rows->sum('orders_count');
+
+        $data = $rows->map(function ($row) use ($totalOrders) {
+            return [
+                'module_id'    => $row->module_id,
+                'module_name'  => $row->module_name,
+                'orders_count' => (int) $row->orders_count,
+                'revenue'      => round((float) $row->revenue, 2),
+                'percentage'   => $totalOrders > 0 ? round(((int) $row->orders_count / $totalOrders) * 100, 1) : 0,
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+    public function ordersPerDay(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered');
+        $this->applyPeriodFilter($query, $request);
+
+        if ($request->filled('module_id')) {
+            $query->whereHas('items.product.category', function ($q) use ($request) {
+                $q->where('module_id', $request->module_id);
+            });
+        }
+
+        $data = $query->select(
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(id) as count')
+        )
+        ->groupBy('date')
+        ->orderBy('date', 'asc')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'date'  => $row->date,
+                'count' => (int) $row->count,
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+    public function deliveryVsPickup(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered');
+        $this->applyPeriodFilter($query, $request);
+
+        if ($request->filled('module_id')) {
+            $query->whereHas('items.product.category', function ($q) use ($request) {
+                $q->where('module_id', $request->module_id);
+            });
+        }
+
+        $total = $query->count();
+        $deliveredCount = (clone $query)->where('is_delivery', 1)->count();
+        $pickupCount = $total - $deliveredCount; // The rest are taken away (0)
+
+        return $this->successResponse([
+            'delivered_count'      => $deliveredCount,
+            'delivered_percentage' => $total > 0 ? round(($deliveredCount / $total) * 100, 1) : 0,
+            'pickup_count'         => $pickupCount,
+            'pickup_percentage'    => $total > 0 ? round(($pickupCount / $total) * 100, 1) : 0,
+            'total'                => $total,
+        ], 'success.data_retrieved');
+    }
+
     public function orderDistribution(Request $request): JsonResponse
     {
         $query = Order::query();
@@ -513,15 +694,21 @@ class ReportsController extends Controller
         $this->applyQueryFilter($query, $request, 'orders');
 
         $data = $query->select(
-            'deliveries.id',
-            'deliveries.name',
-            'deliveries.vehicle_type',
-            DB::raw('SUM(CASE WHEN orders.simple_status = "delivered" THEN 1 ELSE 0 END) as successful_deliveries'),
-            DB::raw('SUM(CASE WHEN orders.simple_status IN ("cancelled", "failed") THEN 1 ELSE 0 END) as failed_deliveries')
+            'deliveries.id as driver_id',
+            'deliveries.name as driver_name',
+            DB::raw('SUM(CASE WHEN orders.simple_status = "delivered" THEN 1 ELSE 0 END) as deliveries_completed')
         )
-        ->groupBy('deliveries.id', 'deliveries.name', 'deliveries.vehicle_type')
-        ->orderBy('successful_deliveries', 'desc')
-        ->get();
+        ->groupBy('deliveries.id', 'deliveries.name')
+        ->orderBy('deliveries_completed', 'desc')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'driver_id'            => $row->driver_id,
+                'driver_name'          => $row->driver_name,
+                'deliveries_completed' => (int) $row->deliveries_completed,
+                'average_rating'       => "0.0" // Ratings not yet implemented
+            ];
+        });
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
@@ -923,6 +1110,44 @@ class ReportsController extends Controller
                 $data = $this->storeStatusOverview()->getData(true)['data'] ?? [];
                 $headings = ['Status', 'Count'];
                 $mapper = fn($row) => [$row['status'], $row['count']];
+                break;
+            case 'order_items_summary':
+                $summaryData = $this->itemsSummary($request)->getData(true)['data'] ?? [];
+                $data = $summaryData['items'] ?? [];
+                $headings = ['Product ID', 'Product Name', 'Category', 'Module', 'Quantity Sold', 'Unit Price', 'Revenue'];
+                $mapper = fn($row) => [$row['product_id'], $row['product_name'], $row['category_name'], $row['module_name'], $row['quantity_sold'], $row['unit_price'], $row['revenue']];
+                break;
+            case 'orders_by_store':
+                $data = $this->ordersByStore($request)->getData(true)['data'] ?? [];
+                $headings = ['Store ID', 'Store Name', 'Orders', 'Revenue', 'Percentage %'];
+                $mapper = fn($row) => [$row['store_id'], $row['store_name'], $row['orders_count'], $row['revenue'], $row['percentage']];
+                break;
+            case 'orders_by_module':
+                $data = $this->ordersByModule($request)->getData(true)['data'] ?? [];
+                $headings = ['Module ID', 'Module Name', 'Orders', 'Revenue', 'Percentage %'];
+                $mapper = fn($row) => [$row['module_id'], $row['module_name'], $row['orders_count'], $row['revenue'], $row['percentage']];
+                break;
+            case 'orders_per_day':
+                $data = $this->ordersPerDay($request)->getData(true)['data'] ?? [];
+                $headings = ['Date', 'Count'];
+                $mapper = fn($row) => [$row['date'], $row['count']];
+                break;
+            case 'delivery_vs_pickup':
+                $metrics = $this->deliveryVsPickup($request)->getData(true)['data'] ?? [];
+                $data = [
+                    [
+                        'Delivery',
+                        $metrics['delivered_count'] ?? 0,
+                        $metrics['delivered_percentage'] ?? 0
+                    ],
+                    [
+                        'Pickup',
+                        $metrics['pickup_count'] ?? 0,
+                        $metrics['pickup_percentage'] ?? 0
+                    ]
+                ];
+                $headings = ['Order Type', 'Count', 'Percentage %'];
+                $mapper = fn($row) => $row;
                 break;
             default:
                 return response()->json(['success' => false, 'message' => 'Invalid report type for export'], 400);

@@ -85,6 +85,10 @@ Route::prefix('admin')->group(function () {
             Route::get('/sales/payment-methods', 'paymentMethodsBreakdown');
 
             // 2. Orders
+            Route::get('/orders/items-summary', 'itemsSummary');
+            Route::get('/orders/by-store', 'ordersByStore');
+            Route::get('/orders/by-module', 'ordersByModule');
+            Route::get('/orders/per-day', 'ordersPerDay');
             Route::get('/orders/distribution', 'orderDistribution');
             Route::get('/orders/cancellations', 'orderCancellations');
             Route::get('/orders/average-value', 'averageOrderValue');
@@ -105,6 +109,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/delivery/driver-performance', 'driverPerformance');
             Route::get('/delivery/availability', 'driverAvailability');
             Route::get('/delivery/deliveries-per-day', 'deliveriesPerDay');
+            Route::get('/delivery/delivery-vs-pickup', 'deliveryVsPickup');
 
             // 6. Vouchers
             Route::get('/vouchers/usage', 'voucherUsageAndEffectiveness');
