@@ -532,7 +532,8 @@ class OrderController extends Controller
             ], 400);
         }
 
-        $order->simple_status  = 'cancelled';
+        $order->simple_status = 'cancelled';
+        $order->reason = $request->input('reason');
         $order->save();
 
         // Log activity

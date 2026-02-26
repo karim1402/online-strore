@@ -389,33 +389,40 @@ class ReportsController extends Controller
         return $this->successResponse($data, 'success.data_retrieved');
     }
 
-    public function mostViewedProducts(): JsonResponse
+    public function mostViewedProducts(Request $request): JsonResponse
     {
-        $data = Product::orderBy('view_count', 'desc')
-            ->select('id', 'name_en', 'view_count', 'is_active')
-            ->limit(50)
-            ->get();
+        $query = Product::orderBy('view_count', 'desc')
+            ->select('id', 'name_en', 'view_count', 'is_active');
+
+        $this->applyPeriodFilter($query, $request);
+
+        $data = $query->limit($request->input('limit', 50))->get();
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
 
-    public function bestSellersFlagged(): JsonResponse
+    public function bestSellersFlagged(Request $request): JsonResponse
     {
-        $data = Product::where('is_best_seller', true)
+        $query = Product::where('is_best_seller', true)
             ->with('category:id,name_en')
-            ->select('id', 'name_en', 'category_id', 'base_price', 'offer_price')
-            ->get();
+            ->select('id', 'name_en', 'category_id', 'base_price', 'offer_price');
+
+        $this->applyPeriodFilter($query, $request);
+
+        $data = $query->get();
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
 
-    public function productsWithOffers(): JsonResponse
+    public function productsWithOffers(Request $request): JsonResponse
     {
-        $data = Product::whereNotNull('offer_price')
+        $query = Product::whereNotNull('offer_price')
             ->where('is_active', true)
-            ->select('id', 'name_en', 'base_price', 'offer_price')
-            ->get()
-            ->map(function ($product) {
+            ->select('id', 'name_en', 'base_price', 'offer_price');
+
+        $this->applyPeriodFilter($query, $request);
+
+        $data = $query->get()->map(function ($product) {
                 $discount = $product->base_price > 0 
                     ? (($product->base_price - $product->offer_price) / $product->base_price) * 100 
                     : 0;
@@ -480,11 +487,15 @@ class ReportsController extends Controller
         $cutoffDate = Carbon::now()->subDays($days);
 
         // Users who registered but never placed an order OR haven't placed an order recently
-        $data = User::whereDoesntHave('orders', function ($q) use ($cutoffDate) {
+        $query = User::whereDoesntHave('orders', function ($q) use ($cutoffDate) {
                 $q->where('created_at', '>=', $cutoffDate);
             })
-            ->select('id', 'name', 'email', 'created_at')
-            ->paginate($request->input('per_page', 50));
+            ->select('id', 'name', 'email', 'created_at');
+
+        // Filter users by registration date range
+        $this->applyPeriodFilter($query, $request);
+
+        $data = $query->paginate($request->input('per_page', 50));
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
@@ -515,11 +526,13 @@ class ReportsController extends Controller
         return $this->successResponse($data, 'success.data_retrieved');
     }
 
-    public function driverAvailability(): JsonResponse
+    public function driverAvailability(Request $request): JsonResponse
     {
-        $data = Delivery::select('status', 'availability', DB::raw('COUNT(*) as count'))
-            ->groupBy('status', 'availability')
-            ->get();
+        $query = Delivery::select('status', 'availability', DB::raw('COUNT(*) as count'));
+
+        $this->applyPeriodFilter($query, $request);
+
+        $data = $query->groupBy('status', 'availability')->get();
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
@@ -563,8 +576,45 @@ class ReportsController extends Controller
 
     public function voucherUsageAndEffectiveness(Request $request): JsonResponse
     {
-        $query = Voucher::withCount('usages')
-            ->withSum('usages', 'discount_amount')
+        $period   = $request->input('period', 'all');
+        $now      = Carbon::now();
+
+        $query = Voucher::withCount(['usages' => function ($q) use ($request, $period, $now) {
+                if ($period === 'today') {
+                    $q->whereDate('created_at', $now->toDateString());
+                } elseif ($period === 'week') {
+                    $q->where('created_at', '>=', $now->copy()->subWeek()->startOfDay());
+                } elseif ($period === 'month') {
+                    $q->where('created_at', '>=', $now->copy()->subMonth()->startOfDay());
+                } elseif ($period === 'year') {
+                    $q->where('created_at', '>=', $now->copy()->subYear()->startOfDay());
+                } elseif ($period === 'custom') {
+                    if ($request->filled('start_date')) {
+                        $q->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+                    }
+                    if ($request->filled('end_date')) {
+                        $q->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+                    }
+                }
+            }])
+            ->withSum(['usages' => function ($q) use ($request, $period, $now) {
+                if ($period === 'today') {
+                    $q->whereDate('created_at', $now->toDateString());
+                } elseif ($period === 'week') {
+                    $q->where('created_at', '>=', $now->copy()->subWeek()->startOfDay());
+                } elseif ($period === 'month') {
+                    $q->where('created_at', '>=', $now->copy()->subMonth()->startOfDay());
+                } elseif ($period === 'year') {
+                    $q->where('created_at', '>=', $now->copy()->subYear()->startOfDay());
+                } elseif ($period === 'custom') {
+                    if ($request->filled('start_date')) {
+                        $q->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+                    }
+                    if ($request->filled('end_date')) {
+                        $q->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+                    }
+                }
+            }], 'discount_amount')
             ->orderBy('usages_count', 'desc');
 
         if ($request->has('status')) {
@@ -573,15 +623,17 @@ class ReportsController extends Controller
 
         $vouchers = $query->get()->map(function($voucher) {
             return [
-                'id' => $voucher->id,
-                'code' => $voucher->code,
-                'type' => $voucher->type,
-                'value' => $voucher->value,
-                'is_active' => $voucher->is_active,
-                'usage_count' => $voucher->usages_count,
-                'total_discount_given' => (float)$voucher->usages_sum_discount_amount,
-                'limit' => $voucher->usage_limit,
-                'utilization_percentage' => $voucher->usage_limit ? round(($voucher->usages_count / $voucher->usage_limit) * 100, 2) : null
+                'id'                    => $voucher->id,
+                'code'                  => $voucher->code,
+                'type'                  => $voucher->type,
+                'value'                 => $voucher->value,
+                'is_active'             => $voucher->is_active,
+                'usage_count'           => $voucher->usages_count,
+                'total_discount_given'  => (float) $voucher->usages_sum_discount_amount,
+                'limit'                 => $voucher->usage_limit,
+                'utilization_percentage' => $voucher->usage_limit
+                    ? round(($voucher->usages_count / $voucher->usage_limit) * 100, 2)
+                    : null,
             ];
         });
 
@@ -677,11 +729,13 @@ class ReportsController extends Controller
     // 8. STORE & VENDOR REPORTS
     // ──────────────────────────────────────────
 
-    public function storeStatusOverview(): JsonResponse
+    public function storeStatusOverview(Request $request): JsonResponse
     {
-        $data = Store::select('status', DB::raw('COUNT(id) as count'))
-            ->groupBy('status')
-            ->get();
+        $query = Store::select('status', DB::raw('COUNT(id) as count'));
+
+        $this->applyPeriodFilter($query, $request);
+
+        $data = $query->groupBy('status')->get();
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
