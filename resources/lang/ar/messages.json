@@ -64,6 +64,7 @@
         "user_retrieved": "تم جلب المستخدم بنجاح",
         "user_updated": "تم تحديث المستخدم بنجاح",
         "user_deleted": "تم حذف المستخدم بنجاح",
+        "user_status_updated": "تم تحديث حالة المستخدم بنجاح",
         "notifications_retrieved": "تم جلب سجل الإشعارات بنجاح",
         "notification_sent": "تم إرسال الإشعار بنجاح",
         "fcm_token_updated": "تم تحديث رمز FCM بنجاح",

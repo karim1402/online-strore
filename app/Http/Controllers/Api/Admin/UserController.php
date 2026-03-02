@@ -204,4 +204,36 @@ class UserController extends Controller
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
+
+    /**
+     * Toggle user status (active/inactive).
+     */
+    public function toggleStatus(int $id): JsonResponse
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            $user->status = $user->status === 'active' ? 'inactive' : 'active';
+            $user->save();
+
+            // Log the status change activity
+            $currentAdmin = auth('admins')->user();
+            activity('user')
+                ->causedBy($currentAdmin)
+                ->performedOn($user)
+                ->withProperties([
+                    'action' => 'status_updated',
+                    'updated_by' => $currentAdmin->name,
+                    'user_name' => $user->name,
+                    'new_status' => $user->status,
+                ])
+                ->log('User status updated by admin');
+
+            return $this->successResponse($user->fresh(), 'success.user_status_updated');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('errors.resource_not_found');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
 }

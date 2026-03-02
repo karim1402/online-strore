@@ -18,20 +18,25 @@ class OrderController extends Controller
     public function statistics(): JsonResponse
     {
         try {
-            $totalOrders = Order::count();
-            $pendingOrders = Order::where('simple_status', 'in_progress')->count();
-            $processingOrders = Order::where('simple_status', 'ready_to_pick')->count();
-            $inDeliveryOrders = Order::where('simple_status', 'in_delivery')->count();
-            $deliveredOrders = Order::where('simple_status', 'delivered')->count();
-            $cancelledOrders = Order::where('simple_status', 'cancelled')->count();
+            $query = Order::query();
+            
+            // Apply all filters before aggregating stats
+            $query = $this->applyOrderFilters($query, request());
+
+            $totalOrders = (clone $query)->count();
+            $pendingOrders = (clone $query)->where('simple_status', 'in_progress')->count();
+            $processingOrders = (clone $query)->where('simple_status', 'ready_to_pick')->count();
+            $inDeliveryOrders = (clone $query)->where('simple_status', 'in_delivery')->count();
+            $deliveredOrders = (clone $query)->where('simple_status', 'delivered')->count();
+            $cancelledOrders = (clone $query)->where('simple_status', 'cancelled')->count();
 
             // Revenue per status
-            $pendingRevenue = Order::where('simple_status', 'in_progress')->sum('total');
-            $processingRevenue = Order::where('simple_status', 'ready_to_pick')->sum('total');
-            $inDeliveryRevenue = Order::where('simple_status', 'in_delivery')->sum('total');
-            $deliveredRevenue = Order::where('simple_status', 'delivered')->sum('total');
-            $cancelledRevenue = Order::where('simple_status', 'cancelled')->sum('total');
-            $totalRevenue = Order::where('simple_status', '!=', 'cancelled')->sum('total');
+            $pendingRevenue = (clone $query)->where('simple_status', 'in_progress')->sum('total');
+            $processingRevenue = (clone $query)->where('simple_status', 'ready_to_pick')->sum('total');
+            $inDeliveryRevenue = (clone $query)->where('simple_status', 'in_delivery')->sum('total');
+            $deliveredRevenue = (clone $query)->where('simple_status', 'delivered')->sum('total');
+            $cancelledRevenue = (clone $query)->where('simple_status', 'cancelled')->sum('total');
+            $totalRevenue = (clone $query)->where('simple_status', '!=', 'cancelled')->sum('total');
 
             return $this->successResponse([
                 'total_orders' => $totalOrders,
@@ -41,12 +46,13 @@ class OrderController extends Controller
                 'delivered' => $deliveredOrders,
                 'cancelled' => $cancelledOrders,
                 'revenue' => [
-                    'total' => round($totalRevenue, 2),
-                    'pending' => round($pendingRevenue, 2),
-                    'processing' => round($processingRevenue, 2),
-                    'in_delivery' => round($inDeliveryRevenue, 2),
-                    'delivered' => round($deliveredRevenue, 2),
-                    'cancelled' => round($cancelledRevenue, 2),
+                    'total' => round((float) $totalRevenue, 2),
+                    'pending' => round((float) $pendingRevenue, 2),
+                    'processing' => round((float) $processingRevenue, 2),
+                    'in_delivery' => round((float) $inDeliveryRevenue, 2),
+                    'delivered' => round((float) $deliveredRevenue, 2),
+                    'cancelled' => round((float) $cancelledRevenue, 2),
+
                 ],
             ], 'success.data_retrieved');
         } catch (\Exception $e) {
@@ -60,39 +66,8 @@ class OrderController extends Controller
             $query = Order::with(['user', 'items.product.category', 'store'])
                 ->orderBy('created_at', 'desc');
 
-            if ($request->filled('store_id')) {
-                $query->where('store_id', $request->store_id);
-            }
-
-            if ($request->filled('status')) {
-                $query->where('simple_status', $request->status);
-            }
-
-            if ($request->filled('payment_status')) {
-                $query->where('payment_status', $request->payment_status);
-            }
-
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('order_number', 'like', "%{$search}%")
-                      ->orWhereHas('user', function ($userQuery) use ($search) {
-                          $userQuery->where('name', 'like', "%{$search}%")
-                                    ->orWhere('email', 'like', "%{$search}%")
-                                    ->orWhere('phone', 'like', "%{$search}%")
-                                    ->orWhere('id', "{$search}");
-                      });
-                });
-            }
-
-            // Filter by date range
-            if ($request->filled('from_date')) {
-                $query->whereDate('created_at', '>=', $request->from_date);
-            }
-
-            if ($request->filled('to_date')) {
-                $query->whereDate('created_at', '<=', $request->to_date);
-            }
+            // Apply the shared filters
+            $query = $this->applyOrderFilters($query, $request);
 
             $perPage = (int) $request->get('per_page', 15) ?? 15;
             // if ($perPage <= 0) {
@@ -212,7 +187,8 @@ class OrderController extends Controller
                     ], 422);
                 }
 
-                $itemPrice = $product->base_price;
+                $baseProductPrice = $product->offer_price ?? $product->base_price;
+                $itemPrice = $baseProductPrice;
                 $itemSubtotal = 0;
 
                 // Validate and calculate option prices
@@ -228,12 +204,19 @@ class OrderController extends Controller
                             ], 422);
                         }
 
-                        $optionPrice = $optionValue->calculatePrice($product->base_price);
-                        $itemPrice = $optionPrice;
+                        $calcPrice = $optionValue->calculatePrice($baseProductPrice);
+                        
+                        if ($optionValue->price_type === 'fixed') {
+                            $calculatedOptionPrice = $calcPrice;
+                        } else {
+                            $calculatedOptionPrice = $calcPrice - $baseProductPrice;
+                        }
+                        
+                        $itemPrice += $calculatedOptionPrice;
 
                         $validatedOptions[] = [
                             'product_option_value_id' => $optionValue->id,
-                            'price' => $optionPrice,
+                            'price' => $calculatedOptionPrice,
                         ];
                     }
                 }
@@ -311,6 +294,7 @@ class OrderController extends Controller
                     'discount' => $discount,
                     'total' => $total,
                     'notes' => $request->notes,
+                    'is_delivery' => 0,
                 ]);
 
                 // Create order items
@@ -333,6 +317,7 @@ class OrderController extends Controller
                             'name_en' => $itemData['product']->name_en,
                             'name_ar' => $itemData['product']->name_ar,
                             'base_price' => $itemData['product']->base_price,
+                            'offer_price' => $itemData['product']->offer_price,
                         ],
                         'quantity' => $itemData['quantity'],
                         'unit_price' => $itemData['price'],
@@ -544,5 +529,88 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
+    }
+
+    public function markDelivered($id): JsonResponse
+    {
+        try {
+            $order = Order::find($id);
+
+            if (!$order) {
+                return $this->errorResponse('errors.order_not_found', [], 404);
+            }
+
+            $order->simple_status = 'delivered';
+            $order->save();
+
+            $order->load(['user', 'store', 'items.options', 'items.addons']);
+
+            return $this->successResponse($order, 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Apply common filters for orders (used in index and statistics)
+     */
+    private function applyOrderFilters($query, Request $request)
+    {
+        if ($request->filled('store_id')) {
+            $query->where('store_id', $request->store_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('simple_status', $request->status);
+        }
+
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+        
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        if ($request->filled('order_type')) {
+            $isDelivery = $request->order_type === 'delivery' ? 1 : 0;
+            $query->where('is_delivery', $isDelivery);
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                  ->orWhereHas('user', function ($userQuery) use ($search) {
+                      $userQuery->where('name', 'like', "%{$search}%")
+                                ->orWhere('email', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%")
+                                ->orWhere('id', "{$search}");
+                  });
+            });
+        }
+
+        if ($request->filled('module_id')) {
+            $query->whereHas('items.product.category', function ($q) use ($request) {
+                $q->where('module_id', $request->module_id);
+            });
+        }
+
+        if ($request->filled('category_id')) {
+            $query->whereHas('items.product', function ($q) use ($request) {
+                // Products fall straight under a category in Store
+                $q->where('category_id', $request->category_id);
+            });
+        }
+
+        return $query;
     }
 }

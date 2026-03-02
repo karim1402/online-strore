@@ -47,6 +47,7 @@ class Order extends Model
         'vendor_invoice_id',
         'delivery_invoice_id',
         'discount',
+        'reason',
     ];
 
     protected $casts = [

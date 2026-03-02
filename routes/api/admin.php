@@ -66,6 +66,63 @@ Route::prefix('admin')->group(function () {
             Route::get('/recent-orders', 'recentOrders');
         });
         
+        // Comprehensive Reporting endpoints
+        Route::controller(\App\Http\Controllers\Api\Admin\ReportsController::class)->prefix('reports')->group(function () {
+            // 0. General Export
+            Route::get('/export', 'export');
+
+            // 1. Sales & Revenue
+            Route::get('/revenue/total', 'totalRevenue');
+            Route::get('/revenue/over-time', 'revenueOverTime');
+            Route::get('/revenue/by-module', 'revenueByModule');
+            Route::get('/revenue/by-category', 'revenueByCategory');
+            Route::get('/revenue/by-store', 'revenueByStore');
+            Route::get('/revenue/by-payment-method', 'revenueByPaymentMethod');
+            Route::get('/revenue/discounts-impact', 'discountImpact');
+
+            // 1b. Sales Charts
+            Route::get('/sales/revenue-trend', 'revenueTrend');
+            Route::get('/sales/payment-methods', 'paymentMethodsBreakdown');
+
+            // 2. Orders
+            Route::get('/orders/items-summary', 'itemsSummary');
+            Route::get('/orders/by-store', 'ordersByStore');
+            Route::get('/orders/by-module', 'ordersByModule');
+            Route::get('/orders/per-day', 'ordersPerDay');
+            Route::get('/orders/distribution', 'orderDistribution');
+            Route::get('/orders/cancellations', 'orderCancellations');
+            Route::get('/orders/average-value', 'averageOrderValue');
+            Route::get('/orders/admin-created', 'adminCreatedOrders');
+
+            // 3. Products
+            Route::get('/products/top-selling', 'topSellingProducts');
+            Route::get('/products/most-viewed', 'mostViewedProducts');
+            Route::get('/products/best-sellers', 'bestSellersFlagged');
+            Route::get('/products/with-offers', 'productsWithOffers');
+
+            // 4. Users
+            Route::get('/users/growth', 'userGrowth');
+            Route::get('/users/top-customers', 'topCustomers');
+            Route::get('/users/inactive', 'inactiveUsers');
+
+            // 5. Delivery
+            Route::get('/delivery/driver-performance', 'driverPerformance');
+            Route::get('/delivery/availability', 'driverAvailability');
+            Route::get('/delivery/deliveries-per-day', 'deliveriesPerDay');
+            Route::get('/delivery/delivery-vs-pickup', 'deliveryVsPickup');
+
+            // 6. Vouchers
+            Route::get('/vouchers/usage', 'voucherUsageAndEffectiveness');
+
+            // 7. Payments
+            Route::get('/payments/success-rate', 'paymentSuccessRate');
+            Route::get('/payments/merchant-fees', 'merchantFees');
+            Route::get('/payments/monthly-trend', 'monthlyPaymentTrend');
+
+            // 8. Stores
+            Route::get('/stores/status-overview', 'storeStatusOverview');
+        });
+        
         // Regular Users CRUD routes (permission-based)
         Route::controller(UserController::class)->prefix('users')->group(function () {
             Route::middleware('permission:users.view,admins')->group(function () {
@@ -79,6 +136,7 @@ Route::prefix('admin')->group(function () {
             
             Route::middleware('permission:users.update,admins')->group(function () {
                 Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
             });
             
             Route::middleware('permission:users.delete,admins')->group(function () {
@@ -473,6 +531,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/', 'store');
             Route::get('/{id}', 'show');
             Route::post('/{id}/mark-ready', 'markReadyToPick');
+            Route::post('/{id}/mark-delivered', 'markDelivered');
             Route::post('/{id}/cancel', 'cancel');
         });
         // Notification Management routes
@@ -509,10 +568,12 @@ Route::prefix('admin')->group(function () {
             Route::post('/{id}/pay', 'markAsPaid');
         });
 
-        // App Settings routes (working hours)
+        // App Settings routes (working hours, app version)
         Route::controller(AppSettingController::class)->prefix('app-settings')->group(function () {
             Route::get('/working-hours', 'getWorkingHours');
             Route::put('/working-hours', 'updateWorkingHours');
+            Route::get('/app-version/{platform}', 'getAppVersion');
+            Route::put('/app-version/{platform}', 'updateAppVersion');
         });
     });
 });

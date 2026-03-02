@@ -29,4 +29,7 @@ jobs:
              */node_modules/*
              */public/*
              */vendor/*-+6 
+             */images/*
+             */updated images/*
+
  

@@ -65,13 +65,13 @@ class OrderController extends Controller
             $delivery = auth('deliveries')->user();
 
             // If delivery person already has an active order, they shouldn't see available orders
-            $activeOrder = Order::where('delivery_id', $delivery->id)
-                ->whereIn('simple_status', ['ready_to_pick', 'in_delivery'])
-                ->first();
+            // $activeOrder = Order::where('delivery_id', $delivery->id)
+            //     ->whereIn('simple_status', ['ready_to_pick', 'in_delivery'])
+            //     ->first();
 
-            if ($activeOrder) {
-                return $this->successResponse(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15), 'success.data_retrieved');
-            }
+            // if ($activeOrder) {
+            //     return $this->successResponse(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15), 'success.data_retrieved');
+            // }
 
             $query = Order::with(['store', 'branch', 'user', 'items'])
                 ->whereNull('delivery_id')
@@ -124,13 +124,13 @@ class OrderController extends Controller
             }
 
             // Check if delivery person already has an active order
-            $activeOrder = Order::where('delivery_id', $delivery->id)
-                ->whereIn('simple_status', ['ready_to_pick', 'in_delivery'])
-                ->first();
+            // $activeOrder = Order::where('delivery_id', $delivery->id)
+            //     ->whereIn('simple_status', ['ready_to_pick', 'in_delivery'])
+            //     ->first();
 
-            if ($activeOrder) {
-                return $this->errorResponse('errors.delivery_has_active_order', [], 400);
-            }
+            // if ($activeOrder) {
+            //     return $this->errorResponse('errors.delivery_has_active_order', [], 400);
+            // }
 
             $order = Order::whereNull('delivery_id')
                 ->where('simple_status', 'ready_to_pick')

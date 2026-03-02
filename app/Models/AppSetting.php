@@ -78,4 +78,29 @@ class AppSetting extends Model
 
         return $currentTime >= $openingTime && $currentTime <= $closingTime;
     }
+
+    /**
+     * Get app version settings for a given platform (android / ios).
+     */
+    public static function getAppVersion(string $platform): array
+    {
+        return [
+            'minimum_version'          => static::get("{$platform}_minimum_version", '1.0.0'),
+            'latest_version'           => static::get("{$platform}_latest_version",  '1.0.0'),
+            'force_update_message'     => static::get("{$platform}_force_update_message",    ''),
+            'optional_update_message'  => static::get("{$platform}_optional_update_message", ''),
+        ];
+    }
+
+    /**
+     * Set app version settings for a given platform.
+     */
+    public static function setAppVersion(string $platform, array $data): void
+    {
+        foreach (['minimum_version', 'latest_version', 'force_update_message', 'optional_update_message'] as $field) {
+            if (array_key_exists($field, $data)) {
+                static::set("{$platform}_{$field}", $data[$field]);
+            }
+        }
+    }
 }
