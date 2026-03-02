@@ -64,6 +64,7 @@
         "user_retrieved": "User retrieved successfully",
         "user_updated": "User updated successfully",
         "user_deleted": "User deleted successfully",
+        "user_status_updated": "User status updated successfully",
         "notifications_retrieved": "Notifications history retrieved successfully",
         "notification_sent": "Notification sent successfully",
         "fcm_token_updated": "FCM token updated successfully",
