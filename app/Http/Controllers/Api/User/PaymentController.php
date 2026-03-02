@@ -83,7 +83,7 @@ class PaymentController extends Controller
             $billingData = [
                 'first_name' => $user->name ?? 'Guest',
                 'last_name' => 'User',
-                'email' => $user->email ?? 'guest@example.com',
+                // 'email' => $user->email ?? 'guest@example.com',
                 'phone_number' => $user->phone ?? ($address->phone ?? '+201000000000'),
                 'apartment' => $address->apartment_number ?? 'NA',
                 'floor' => $address->floor_number ?? 'NA',
