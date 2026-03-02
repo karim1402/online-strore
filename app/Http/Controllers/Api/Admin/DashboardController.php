@@ -59,7 +59,25 @@ class DashboardController extends Controller
             $ordersChange = $this->percentageChange($ordersThisMonth, $ordersLastMonth);
             $productsChange = $this->percentageChange($totalProducts, $productsLastMonth);
 
+            // Daily Revenue
+            $revenueToday = (float) Order::where('simple_status', 'delivered')
+                ->whereDate('created_at', $now->toDateString())
+                ->sum('total');
+
+            $revenueYesterday = (float) Order::where('simple_status', 'delivered')
+                ->whereDate('created_at', $now->copy()->subDay()->toDateString())
+                ->sum('total');
+
+            $dailyRevenueChange = $this->percentageChange($revenueToday, $revenueYesterday);
+
             return $this->successResponse([
+                'daily_revenue' => [
+                    'value' => round($revenueToday, 2),
+                    'currency' => 'EGP',
+                    'change' => $dailyRevenueChange,
+                    'trend' => $this->trend($dailyRevenueChange),
+                    'period' => 'today',
+                ],
                 'total_revenue' => [
                     'value' => round($totalRevenue, 2),
                     'currency' => 'EGP',
