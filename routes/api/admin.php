@@ -136,6 +136,7 @@ Route::prefix('admin')->group(function () {
             
             Route::middleware('permission:users.update,admins')->group(function () {
                 Route::put('/{id}', 'update');
+                Route::patch('/{id}/toggle-status', 'toggleStatus');
             });
             
             Route::middleware('permission:users.delete,admins')->group(function () {

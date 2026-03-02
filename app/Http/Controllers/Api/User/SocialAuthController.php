@@ -48,6 +48,11 @@ class SocialAuthController extends Controller
             // Find or create user
             $user = $this->findOrCreateSocialUser($googleUser, 'google');
 
+            // Check if the user account is active
+            if ($user->status !== 'active') {
+                return $this->errorResponse('errors.account_disabled', [], 403);
+            }
+
             // Generate JWT token
             $token = Auth::guard('api')->login($user);
 
@@ -107,6 +112,11 @@ class SocialAuthController extends Controller
 
             // Find or create user
             $user = $this->findOrCreateSocialUser($facebookUser, 'facebook');
+
+            // Check if the user account is active
+            if ($user->status !== 'active') {
+                return $this->errorResponse('errors.account_disabled', [], 403);
+            }
 
             // Generate JWT token
             $token = Auth::guard('api')->login($user);
@@ -237,6 +247,11 @@ class SocialAuthController extends Controller
                     'name' => $name,
                 ];
                 $user = $this->findOrCreateSocialUser($appleUser, 'apple');
+            }
+
+            // Check if the user account is active
+            if ($user->status !== 'active') {
+                return $this->errorResponse('errors.account_disabled', [], 403);
             }
 
             // Generate JWT token
