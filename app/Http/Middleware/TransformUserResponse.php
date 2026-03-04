@@ -45,7 +45,7 @@ class TransformUserResponse
     }
 
     /**
-     * Recursively transform 'status' fields from string (active/inactive) to boolean.
+     * Recursively remove 'status' string fields from nested data.
      */
     private function transformStatusFields($data)
     {
@@ -55,7 +55,7 @@ class TransformUserResponse
 
         foreach ($data as $key => $value) {
             if ($key === 'status' && is_string($value)) {
-                $data[$key] = $value === 'active';
+                unset($data[$key]);
             } elseif (is_array($value)) {
                 $data[$key] = $this->transformStatusFields($value);
             }
