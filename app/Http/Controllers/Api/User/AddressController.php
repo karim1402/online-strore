@@ -444,4 +444,30 @@ class AddressController extends Controller
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
+    /**
+     * Get delivery fees for a given address.
+     * Returns 0 for now — will be dynamic in the future.
+     */
+    public function deliveryFees($id): JsonResponse
+    {
+        try {
+            $user = Auth::guard('api')->user();
+
+            $address = UserAddress::where('user_id', $user->id)
+                ->find($id);
+
+            if (!$address) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            return $this->successResponse([
+                'address_id'     => (int) $id,
+                'delivery_fees'  => 0,
+                'currency'       => 'EGP',
+            ], 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
 }
+
