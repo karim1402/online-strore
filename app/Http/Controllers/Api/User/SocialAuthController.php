@@ -49,7 +49,7 @@ class SocialAuthController extends Controller
             $user = $this->findOrCreateSocialUser($googleUser, 'google');
 
             // Check if the user account is active
-            if ($user->status !== 'active') {
+            if (!$user->status) {
                 return $this->errorResponse('errors.account_disabled', [], 403);
             }
 
@@ -114,7 +114,7 @@ class SocialAuthController extends Controller
             $user = $this->findOrCreateSocialUser($facebookUser, 'facebook');
 
             // Check if the user account is active
-            if ($user->status !== 'active') {
+            if (!$user->status) {
                 return $this->errorResponse('errors.account_disabled', [], 403);
             }
 
@@ -250,7 +250,7 @@ class SocialAuthController extends Controller
             }
 
             // Check if the user account is active
-            if ($user->status !== 'active') {
+            if (!$user->status) {
                 return $this->errorResponse('errors.account_disabled', [], 403);
             }
 

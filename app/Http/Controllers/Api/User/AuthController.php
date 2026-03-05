@@ -163,7 +163,7 @@ class AuthController extends Controller
         $user = Auth::guard('api')->user();
 
         // Check if the user account is active
-        if ($user->status !== 'active') {
+        if (!$user->status) {
             Auth::guard('api')->logout();
             return $this->errorResponse('errors.account_disabled', [], 403);
         }
