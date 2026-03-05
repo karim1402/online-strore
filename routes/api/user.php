@@ -77,6 +77,7 @@ Route::prefix('user')->group(function () {
             Route::put('/{id}', 'update')->name('user.addresses.update');
             Route::delete('/{id}', 'destroy')->name('user.addresses.destroy');
             Route::patch('/{id}/set-default', 'setDefault')->name('user.addresses.setDefault');
+            Route::get('/{id}/delivery-fees', 'deliveryFees')->name('user.addresses.deliveryFees');
         });
 
         // Cart Management Routes
