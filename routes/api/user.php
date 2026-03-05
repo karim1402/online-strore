@@ -22,7 +22,7 @@ use App\Http\Controllers\Api\User\CategoryController;
 |
 */
 
-Route::prefix('user')->middleware(\App\Http\Middleware\TransformUserResponse::class)->group(function () {
+Route::prefix('user')->group(function () {
     // Authentication routes
     Route::controller(AuthController::class)->group(function () {
         Route::post('send-otp', 'sendOtp')->name('user.send-otp');
