@@ -213,7 +213,7 @@ class UserController extends Controller
         try {
             $user = User::findOrFail($id);
 
-            $user->status = $user->status === 'active' ? 'inactive' : 'active';
+            $user->status = !$user->status;
             $user->save();
 
             // Log the status change activity
