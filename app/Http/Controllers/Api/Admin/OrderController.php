@@ -106,6 +106,8 @@ class OrderController extends Controller
         try {
             // Validate input
             $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+                'user_name' => 'nullable|string|max:255',
+                'user_phone' => 'nullable|string|max:20',
                 'user_id' => 'nullable|exists:users,id',
                 'address_id' => 'nullable|exists:user_addresses,id',
                 'address' => 'nullable|array',
@@ -279,6 +281,8 @@ class OrderController extends Controller
                 // Create order
                 $order = Order::create([
                     'order_number' => $orderNumber,
+                    'user_name' => $request->user_name,
+                    'user_phone' => $request->user_phone,
                     'user_id' => $user ? $user->id : null,
                     'store_id' => null, // Admin orders don't require store
                     'address_id' => $request->address_id ?? null,
@@ -541,6 +545,7 @@ class OrderController extends Controller
             }
 
             $order->simple_status = 'delivered';
+            $order->payment_status = 'paid';
             $order->save();
 
             $order->load(['user', 'store', 'items.options', 'items.addons']);
