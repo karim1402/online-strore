@@ -208,6 +208,7 @@ class OrderController extends Controller
             }
 
             $order->simple_status = 'delivered';
+            $order->payment_status = 'paid';
             $order->save();
 
             $order->load(['store', 'branch', 'user', 'items.options', 'items.addons', 'delivery']);
