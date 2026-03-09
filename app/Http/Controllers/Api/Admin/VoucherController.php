@@ -15,7 +15,7 @@ class VoucherController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Voucher::query();
+        $query = Voucher::with('module');
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -24,6 +24,10 @@ class VoucherController extends Controller
 
         if ($request->filled('is_active')) {
             $query->where('is_active', $request->boolean('is_active'));
+        }
+
+        if ($request->filled('module_id')) {
+            $query->where('module_id', $request->input('module_id'));
         }
 
         $vouchers = $query->orderBy('created_at', 'desc')->paginate($request->input('per_page', 15));
@@ -51,6 +55,7 @@ class VoucherController extends Controller
             'usage_limit' => 'nullable|integer|min:1',
             'usage_limit_per_user' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
+            'module_id' => 'nullable|exists:modules,id',
         ]);
 
         if ($validator->fails()) {
@@ -62,6 +67,7 @@ class VoucherController extends Controller
         }
 
         $voucher = Voucher::create($request->all());
+        $voucher->load('module');
 
         return response()->json([
             'success' => true,
@@ -75,7 +81,7 @@ class VoucherController extends Controller
      */
     public function show($id)
     {
-        $voucher = Voucher::find($id);
+        $voucher = Voucher::with('module')->find($id);
 
         if (!$voucher) {
             return response()->json([
@@ -116,6 +122,7 @@ class VoucherController extends Controller
             'usage_limit' => 'nullable|integer|min:1',
             'usage_limit_per_user' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
+            'module_id' => 'nullable|exists:modules,id',
         ]);
 
         if ($validator->fails()) {
@@ -127,6 +134,7 @@ class VoucherController extends Controller
         }
 
         $voucher->update($request->all());
+        $voucher->load('module');
 
         return response()->json([
             'success' => true,
