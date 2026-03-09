@@ -63,7 +63,7 @@ class OrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Order::with(['user', 'items.product.category', 'store'])
+            $query = Order::with(['user', 'items.product.category', 'store', 'voucherUsage.voucher.module'])
                 ->orderBy('created_at', 'desc');
 
             // Apply the shared filters
@@ -88,7 +88,7 @@ class OrderController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $order = Order::with(['user', 'store', 'delivery', 'items.product.images', 'items.product.category', 'items.options', 'items.addons', 'branch', 'vendorInvoice'])
+            $order = Order::with(['user', 'store', 'delivery', 'items.product.images', 'items.product.category', 'items.options', 'items.addons', 'branch', 'vendorInvoice', 'voucherUsage.voucher.module'])
                 ->find($id);
 
             if (!$order) {
@@ -613,6 +613,12 @@ class OrderController extends Controller
             $query->whereHas('items.product', function ($q) use ($request) {
                 // Products fall straight under a category in Store
                 $q->where('category_id', $request->category_id);
+            });
+        }
+
+        if ($request->filled('voucher_id')) {
+            $query->whereHas('voucherUsage', function ($q) use ($request) {
+                $q->where('voucher_id', $request->voucher_id);
             });
         }
 

@@ -129,6 +129,11 @@ class Order extends Model
         return $this->belongsTo(DeliveryInvoice::class);
     }
 
+    public function voucherUsage()
+    {
+        return $this->hasOne(VoucherUsage::class);
+    }
+
     /**
      * Computed attributes
      */
