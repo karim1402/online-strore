@@ -22,6 +22,7 @@ class Voucher extends Model
         'usage_limit_per_user',
         'usage_count',
         'is_active',
+        'module_id',
     ];
 
     protected $casts = [
@@ -34,9 +35,21 @@ class Voucher extends Model
     ];
 
     /**
-     * Check if the voucher is valid for the given user and order amount.
+     * The module this voucher is restricted to (nullable = global voucher).
      */
-    public function isValidForUser($user, $orderAmount)
+    public function module()
+    {
+        return $this->belongsTo(Module::class);
+    }
+
+    /**
+     * Check if the voucher is valid for the given user, order amount, and cart items.
+     *
+     * @param  \App\Models\User|null  $user
+     * @param  float  $orderAmount
+     * @param  \Illuminate\Support\Collection  $cartItems  Cart items with loaded product.category
+     */
+    public function isValidForUser($user, $orderAmount, $cartItems = null)
     {
         if (!$this->is_active) {
             return false;
@@ -65,7 +78,42 @@ class Voucher extends Model
             }
         }
 
+        // Module restriction check: if this voucher is linked to a module,
+        // the cart must contain at least one product from that module.
+        if ($this->module_id) {
+            if (!$cartItems || $cartItems->isEmpty()) {
+                return false;
+            }
+
+            $hasModuleProduct = $cartItems->contains(function ($item) {
+                return optional($item->product)->module_id == $this->module_id;
+            });
+
+            if (!$hasModuleProduct) {
+                return false;
+            }
+        }
+
         return true;
+    }
+
+    /**
+     * Check if the voucher is module-restricted and the given cart items fail that restriction.
+     * Used to return a specific error message vs generic invalid.
+     */
+    public function failsModuleRestriction($cartItems = null): bool
+    {
+        if (!$this->module_id) {
+            return false;
+        }
+
+        if (!$cartItems || $cartItems->isEmpty()) {
+            return true;
+        }
+
+        return !$cartItems->contains(function ($item) {
+            return optional($item->product)->module_id == $this->module_id;
+        });
     }
 
     /**

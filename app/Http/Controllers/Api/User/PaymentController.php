@@ -62,7 +62,7 @@ class PaymentController extends Controller
             $isDelivery = $request->boolean('is_delivery', true);
 
             // Get cart
-            $cart = Cart::with(['items.product', 'items.options', 'items.addons'])
+            $cart = Cart::with(['items.product.category', 'items.product', 'items.options', 'items.addons'])
                 ->where('user_id', $user->id)
                 ->first();
 
@@ -103,8 +103,8 @@ class PaymentController extends Controller
             $discount = 0.00;
             $voucher = null;
             if ($request->filled('voucher_code')) {
-                $voucher = \App\Models\Voucher::where('code', $request->voucher_code)->first();
-                if ($voucher && $voucher->isValidForUser($user, $subtotal)) {
+                $voucher = \App\Models\Voucher::with('module')->where('code', $request->voucher_code)->first();
+                if ($voucher && $voucher->isValidForUser($user, $subtotal, $cart->items)) {
                     $discount = $voucher->getDiscountAmount($subtotal);
                 } else {
                      return $this->errorResponse('errors.voucher_invalid', [], 422);
@@ -299,7 +299,7 @@ class PaymentController extends Controller
     private function createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $paymentObj, $isDelivery = true)
     {
         $user = \App\Models\User::find($userId);
-        $cart = Cart::with(['items.product', 'items.options', 'items.addons'])->where('user_id', $userId)->first();
+        $cart = Cart::with(['items.product.category', 'items.product', 'items.options', 'items.addons'])->where('user_id', $userId)->first();
         $address = UserAddress::find($addressId);
 
         if (!$cart || !$address) return null;
@@ -316,8 +316,8 @@ class PaymentController extends Controller
         $discount = 0.00;
         $voucher = null;
         if ($voucherId > 0) {
-            $voucher = \App\Models\Voucher::find($voucherId);
-            if ($voucher && $voucher->isValidForUser($user, $subtotal)) {
+            $voucher = \App\Models\Voucher::with('module')->find($voucherId);
+            if ($voucher && $voucher->isValidForUser($user, $subtotal, $cart->items)) {
                 $discount = $voucher->getDiscountAmount($subtotal);
             }
         }

@@ -80,6 +80,7 @@ class OrderController extends Controller
         $cart = $user->cart()->with([
             // 'items.product.store',
             'items.product.primaryImage',
+            'items.product.category',
             'items.options.productOptionValue.optionValue.optionGroup',
             'items.options.productOptionValue.optionValue.optionGroup',
             'items.addons.addon'
@@ -145,8 +146,8 @@ class OrderController extends Controller
             $discount = 0.00;
             $voucher = null;
             if ($request->filled('voucher_code')) {
-                $voucher = \App\Models\Voucher::where('code', $request->voucher_code)->first();
-                if ($voucher && $voucher->isValidForUser($user, $subtotal)) {
+                $voucher = \App\Models\Voucher::with('module')->where('code', $request->voucher_code)->first();
+                if ($voucher && $voucher->isValidForUser($user, $subtotal, $cart->items)) {
                     $discount = $voucher->getDiscountAmount($subtotal);
                 }
             }
