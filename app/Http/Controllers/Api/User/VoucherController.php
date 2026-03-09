@@ -45,7 +45,7 @@ class VoucherController extends Controller
             $moduleName = $voucher->module->name ?? 'the required module';
             return response()->json([
                 'success' => false,
-                'message' => "This voucher is only valid for {$moduleName} products. Your cart does not contain any products from this module.",
+                'message' => LocalizationService::getMessage('errors.voucher_module_restricted', ['module' => $moduleName]),
                 'data'    => [
                     'valid'            => false,
                     'code'             => null,
