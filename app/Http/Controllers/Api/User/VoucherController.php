@@ -30,7 +30,7 @@ class VoucherController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Voucher']),
-            ], 404);
+            ], 400);
         }
 
         // Load the authenticated user's cart items (with product → category for module_id resolution)
