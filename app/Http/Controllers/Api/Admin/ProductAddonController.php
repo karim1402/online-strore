@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductAddon;
 use App\Models\Addon;
+use App\Models\Module;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
@@ -193,6 +194,65 @@ class ProductAddonController extends Controller
             DB::commit();
 
             return $this->successResponse(null, 'success.addons_reordered');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Assign addons to all products in a module
+     */
+    public function assignAddonsToModule(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'module_id' => 'required|integer|exists:modules,id',
+                'addon_ids' => 'required|array',
+                'addon_ids.*' => 'required|integer|exists:addons,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            $module = Module::find($request->module_id);
+
+            if (!$module) {
+                return $this->errorResponse('errors.module_not_found', [], 404);
+            }
+
+            // Get all product IDs in this module (through categories)
+            $categoryIds = $module->categories()->pluck('id');
+            $products = Product::whereIn('category_id', $categoryIds)->get();
+
+            if ($products->isEmpty()) {
+                return $this->errorResponse('errors.no_products_in_module', [], 404);
+            }
+
+            $affectedCount = 0;
+
+            foreach ($products as $product) {
+                foreach ($request->addon_ids as $index => $addonId) {
+                    // Skip if already assigned
+                    if (!$product->addons()->where('addon_id', $addonId)->exists()) {
+                        $product->addons()->attach($addonId, [
+                            'is_available' => true,
+                            'sort_order' => $index,
+                        ]);
+                    }
+                }
+                $affectedCount++;
+            }
+
+            DB::commit();
+
+            return $this->successResponse([
+                'affected_products' => $affectedCount,
+                'addon_ids' => $request->addon_ids,
+            ], 'success.addons_assigned', [], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->errorResponse('errors.server_error', [], 500);

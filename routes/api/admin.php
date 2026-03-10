@@ -465,6 +465,7 @@ Route::prefix('admin')->group(function () {
             
             Route::middleware('permission:stores.create,admins')->group(function () {
                 Route::post('/assign', 'assignAddons');
+                Route::post('/assign-to-module', 'assignAddonsToModule');
             });
             
             Route::middleware('permission:stores.update,admins')->group(function () {
