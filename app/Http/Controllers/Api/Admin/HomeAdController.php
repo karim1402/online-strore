@@ -45,7 +45,7 @@ class HomeAdController extends Controller
             'module_id' => 'required_if:link_type,module|nullable|exists:modules,id',
             'product_ids' => 'required_if:link_type,product|nullable|array',
             'product_ids.*' => 'exists:products,id',
-            'image' => 'required|image|max:2048', // Max 2MB
+            'image' => 'required|image', // Max 2MB
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
@@ -102,7 +102,7 @@ class HomeAdController extends Controller
             'module_id' => 'required_if:link_type,module|nullable|exists:modules,id',
             'product_ids' => 'required_if:link_type,product|nullable|array',
             'product_ids.*' => 'exists:products,id',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
