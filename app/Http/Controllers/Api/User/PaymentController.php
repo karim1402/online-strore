@@ -38,8 +38,9 @@ class PaymentController extends Controller
             $user = auth('api')->user();
 
             $request->validate([
-                'address_id' => 'required|exists:user_addresses,id',
-                'is_delivery' => 'nullable|boolean',
+                'address_id'     => 'required|exists:user_addresses,id',
+                'is_delivery'    => 'nullable|boolean',
+                'scheduled_time' => 'nullable|date_format:H:i',
             ]);
 
             // Check working hours
@@ -155,17 +156,19 @@ class PaymentController extends Controller
                 ];
             }
 
-            // Special reference includes user_id, address_id, and voucher_id
-            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}-DEL-{1/0}
+            // Special reference includes user_id, address_id, voucher_id, timestamp, delivery flag, and scheduled time
+            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}-DEL-{1/0}-ST-{base64_time}
             $voucherId = $voucher ? $voucher->id : 0;
             $delFlag = $isDelivery ? 1 : 0;
+            $encodedTime = base64_encode($request->scheduled_time ?? '');
             $specialReference = sprintf(
-                'USER-%d-ADDR-%d-VOUCHER-%d-TS-%d-DEL-%d',
+                'USER-%d-ADDR-%d-VOUCHER-%d-TS-%d-DEL-%d-ST-%s',
                 $user->id,
                 $address->id,
                 $voucherId,
                 time(),
-                $delFlag
+                $delFlag,
+                $encodedTime
             );
 
             $paymentData = [
@@ -217,23 +220,30 @@ class PaymentController extends Controller
             $specialReference = $obj['order']['merchant_order_id'] ?? null;
 
             // 2. Parse Special Reference
-            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}-DEL-{0|1}
-            // Fallback for old format
+            // Format: USER-{id}-ADDR-{id}-VOUCHER-{id}-TS-{timestamp}-DEL-{0|1}-ST-{base64_time}
+            // Fallback for old formats
             $voucherId = 0;
             $isDelivery = true; // Default
+            $scheduledTime = null;
 
-            if (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)-DEL-(\d+)/', $specialReference, $matches)) {
-                $userId = $matches[1];
+            if (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)-DEL-(\d+)-ST-([A-Za-z0-9+\/=]*)/', $specialReference, $matches)) {
+                $userId    = $matches[1];
                 $addressId = $matches[2];
                 $voucherId = $matches[3];
                 // TS = $matches[4]
-                $isDelivery = (bool) $matches[5];
+                $isDelivery    = (bool) $matches[5];
+                $scheduledTime = base64_decode($matches[6]) ?: null;
+            } elseif (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)-DEL-(\d+)/', $specialReference, $matches)) {
+                $userId    = $matches[1];
+                $addressId = $matches[2];
+                $voucherId = $matches[3];
+                $isDelivery    = (bool) $matches[5];
             } elseif (preg_match('/USER-(\d+)-ADDR-(\d+)-VOUCHER-(\d+)-TS-(\d+)/', $specialReference, $matches)) {
-                $userId = $matches[1];
+                $userId    = $matches[1];
                 $addressId = $matches[2];
                 $voucherId = $matches[3];
             } elseif (preg_match('/USER-(\d+)-ADDR-(\d+)-TS-(\d+)/', $specialReference, $matches)) {
-                $userId = $matches[1];
+                $userId    = $matches[1];
                 $addressId = $matches[2];
             } else {
                 Log::error('Paymob Webhook: Invalid special reference ' . $specialReference);
@@ -250,7 +260,7 @@ class PaymentController extends Controller
                 DB::beginTransaction();
 
                 // 4. Create Order
-                $order = $this->createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $obj, $isDelivery);
+                $order = $this->createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $obj, $isDelivery, $scheduledTime ?? null);
 
                 if (!$order) {
                     DB::rollBack();
@@ -296,7 +306,7 @@ class PaymentController extends Controller
     /**
      * Create Order Logic (Moved from OrderController)
      */
-    private function createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $paymentObj, $isDelivery = true)
+    private function createOrderFromCart($userId, $addressId, $voucherId, $transactionId, $paymentObj, $isDelivery = true, $scheduledTime = null)
     {
         $user = \App\Models\User::find($userId);
         $cart = Cart::with(['items.product.category', 'items.product', 'items.options', 'items.addons'])->where('user_id', $userId)->first();
@@ -340,8 +350,9 @@ class PaymentController extends Controller
             'tax' => $tax,
             'discount' => $discount,
             'total' => $total,
-            'is_delivery' => $isDelivery,
+            'is_delivery'        => $isDelivery,
             'is_cash_handed_over' => false, // Online payment already captured
+            'scheduled_time'     => $scheduledTime ?: null,
         ]);
 
         // Record Voucher Usage

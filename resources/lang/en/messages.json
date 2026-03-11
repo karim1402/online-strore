@@ -199,7 +199,8 @@
         "logo": "logo",
         "document": "document",
         "module_id": "module",
-        "module_ids": "modules"
+        "module_ids": "modules",
+        "scheduled_time": "scheduled time"
     },
     "guards": {
         "user_dashboard": "User Dashboard",
