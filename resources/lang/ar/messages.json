@@ -197,7 +197,8 @@
         "logo": "الشعار",
         "document": "المستند",
         "module_id": "الموديول",
-        "module_ids": "الموديولات"
+        "module_ids": "الموديولات",
+        "scheduled_time": "وقت الطلب"
     },
     "guards": {
         "user_dashboard": "لوحة تحكم المستخدم",

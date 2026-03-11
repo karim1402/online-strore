@@ -50,6 +50,7 @@ class Order extends Model
         'delivery_invoice_id',
         'discount',
         'reason',
+        'scheduled_time',
     ];
 
     protected $casts = [
@@ -62,6 +63,7 @@ class Order extends Model
         'is_cash_handed_over' => 'boolean',
         'is_paid_to_vendor' => 'boolean',
         'is_delivery' => 'boolean',
+        'scheduled_time' => 'string',
     ];
 
     /**

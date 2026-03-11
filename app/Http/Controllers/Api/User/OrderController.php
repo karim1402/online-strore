@@ -31,6 +31,7 @@ class OrderController extends Controller
             // 'payment_method' => 'required|in:cash,online',
             'is_delivery' => 'nullable|boolean',
             'notes' => 'nullable|string|max:500',
+            'scheduled_time' => 'nullable|date_format:H:i',
             // Payment details (flat fields, required if payment_method is online)
             // 'transaction_id' => 'required_if:payment_method,online|string',
             // 'gateway_order_id' => 'required_if:payment_method,online|string',
@@ -203,6 +204,7 @@ class OrderController extends Controller
                 'discount' => $discount,
                 'total' => $total,
                 'notes' => $request->notes,
+                'scheduled_time' => $request->scheduled_time ?: null,
                 'is_cash_handed_over' => $request->payment_method === 'online',
                 'is_paid_to_vendor' => $request->payment_method === 'cash',
             ]);
@@ -872,6 +874,7 @@ class OrderController extends Controller
             'discount' => number_format($order->discount, 2),
             'total' => number_format($order->total, 2),
             'items_count' => $order->items->count(),
+            'scheduled_time' => $order->scheduled_time,
             'created_at' => $order->created_at->toISOString(),
         ];
     }
@@ -898,6 +901,7 @@ class OrderController extends Controller
             'payment_method' => $order->payment_method,
             'total' => number_format($order->total, 2),
             'items_count' => $order->items->count(),
+            'scheduled_time' => $order->scheduled_time,
             'created_at' => $order->created_at->toISOString(),
         ];
     }
@@ -967,6 +971,7 @@ class OrderController extends Controller
             'total' => number_format($order->total, 2),
             'discount' => number_format($order->discount, 2),
             'notes' => $order->notes,
+            'scheduled_time' => $order->scheduled_time,
             'created_at' => $order->created_at->toISOString(),
             'updated_at' => $order->updated_at->toISOString(),
         ];
