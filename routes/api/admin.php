@@ -475,6 +475,7 @@ Route::prefix('admin')->group(function () {
             
             Route::middleware('permission:stores.delete,admins')->group(function () {
                 Route::delete('/product/{productId}/addon/{addonId}', 'removeAddon');
+                Route::delete('/remove-from-module', 'removeAddonsFromModule');
             });
         });
 
