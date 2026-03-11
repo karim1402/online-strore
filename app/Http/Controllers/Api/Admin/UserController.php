@@ -138,6 +138,7 @@ class UserController extends Controller
             $validator = ValidationService::make($request->all(), [
                 'name' => 'nullable|string|between:2,100',
                 'email' => 'nullable|string|email|max:100|unique:users,email,' . $id,
+                'phone' => 'nullable|string|max:20|unique:users,phone,' . $id,
                 'password' => 'nullable|string|min:6',
             ]);
 
