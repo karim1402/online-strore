@@ -113,14 +113,14 @@ class PaymentController extends Controller
             }
 
             $total = max(0, $subtotal + $deliveryFee + $tax - $discount);
-            $amountCents = (int) ($total * 100);
+            // We'll calculate the final amount_cents from the items array to ensure Paymob alignment
 
             // Prepare items data
             $items = [];
             foreach ($cart->items as $item) {
                 $items[] = [
                     'name' => 'Order Item',
-                    'amount' => (int) ($this->calculateItemPrice($item) * 100),
+                    'amount' => (int) round($this->calculateItemPrice($item) * 100),
                     'description' => 'Product ID: ' . $item->product_id,
                     'quantity' => $item->quantity,
                 ];
@@ -130,7 +130,7 @@ class PaymentController extends Controller
             if ($deliveryFee > 0) {
                 $items[] = [
                     'name' => 'Delivery Fee',
-                    'amount' => (int) ($deliveryFee * 100),
+                    'amount' => (int) round($deliveryFee * 100),
                     'description' => 'Delivery Fee',
                     'quantity' => 1,
                 ];
@@ -140,7 +140,7 @@ class PaymentController extends Controller
             if ($tax > 0) {
                 $items[] = [
                     'name' => 'Tax',
-                    'amount' => (int) ($tax * 100),
+                    'amount' => (int) round($tax * 100),
                     'description' => 'Tax',
                     'quantity' => 1,
                 ];
@@ -150,10 +150,16 @@ class PaymentController extends Controller
             if ($discount > 0) {
                 $items[] = [
                     'name' => 'Discount',
-                    'amount' => -((int) ($discount * 100)),
+                    'amount' => -( (int) round($discount * 100) ),
                     'description' => 'Voucher Discount',
                     'quantity' => 1,
                 ];
+            }
+
+            // Calculate total amount_cents from items to ensure they match perfectly
+            $amountCents = 0;
+            foreach ($items as $item) {
+                $amountCents += $item['amount'] * ($item['quantity'] ?? 1);
             }
 
             // Special reference includes user_id, address_id, voucher_id, timestamp, delivery flag, and scheduled time
