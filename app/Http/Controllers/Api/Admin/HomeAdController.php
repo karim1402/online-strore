@@ -41,7 +41,7 @@ class HomeAdController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'type' => 'required|in:banner,offer',
-            'link_type' => 'required|in:module,product',
+            'link_type' => 'required_if:type,offer|nullable|in:module,product',
             'module_id' => 'required_if:link_type,module|nullable|exists:modules,id',
             'product_ids' => 'required_if:link_type,product|nullable|array',
             'product_ids.*' => 'exists:products,id',
@@ -56,6 +56,12 @@ class HomeAdController extends Controller
 
         $data = $validator->validated();
 
+        // Banner type has no link
+        if ($request->type === 'banner') {
+            $data['link_type'] = null;
+            $data['module_id'] = null;
+        }
+
         // Handle Image Upload
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('home_ads', 'public');
@@ -64,7 +70,7 @@ class HomeAdController extends Controller
 
         $ad = HomeAd::create($data);
 
-        if ($request->link_type === 'product' && $request->has('product_ids')) {
+        if ($ad->link_type === 'product' && $request->has('product_ids')) {
             $ad->products()->sync($request->product_ids);
         }
 
@@ -96,9 +102,11 @@ class HomeAdController extends Controller
             return $this->notFoundResponse();
         }
 
+        $effectiveType = $request->input('type', $ad->type);
+
         $validator = Validator::make($request->all(), [
             'type' => 'nullable|in:banner,offer',
-            'link_type' => 'nullable|in:module,product',
+            'link_type' => ($effectiveType === 'offer' ? 'required' : 'nullable') . '|nullable|in:module,product',
             'module_id' => 'required_if:link_type,module|nullable|exists:modules,id',
             'product_ids' => 'required_if:link_type,product|nullable|array',
             'product_ids.*' => 'exists:products,id',
@@ -113,36 +121,35 @@ class HomeAdController extends Controller
 
         $data = $validator->validated();
 
+        // Banner type has no link — force nulls
+        if ($effectiveType === 'banner') {
+            $data['link_type'] = null;
+            $data['module_id'] = null;
+        }
+
         if ($request->hasFile('image')) {
             // Delete old image
             if ($ad->image && Storage::disk('public')->exists($ad->image)) {
                 Storage::disk('public')->delete($ad->image);
             }
-            
+
             $path = $request->file('image')->store('home_ads', 'public');
             $data['image'] = $path;
         }
 
         $ad->update($data);
 
-        if ($request->has('link_type')) {
-            if ($request->link_type === 'product') {
-                if ($request->has('product_ids')) {
-                    $ad->products()->sync($request->product_ids);
-                } else {
-                     // If link_type changed to product but no product_ids sent (maybe partial update?), 
-                     // we might keep existing or clear. 
-                     // Given validation 'required_if', usually we expect them.
-                     // But for 'nullable' rules in update, it's tricky. 
-                     // Let's assume if provided, we sync.
-                }
-            } else {
-                // If changed to module, remove products
-                $ad->products()->detach();
+        // Sync products only for offer type
+        if ($effectiveType === 'banner') {
+            // Banner has no linked products
+            $ad->products()->detach();
+        } elseif ($ad->fresh()->link_type === 'product') {
+            if ($request->has('product_ids')) {
+                $ad->products()->sync($request->product_ids);
             }
-        } elseif ($ad->link_type === 'product' && $request->has('product_ids')) {
-            // If link_type didn't change (or wasn't sent) but it IS product, and we have IDs
-            $ad->products()->sync($request->product_ids);
+        } else {
+            // link_type changed to module or something else — remove products
+            $ad->products()->detach();
         }
 
         return $this->successResponse($ad->load(['module', 'products']), 'success.updated');
