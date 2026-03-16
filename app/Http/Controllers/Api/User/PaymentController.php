@@ -82,14 +82,14 @@ class PaymentController extends Controller
 
             // Prepare billing data
             $billingData = [
-                'first_name' => $user->name ?? 'Guest',
+                'first_name' => mb_substr($user->name ?? 'Guest', 0, 50),
                 'last_name' => 'User',
                 // 'email' => $user->email ?? 'guest@example.com',
-                'phone_number' => $user->phone ?? ($address->phone ?? '+201000000000'),
-                'apartment' => $address->apartment_number ?? 'NA',
-                'floor' => $address->floor_number ?? 'NA',
-                'street' => $address->street_name ?? 'NA',
-                'building' => $address->building_name ?? 'NA',
+                'phone_number' => mb_substr($user->phone ?? ($address->phone ?? '+201000000000'), 0, 50),
+                'apartment' => mb_substr($address->apartment_number ?? 'NA', 0, 50),
+                'floor' => mb_substr($address->floor_number ?? 'NA', 0, 50),
+                'street' => mb_substr($address->street_name ?? 'NA', 0, 50),
+                'building' => mb_substr($address->building_name ?? 'NA', 0, 50),
                 'city' => 'Cairo',
                 'country' => 'EG',
                 'state' => 'Cairo',
