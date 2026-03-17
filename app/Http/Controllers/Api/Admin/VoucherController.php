@@ -56,6 +56,8 @@ class VoucherController extends Controller
             'usage_limit_per_user' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
             'module_id' => 'nullable|exists:modules,id',
+            'min_user_orders' => 'nullable|integer|min:1',
+            'min_user_spend' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -123,6 +125,8 @@ class VoucherController extends Controller
             'usage_limit_per_user' => 'nullable|integer|min:1',
             'is_active' => 'boolean',
             'module_id' => 'nullable|exists:modules,id',
+            'min_user_orders' => 'nullable|integer|min:1',
+            'min_user_spend' => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {

@@ -145,11 +145,31 @@ class OrderController extends Controller
             
             // Apply Voucher
             $discount = 0.00;
-            $voucher = null;
             if ($request->filled('voucher_code')) {
                 $voucher = \App\Models\Voucher::with('module')->where('code', $request->voucher_code)->first();
-                if ($voucher && $voucher->isValidForUser($user, $subtotal, $cart->items)) {
-                    $discount = $voucher->getDiscountAmount($subtotal);
+                if ($voucher) {
+                    $validationResult = $voucher->validateForUser($user, $subtotal, $cart->items);
+                    if ($validationResult === true) {
+                        $discount = $voucher->getDiscountAmount($subtotal);
+                    } else {
+                        DB::rollBack();
+                        
+                        $messageParams = [];
+                        if ($validationResult === 'errors.voucher_module_restricted') {
+                            $messageParams['module'] = $voucher->module->name ?? 'the required module';
+                        }
+
+                        return response()->json([
+                            'success' => false,
+                            'message' => LocalizationService::getMessage($validationResult, $messageParams),
+                        ], 422);
+                    }
+                } else {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Voucher']),
+                    ], 404);
                 }
             }
 
