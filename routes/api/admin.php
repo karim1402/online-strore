@@ -576,6 +576,8 @@ Route::prefix('admin')->group(function () {
             Route::put('/working-hours', 'updateWorkingHours');
             Route::get('/app-version/{platform}', 'getAppVersion');
             Route::put('/app-version/{platform}', 'updateAppVersion');
+            Route::get('/delivery-settings', 'getDeliverySettings');
+            Route::put('/delivery-settings', 'updateDeliverySettings');
         });
     });
 });

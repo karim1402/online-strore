@@ -107,4 +107,49 @@ class AppSettingController extends Controller
             $platform => AppSetting::getAppVersion($platform),
         ], 'success.operation_successful');
     }
+
+    /**
+     * Get delivery settings.
+     * GET /admin/app-settings/delivery-settings
+     */
+    public function getDeliverySettings(): JsonResponse
+    {
+        return $this->successResponse([
+            'delivery_base_fee'  => AppSetting::get('delivery_base_fee', '0'),
+            'delivery_km_fee'    => AppSetting::get('delivery_km_fee', '0'),
+            'delivery_start_lat' => AppSetting::get('delivery_start_lat', ''),
+            'delivery_start_lng' => AppSetting::get('delivery_start_lng', ''),
+        ], 'success.operation_successful');
+    }
+
+    /**
+     * Update delivery settings.
+     * PUT /admin/app-settings/delivery-settings
+     */
+    public function updateDeliverySettings(Request $request): JsonResponse
+    {
+        $rules = [
+            'delivery_base_fee'  => 'required|numeric|min:0',
+            'delivery_km_fee'    => 'required|numeric|min:0',
+            'delivery_start_lat' => 'required|numeric|between:-90,90',
+            'delivery_start_lng' => 'required|numeric|between:-180,180',
+        ];
+
+        $validator = ValidationService::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($validator);
+        }
+
+        AppSetting::set('delivery_base_fee', $request->delivery_base_fee);
+        AppSetting::set('delivery_km_fee', $request->delivery_km_fee);
+        AppSetting::set('delivery_start_lat', $request->delivery_start_lat);
+        AppSetting::set('delivery_start_lng', $request->delivery_start_lng);
+
+        return $this->successResponse([
+            'delivery_base_fee'  => AppSetting::get('delivery_base_fee'),
+            'delivery_km_fee'    => AppSetting::get('delivery_km_fee'),
+            'delivery_start_lat' => AppSetting::get('delivery_start_lat'),
+            'delivery_start_lng' => AppSetting::get('delivery_start_lng'),
+        ], 'success.operation_successful');
+    }
 }

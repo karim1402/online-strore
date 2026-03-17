@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Makook – Phase 2 Development Plan</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:   #FF6B35;
+      --primary-dk:#D94F1A;
+      --accent:    #1A1A2E;
+      --soft:      #FFF4F0;
+      --muted:     #6B7280;
+      --border:    #E5E7EB;
+      --green:     #10B981;
+      --blue:      #3B82F6;
+      --purple:    #8B5CF6;
+      --yellow:    #F59E0B;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #F9FAFB;
+      color: #111827;
+      font-size: 10.5pt;
+      line-height: 1.65;
+    }
+
+    /* ── Page wrapper ─────────────────────────────── */
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 12mm auto;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+      page-break-after: always;
+    }
+
+    /* ── Cover page ───────────────────────────────── */
+    .cover {
+      background: linear-gradient(145deg, #1A1A2E 0%, #16213E 60%, #0F3460 100%);
+      color: #fff;
+      min-height: 297mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 0;
+    }
+
+    .cover-top {
+      padding: 14mm 16mm 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .logo-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dk));
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+
+    .logo-text { font-size: 22pt; font-weight: 800; letter-spacing: -0.5px; }
+    .logo-text span { color: var(--primary); }
+
+    .badge {
+      background: rgba(255,107,53,.18);
+      border: 1px solid rgba(255,107,53,.4);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 8pt;
+      font-weight: 600;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .cover-hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 20mm;
+    }
+
+    .phase-label {
+      font-size: 9pt;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .cover-title {
+      font-size: 30pt;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    .cover-title em { color: var(--primary); font-style: normal; }
+
+    .cover-subtitle {
+      font-size: 11pt;
+      color: rgba(255,255,255,.65);
+      max-width: 130mm;
+      margin: 0 auto 36px;
+    }
+
+    .cover-tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .cover-tag {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 9pt;
+      font-weight: 600;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15);
+    }
+
+    .cover-footer {
+      padding: 8mm 16mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: rgba(255,255,255,.4);
+      font-size: 8pt;
+    }
+
+    /* ── Inner pages ──────────────────────────────── */
+    .inner { padding: 14mm 16mm; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .section-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .icon-orange { background: var(--soft); }
+    .icon-blue   { background: #EFF6FF; }
+    .icon-green  { background: #ECFDF5; }
+    .icon-purple { background: #F5F3FF; }
+    .icon-yellow { background: #FFFBEB; }
+
+    .section-title { font-size: 15pt; font-weight: 700; color: var(--accent); }
+    .section-num   { font-size: 9pt; color: var(--muted); font-weight: 500; }
+
+    /* ── Feature cards ────────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 14px;
+      background: #FAFAFA;
+    }
+
+    .feature-card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-orange { background: var(--primary); }
+    .dot-blue   { background: var(--blue); }
+    .dot-green  { background: var(--green); }
+    .dot-purple { background: var(--purple); }
+    .dot-yellow { background: var(--yellow); }
+
+    .feature-card h4 { font-size: 10pt; font-weight: 700; color: var(--accent); }
+    .feature-card p  { font-size: 8.5pt; color: var(--muted); line-height: 1.55; }
+
+    /* ── Sub-list ─────────────────────────────────── */
+    .sub-list { list-style: none; padding: 0; margin: 10px 0 0; }
+    .sub-list li {
+      padding: 5px 0 5px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 9pt;
+      color: #374151;
+      position: relative;
+    }
+    .sub-list li:last-child { border-bottom: none; }
+    .sub-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* ── Timeline ─────────────────────────────────── */
+    .timeline { margin: 10px 0; }
+    .tl-item {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .tl-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .tl-circle {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 10pt;
+      color: #fff;
+    }
+    .tl-line { flex: 1; width: 2px; background: var(--border); margin: 4px 0; }
+    .tl-body { padding-top: 6px; }
+    .tl-body h4 { font-weight: 700; font-size: 10pt; margin-bottom: 3px; }
+    .tl-body p  { font-size: 8.5pt; color: var(--muted); }
+    .tl-body .weeks {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 8pt;
+      background: var(--soft);
+      color: var(--primary);
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+
+    /* ── Endpoint table ───────────────────────────── */
+    table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin: 10px 0; }
+    th {
+      background: var(--accent);
+      color: #fff;
+      padding: 7px 10px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 8pt;
+    }
+    td { padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:nth-child(even) td { background: #F9FAFB; }
+    .method {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 7.5pt;
+    }
+    .get    { background: #DBEAFE; color: #1D4ED8; }
+    .post   { background: #D1FAE5; color: #065F46; }
+    .patch  { background: #FEF3C7; color: #92400E; }
+    .delete { background: #FEE2E2; color: #991B1B; }
+
+    /* ── Summary boxes ────────────────────────────── */
+    .highlight-box {
+      border-left: 4px solid var(--primary);
+      background: var(--soft);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 9pt;
+      color: #374151;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .stat-box {
+      text-align: center;
+      padding: 12px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .stat-box .num { font-size: 18pt; font-weight: 800; }
+    .stat-box .lbl { font-size: 7.5pt; color: var(--muted); margin-top: 2px; }
+    .c-orange { color: var(--primary); }
+    .c-blue   { color: var(--blue); }
+    .c-green  { color: var(--green); }
+    .c-purple { color: var(--purple); }
+
+    /* ── Page header bar ──────────────────────────── */
+    .page-bar {
+      background: var(--accent);
+      padding: 8px 16mm;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: rgba(255,255,255,.7);
+      font-size: 7.5pt;
+    }
+
+    .page-bar .logo-sm { color: var(--primary); font-weight: 700; font-size: 9pt; }
+
+    /* ── Print styles ─────────────────────────────── */
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; border-radius: 0; box-shadow: none; width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 1 — COVER                               -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-top">
+    <div class="logo-box">
+      <div class="logo-icon">🛵</div>
+      <div class="logo-text">ma<span>kook</span></div>
+    </div>
+    <div class="badge">Confidential · Internal</div>
+  </div>
+
+  <div class="cover-hero">
+    <div class="phase-label">Development Roadmap</div>
+    <h1 class="cover-title">
+      Phase 2<br/><em>Advanced Features</em><br/>Plan
+    </h1>
+    <p class="cover-subtitle">
+      A structured plan for delivering advanced real-time tracking, intelligent push notifications, and next-generation platform enhancements to the Makook delivery ecosystem.
+    </p>
+    <div class="cover-tags">
+      <span class="cover-tag">🛰 Advanced Tracking</span>
+      <span class="cover-tag">🔔 Smart Notifications</span>
+      <span class="cover-tag">📊 Analytics Engine</span>
+      <span class="cover-tag">🤖 AI Recommendations</span>
+      <span class="cover-tag">💬 In-App Chat</span>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <span>Makook Platform · Phase 2 Technical Plan</span>
+    <span>Prepared: March 2026</span>
+    <span>Version 1.0</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 2 — OVERVIEW + TRACKING                 -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-bar">
+    <span class="logo-sm">makook</span>
+    <span>Phase 2 Plan · Advanced Tracking</span>
+    <span>Page 2</span>
+  </div>
+  <div class="inner">
+
+    <!-- Executive Summary -->
+    <div class="section-header">
+      <div class="section-icon icon-orange">📋</div>
+      <div>
+        <div class="section-num">SECTION 01</div>
+        <div class="section-title">Executive Summary</div>
+      </div>
+    </div>
+
+    <p style="color:#374151; font-size:9.5pt; margin-bottom:12px;">
+      Phase 1 of Makook established a solid foundation: multi-role authentication (Admin, Vendor,
+      Delivery, User), order lifecycle management, product &amp; store catalogs, vouchers, reports,
+      and basic push notifications. <strong>Phase 2</strong> elevates the platform into a premium,
+      data-driven delivery experience by introducing real-time intelligence, proactive communications,
+      and advanced user engagement features.
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-box"><div class="num c-orange">5</div><div class="lbl">Major Feature Areas</div></div>
+      <div class="stat-box"><div class="num c-blue">30+</div><div class="lbl">New API Endpoints</div></div>
+      <div class="stat-box"><div class="num c-green">10</div><div class="lbl">Estimated Weeks</div></div>
+      <div class="stat-box"><div class="num c-purple">3</div><div class="lbl">Sprints</div></div>
+    </div>
+
+    <div class="highlight-box">
+      🎯 <strong>Goal:</strong> Transform Makook from a functional ordering system into a smart, real-time, and customer-retention-focused delivery platform that competes with market leaders.
+    </div>
+
+    <div style="margin-top: 22px;"></div>
+
+    <!-- Advanced Tracking -->
+    <div class="section-header">
+      <div class="section-icon icon-blue">🛰</div>
+      <div>
+        <div class="section-num">SECTION 02</div>
+        <div class="section-title">Advanced Order Tracking</div>
+      </div>
+    </div>
+
+    <p style="color:#374151; font-size:9pt; margin-bottom:12px;">
+      Customers today expect to see exactly where their order is, in real-time. This module introduces
+      WebSocket-powered live tracking, a full location history trail, and an estimated arrival engine.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-blue"></div><h4>Live Driver Location</h4></div>
+        <p>Delivery drivers broadcast their GPS coordinates every few seconds via Pusher. Customers and admins see a live-updating map pin without refreshing the page.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-blue"></div><h4>ETA Engine</h4></div>
+        <p>A server-side calculation combines current driver coordinates, distance to destination, average speed, and traffic heuristics to provide a live Estimated Time of Arrival (ETA).</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-blue"></div><h4>Location History Trail</h4></div>
+        <p>Every driver ping is stored in a <code>driver_locations</code> table. Admins can replay the full route of any completed delivery — useful for dispute resolution.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-blue"></div><h4>Order Status Timeline</h4></div>
+        <p>Each status change (placed → accepted → preparing → picked up → delivered) is timestamped and visible to the customer as an interactive step-progress view.</p>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Actor</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method post">POST</span></td><td>/api/delivery/location/update</td><td>Driver broadcasts current GPS position</td><td>Driver</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/user/orders/{id}/tracking</td><td>Returns live driver location + ETA</td><td>Customer</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/admin/orders/{id}/route</td><td>Full location history for an order</td><td>Admin</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/user/orders/{id}/timeline</td><td>Status change history with timestamps</td><td>Customer</td></tr>
+      </tbody>
+    </table>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 3 — PUSH NOTIFICATIONS                  -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-bar">
+    <span class="logo-sm">makook</span>
+    <span>Phase 2 Plan · Advanced Push Notifications</span>
+    <span>Page 3</span>
+  </div>
+  <div class="inner">
+
+    <div class="section-header">
+      <div class="section-icon icon-orange">🔔</div>
+      <div>
+        <div class="section-num">SECTION 03</div>
+        <div class="section-title">Advanced Push Notifications</div>
+      </div>
+    </div>
+
+    <p style="color:#374151; font-size:9pt; margin-bottom:12px;">
+      Phase 1 introduced basic FCM push notifications. Phase 2 evolves this into a full
+      <strong>notification intelligence layer</strong> — segmented, scheduled, personalized, and
+      multi-channel (FCM + In-App + SMS), with rich media support and deep-link routing.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-orange"></div><h4>Segmented Campaigns</h4></div>
+        <p>Admins can send push notifications to targeted user segments: all users, specific cities, users who haven't ordered in 7 days, top spenders, or users of a specific module.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-orange"></div><h4>Scheduled Notifications</h4></div>
+        <p>Admins schedule notifications for a future datetime. A background job queue (Laravel Scheduler) processes and dispatches them at the right time in the right timezone.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-orange"></div><h4>Rich Media &amp; Deep Links</h4></div>
+        <p>Notifications support image attachments, action buttons ("Track Order", "View Offer"), and deep links that open specific screens in the mobile app directly.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-orange"></div><h4>Notification Centre</h4></div>
+        <p>All sent notifications are stored and retrievable by users as a notification inbox — read/unread state, timestamps, and direct links to the relevant content.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-orange"></div><h4>Delivery Analytics</h4></div>
+        <p>Track open rates, click-through rates, and conversions per campaign. Admins see a dashboard showing which notifications drove the most orders.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-orange"></div><h4>Automated Triggers</h4></div>
+        <p>Event-driven notifications: "Your order is ready!", "Driver is 5 minutes away!", "Rate your last order", "You have a new voucher!" — all sent automatically based on system events.</p>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Method</th><th>Endpoint</th><th>Description</th><th>Actor</th></tr></thead>
+      <tbody>
+        <tr><td><span class="method post">POST</span></td><td>/api/admin/notifications/campaign</td><td>Create &amp; send a targeted campaign</td><td>Admin</td></tr>
+        <tr><td><span class="method post">POST</span></td><td>/api/admin/notifications/schedule</td><td>Schedule a notification for future delivery</td><td>Admin</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/user/notifications</td><td>User notification inbox (paginated)</td><td>Customer</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td>/api/user/notifications/{id}/read</td><td>Mark a notification as read</td><td>Customer</td></tr>
+        <tr><td><span class="method patch">PATCH</span></td><td>/api/user/notifications/read-all</td><td>Mark all notifications as read</td><td>Customer</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/admin/notifications/analytics</td><td>Campaign open/click rate stats</td><td>Admin</td></tr>
+        <tr><td><span class="method get">GET</span></td><td>/api/user/notifications/unread-count</td><td>Returns count of unread notifications</td><td>Customer</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight-box">
+      💡 <strong>Tech Stack:</strong> FCM (Firebase Cloud Messaging) for mobile push · Laravel Queues + Scheduler for deferred dispatch · Pusher for real-time in-app banners · Vonage/Twilio for optional SMS fallback.
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 4 — ADVANCED FEATURES (Part 1)          -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-bar">
+    <span class="logo-sm">makook</span>
+    <span>Phase 2 Plan · Advanced Platform Features</span>
+    <span>Page 4</span>
+  </div>
+  <div class="inner">
+
+    <div class="section-header">
+      <div class="section-icon icon-green">⚡</div>
+      <div>
+        <div class="section-num">SECTION 04</div>
+        <div class="section-title">Advanced Platform Features</div>
+      </div>
+    </div>
+
+    <!-- Feature A: AI Recommendations -->
+    <div style="margin-bottom: 18px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div class="dot dot-green" style="width:10px; height:10px;"></div>
+        <strong style="font-size:11pt;">A — AI-Powered Product Recommendations</strong>
+      </div>
+      <p style="font-size:9pt; color:#374151; margin-bottom:8px;">
+        Leverage order history to surface the right products to the right users at the right time.
+        A lightweight recommendation engine analyzes each customer's purchase patterns and returns
+        personalized product lists on the home screen, increasing average order value.
+      </p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-green"></div><h4>"Order Again" Section</h4></div>
+          <p>Returns frequently-ordered items for the current user, sorted by recency and frequency.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-green"></div><h4>Trending Products</h4></div>
+          <p>Aggregates top-selling items across a rolling 7-day window, segmented by module or city.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-green"></div><h4>"You May Also Like"</h4></div>
+          <p>Collaborative filtering: users who ordered product A also ordered product B — served as add-on suggestions at checkout.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-green"></div><h4>Personalized Home Feed</h4></div>
+          <p>Home ads and offer banners are ranked based on the user's category affinity score.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature B: In-App Chat -->
+    <div style="margin-bottom: 18px;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div class="dot dot-purple" style="width:10px; height:10px;"></div>
+        <strong style="font-size:11pt;">B — In-App Chat (Customer ↔ Support / Driver)</strong>
+      </div>
+      <p style="font-size:9pt; color:#374151; margin-bottom:8px;">
+        A real-time chat layer powered by Pusher allows customers to communicate directly with
+        their delivery driver or with support staff without leaving the app — eliminating the
+        need for external messaging apps.
+      </p>
+      <ul class="sub-list">
+        <li>Customers can message their driver once an order is accepted</li>
+        <li>Admins have a support inbox to handle escalated customer queries</li>
+        <li>Messages are stored per-order for full conversation history</li>
+        <li>Unread message badge count synced in real-time via Pusher channels</li>
+        <li>Chat closes automatically once order is marked delivered</li>
+      </ul>
+    </div>
+
+    <!-- Feature C: Advanced Analytics Dashboard -->
+    <div>
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+        <div class="dot dot-yellow" style="width:10px; height:10px;"></div>
+        <strong style="font-size:11pt;">C — Advanced Analytics &amp; Business Intelligence Dashboard</strong>
+      </div>
+      <p style="font-size:9pt; color:#374151; margin-bottom:8px;">
+        Extend the existing admin dashboard with granular, actionable metrics and visual reports
+        that help management make data-driven decisions.
+      </p>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-yellow"></div><h4>Revenue Heatmap</h4></div>
+          <p>Hour-by-hour and day-by-day revenue heatmap showing peak ordering periods.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-yellow"></div><h4>Customer Lifetime Value</h4></div>
+          <p>CLV score per customer: total spend, order frequency, churn risk indicator.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-yellow"></div><h4>Funnel Drop-off Report</h4></div>
+          <p>Tracks how many users browse → add to cart → checkout → complete. Shows abandonment rate at each step.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-card-header"><div class="dot dot-yellow"></div><h4>Driver Efficiency Score</h4></div>
+          <p>Composite score from delivery time accuracy, customer ratings, and completion rate.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!--  PAGE 5 — FEATURES (Part 2) + ROADMAP         -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="page">
+  <div class="page-bar">
+    <span class="logo-sm">makook</span>
+    <span>Phase 2 Plan · Loyalty System &amp; Delivery Roadmap</span>
+    <span>Page 5</span>
+  </div>
+  <div class="inner">
+
+    <!-- Feature D: Loyalty & Rewards -->
+    <div class="section-header">
+      <div class="section-icon icon-purple">🎁</div>
+      <div>
+        <div class="section-num">SECTION 04 (CONT.)</div>
+        <div class="section-title">D — Loyalty &amp; Rewards System</div>
+      </div>
+    </div>
+
+    <p style="font-size:9pt; color:#374151; margin-bottom:10px;">
+      Increase customer retention by rewarding repeat purchases. Users earn points for every order,
+      which can be redeemed for discounts or free delivery — creating a powerful habit loop.
+    </p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-purple"></div><h4>Points Engine</h4></div>
+        <p>Configurable earn rate (e.g. 10 pts per EGP 50). Points are credited on order delivery.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-purple"></div><h4>Redemption at Checkout</h4></div>
+        <p>Users can apply points as a discount at checkout. Min/max redemption rules are admin-configurable.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-purple"></div><h4>Tier System</h4></div>
+        <p>Bronze → Silver → Gold → Platinum tiers unlock better earn rates, priority support, and exclusive offers.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-header"><div class="dot dot-purple"></div><h4>Points Ledger</h4></div>
+        <p>Full history of earned and spent points per user. Admins can manually adjust balances and issue bonus points.</p>
+      </div>
+    </div>
+
+    <!-- Feature E: Smart Search -->
+    <div class="section-header" style="margin-top:16px;">
+      <div class="section-icon icon-blue">🔍</div>
+      <div>
+        <div class="section-num">SECTION 04 (CONT.)</div>
+        <div class="section-title">E — Smart Search &amp; Discovery</div>
+      </div>
+    </div>
+
+    <p style="font-size:9pt; color:#374151; margin-bottom:10px;">
+      Replace simple keyword matching with a full-text, fuzzy, and context-aware search experience
+      across products, stores, categories, and offers — with auto-complete and recent search history.
+    </p>
+
+    <ul class="sub-list" style="margin-bottom:16px;">
+      <li>Fuzzy search: handles typos ("burgr" → "burger") using Laravel Scout + Meilisearch</li>
+      <li>Searchable entities: Products, Stores, Categories, Modules, Offers</li>
+      <li>Auto-complete suggestions appear after 2 characters typed</li>
+      <li>Search results ranked by relevance score + user preference affinity</li>
+      <li>Recent searches stored per user; popular searches shown as trending chips</li>
+    </ul>
+
+    <!-- ── Sprint Roadmap ── -->
+    <div class="section-header">
+      <div class="section-icon icon-orange">🗓</div>
+      <div>
+        <div class="section-num">SECTION 05</div>
+        <div class="section-title">Delivery Roadmap — 3 Sprints × ~3 Weeks</div>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-circle" style="background:var(--blue);">1</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-body">
+          <h4>Sprint 1 — Real-Time Core</h4>
+          <p>Live driver location broadcasting · ETA engine · Order status timeline · Notification inbox (store &amp; display) · Automated trigger notifications (order events)</p>
+          <span class="weeks">Weeks 1–4</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-circle" style="background:var(--primary);">2</div>
+          <div class="tl-line"></div>
+        </div>
+        <div class="tl-body">
+          <h4>Sprint 2 — Engagement &amp; Intelligence</h4>
+          <p>Segmented push campaigns · Scheduled notifications · Analytics dashboard extensions · AI recommendation engine · In-app chat (Customer ↔ Driver)</p>
+          <span class="weeks">Weeks 4–8</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-circle" style="background:var(--green);">3</div>
+        </div>
+        <div class="tl-body">
+          <h4>Sprint 3 — Retention &amp; Discovery</h4>
+          <p>Loyalty &amp; rewards system (points, tiers, redemption) · Smart search with Meilisearch · Notification delivery analytics · CLV &amp; funnel reports · QA, load testing &amp; deployment</p>
+          <span class="weeks">Weeks 8–12</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight-box" style="margin-top:14px; border-color:var(--green); background:#ECFDF5;">
+      ✅ <strong>Success Criteria:</strong> Live tracking latency &lt; 2s · Notification open rate &gt; 25% · Loyalty program adoption &gt; 40% of active users within 30 days of launch · Search result relevance score &gt; 90%.
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
