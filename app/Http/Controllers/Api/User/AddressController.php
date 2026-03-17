@@ -483,7 +483,7 @@ class AddressController extends Controller
                      sin($lonDelta / 2) * sin($lonDelta / 2);
                 $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
-                $distanceKm = $earthRadius * $c;
+                $distanceKm = max(1, round($earthRadius * $c));
                 
                 // Base fee + (Distance in km * Km Fee)
                 $totalFee += ($distanceKm * $kmFee);
