@@ -130,4 +130,41 @@ class UserAddress extends Model
             }
         });
     }
+
+    /**
+     * Calculate delivery fee for this address
+     */
+    public function calculateDeliveryFee(): float
+    {
+        $baseFee = (float) \App\Models\AppSetting::get('delivery_base_fee', '0');
+        $kmFee   = (float) \App\Models\AppSetting::get('delivery_km_fee', '0');
+        $startLat = \App\Models\AppSetting::get('delivery_start_lat');
+        $startLng = \App\Models\AppSetting::get('delivery_start_lng');
+
+        $totalFee = $baseFee;
+
+        if ($startLat !== null && $startLng !== null && $this->latitude !== null && $this->longitude !== null) {
+            $earthRadius = 6371; // Earth's radius in kilometers
+
+            $latFrom = deg2rad((float)$startLat);
+            $lonFrom = deg2rad((float)$startLng);
+            $latTo = deg2rad((float)$this->latitude);
+            $lonTo = deg2rad((float)$this->longitude);
+
+            $latDelta = $latTo - $latFrom;
+            $lonDelta = $lonTo - $lonFrom;
+
+            $a = sin($latDelta / 2) * sin($latDelta / 2) +
+                 cos($latFrom) * cos($latTo) *
+                 sin($lonDelta / 2) * sin($lonDelta / 2);
+            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+            $distanceKm = max(1, round($earthRadius * $c));
+            
+            // Base fee + (Distance in km * Km Fee)
+            $totalFee += ($distanceKm * $kmFee);
+        }
+
+        return round($totalFee, 2);
+    }
 }

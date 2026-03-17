@@ -140,7 +140,7 @@ class OrderController extends Controller
 
             // Calculate totals
             $subtotal = $this->calculateSubtotal($cart);
-            $deliveryFee = 0.00; // Placeholder
+            $deliveryFee = $request->boolean('is_delivery', true) ? $address->calculateDeliveryFee() : 0.00;
             $tax = 0.00; // Placeholder
             
             // Apply Voucher
@@ -735,9 +735,10 @@ class OrderController extends Controller
     private function calculateCartTotal($cart)
     {
         $subtotal = $this->calculateSubtotal($cart);
-        $deliveryFee = 10.00;
+        // Note: Delivery fee is not predictably known here without address, 
+        // the actual final logic adds it during checkout/intention.
         $tax = 0.00;
-        return $subtotal + $deliveryFee + $tax;
+        return $subtotal + $tax;
     }
 
     /**

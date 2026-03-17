@@ -460,38 +460,11 @@ class AddressController extends Controller
                 return $this->errorResponse('errors.not_found', [], 404);
             }
 
-            $baseFee = (float) \App\Models\AppSetting::get('delivery_base_fee', '0');
-            $kmFee   = (float) \App\Models\AppSetting::get('delivery_km_fee', '0');
-            $startLat = \App\Models\AppSetting::get('delivery_start_lat');
-            $startLng = \App\Models\AppSetting::get('delivery_start_lng');
-
-            $totalFee = $baseFee;
-
-            if ($startLat !== null && $startLng !== null && $address->latitude !== null && $address->longitude !== null) {
-                $earthRadius = 6371; // Earth's radius in kilometers
-
-                $latFrom = deg2rad((float)$startLat);
-                $lonFrom = deg2rad((float)$startLng);
-                $latTo = deg2rad((float)$address->latitude);
-                $lonTo = deg2rad((float)$address->longitude);
-
-                $latDelta = $latTo - $latFrom;
-                $lonDelta = $lonTo - $lonFrom;
-
-                $a = sin($latDelta / 2) * sin($latDelta / 2) +
-                     cos($latFrom) * cos($latTo) *
-                     sin($lonDelta / 2) * sin($lonDelta / 2);
-                $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
-                $distanceKm = max(1, round($earthRadius * $c));
-                
-                // Base fee + (Distance in km * Km Fee)
-                $totalFee += ($distanceKm * $kmFee);
-            }
+            $totalFee = $address->calculateDeliveryFee();
 
             return $this->successResponse([
                 'address_id'     => (int) $id,
-                'delivery_fees'  => round($totalFee, 2),
+                'delivery_fees'  => $totalFee,
                 'currency'       => 'EGP',
             ], 'success.data_retrieved');
         } catch (\Exception $e) {
