@@ -17,7 +17,8 @@ class DeliverySettingsSeeder extends Seeder
         AppSetting::set('delivery_km_fee', '5.00');   // Example per km fee
         
         // Service center coordinates (using the same as AddressController)
-        AppSetting::set('delivery_start_lat', '30.79080633963492');
-        AppSetting::set('delivery_start_lng', '30.997924804687504');
+        AppSetting::set('delivery_start_lat', '30.7989597');
+        AppSetting::set('delivery_start_lng', '31.0065842');
+        
     }
 }
