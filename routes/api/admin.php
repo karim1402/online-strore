@@ -99,6 +99,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/products/most-viewed', 'mostViewedProducts');
             Route::get('/products/best-sellers', 'bestSellersFlagged');
             Route::get('/products/with-offers', 'productsWithOffers');
+            Route::get('/products/{id}/buyers', 'productBuyers');
 
             // 4. Users
             Route::get('/users/growth', 'userGrowth');
@@ -128,6 +129,7 @@ Route::prefix('admin')->group(function () {
             Route::middleware('permission:users.view,admins')->group(function () {
                 Route::get('/', 'index');
                 Route::get('/{id}', 'show');
+                Route::get('/{id}/orders', 'userOrders');
             });
             
             Route::middleware('permission:users.create,admins')->group(function () {
