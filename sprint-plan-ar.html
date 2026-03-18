@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<!-- لتصدير PDF: Ctrl+P → Save as PDF → A4 → Margins: None → Background graphics: ON -->
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>ماكوك – خطة السبرينت التنفيذية (عربي)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap');
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --p: #FF6B35;
+            --pd: #D94F1A;
+            --dark: #1A1A2E;
+            --blue: #3B82F6;
+            --green: #10B981;
+            --purple: #8B5CF6;
+            --yellow: #F59E0B;
+            --border: #E5E7EB;
+            --muted: #6B7280;
+            --soft: #FFF4F0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #F3F4F6;
+            color: #111827;
+            font-size: 11pt;
+            line-height: 1.7;
+            direction: rtl;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 10mm auto;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .09);
+            page-break-after: always;
+            break-after: page;
+        }
+
+        /* ── COVER ── */
+        .cover {
+            background: linear-gradient(145deg, #1A1A2E 0%, #16213E 55%, #0F3460 100%);
+            color: #fff;
+            min-height: 297mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cover-top {
+            padding: 13mm 15mm 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--p), var(--pd));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
+
+        .logo-text {
+            font-size: 22pt;
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        .logo-text span {
+            color: var(--p);
+        }
+
+        .badge {
+            background: rgba(255, 107, 53, .18);
+            border: 1px solid rgba(255, 107, 53, .4);
+            color: var(--p);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 8pt;
+            font-weight: 700;
+        }
+
+        .cover-hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 18mm;
+        }
+
+        .phase-label {
+            font-size: 9pt;
+            letter-spacing: 2px;
+            color: var(--p);
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .cover-title {
+            font-size: 28pt;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 18px;
+        }
+
+        .cover-title em {
+            color: var(--p);
+            font-style: normal;
+        }
+
+        .cover-sub {
+            font-size: 10.5pt;
+            color: rgba(255, 255, 255, .62);
+            max-width: 128mm;
+            margin: 0 auto 30px;
+        }
+
+        .sprint-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 130mm;
+            margin: 0 auto;
+        }
+
+        .pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .13);
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+
+        .pill-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 11pt;
+            flex-shrink: 0;
+            color: #fff;
+        }
+
+        .pill-body {
+            text-align: right;
+        }
+
+        .pill-body strong {
+            display: block;
+            font-size: 9.5pt;
+            font-weight: 700;
+        }
+
+        .pill-body span {
+            font-size: 8pt;
+            color: rgba(255, 255, 255, .5);
+        }
+
+        .cover-footer {
+            padding: 7mm 15mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            color: rgba(255, 255, 255, .38);
+            font-size: 7.5pt;
+        }
+
+        /* ── INNER ── */
+        .page-bar {
+            background: var(--dark);
+            padding: 7px 15mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(255, 255, 255, .65);
+            font-size: 7.5pt;
+        }
+
+        .page-bar .lsm {
+            color: var(--p);
+            font-weight: 700;
+            font-size: 9pt;
+        }
+
+        .inner {
+            padding: 12mm 15mm;
+        }
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin-bottom: 14px;
+            padding-bottom: 9px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .sec-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .ic-o {
+            background: var(--soft);
+        }
+
+        .ic-b {
+            background: #EFF6FF;
+        }
+
+        .ic-g {
+            background: #ECFDF5;
+        }
+
+        .ic-p {
+            background: #F5F3FF;
+        }
+
+        .ic-y {
+            background: #FFFBEB;
+        }
+
+        .sec-title {
+            font-size: 14pt;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .sec-num {
+            font-size: 8.5pt;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .sprint-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 18px 0 10px;
+        }
+
+        .sprint-badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 8.5pt;
+            font-weight: 700;
+        }
+
+        .sb1 {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .sb2 {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .sb3 {
+            background: #F5F3FF;
+            color: #6D28D9;
+        }
+
+        .sprint-title {
+            font-size: 13pt;
+            font-weight: 700;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 11px;
+            margin: 10px 0 16px;
+        }
+
+        .fc {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 11px 13px;
+            background: #FAFAFA;
+        }
+
+        .fc-head {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .do {
+            background: var(--p);
+        }
+
+        .db {
+            background: var(--blue);
+        }
+
+        .dg {
+            background: var(--green);
+        }
+
+        .dp {
+            background: var(--purple);
+        }
+
+        .dy {
+            background: var(--yellow);
+        }
+
+        .fc h4 {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .fc p {
+            font-size: 8.5pt;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .sub-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+        }
+
+        .sub-list li {
+            padding: 5px 17px 5px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 8.5pt;
+            color: #374151;
+            position: relative;
+        }
+
+        .sub-list li:last-child {
+            border-bottom: none;
+        }
+
+        .sub-list li::before {
+            content: '←';
+            position: absolute;
+            right: 0;
+            color: var(--p);
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            margin: 10px 0 14px;
+        }
+
+        th {
+            background: var(--dark);
+            color: #fff;
+            padding: 7px 9px;
+            text-align: right;
+            font-weight: 600;
+            font-size: 7.5pt;
+        }
+
+        td {
+            padding: 5px 9px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) td {
+            background: #F9FAFB;
+        }
+
+        .m {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 7pt;
+        }
+
+        .get {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .post {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .patch {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .hbox {
+            border-right: 4px solid var(--p);
+            border-left: none;
+            background: var(--soft);
+            padding: 9px 13px;
+            border-radius: 8px 0 0 8px;
+            margin: 12px 0;
+            font-size: 8.5pt;
+            color: #374151;
+        }
+
+        .hbox-g {
+            border-color: var(--green);
+            background: #ECFDF5;
+        }
+
+        .hbox-p {
+            border-color: var(--purple);
+            background: #F5F3FF;
+        }
+
+        .hbox-b {
+            border-color: var(--blue);
+            background: #EFF6FF;
+        }
+
+        .hbox-y {
+            border-color: var(--yellow);
+            background: #FFFBEB;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 9px;
+            margin: 12px 0;
+        }
+
+        .sbox {
+            text-align: center;
+            padding: 11px 7px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+        }
+
+        .sbox .num {
+            font-size: 17pt;
+            font-weight: 800;
+        }
+
+        .sbox .lbl {
+            font-size: 7.5pt;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .co {
+            color: var(--p);
+        }
+
+        .cb {
+            color: var(--blue);
+        }
+
+        .cg {
+            color: var(--green);
+        }
+
+        .cp {
+            color: var(--purple);
+        }
+
+        .milestone-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 11px;
+            margin: 10px 0;
+        }
+
+        .milestone {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 12px 13px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .ms-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .ms-body h4 {
+            font-size: 9.5pt;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .ms-body p {
+            font-size: 8pt;
+            color: var(--muted);
+        }
+
+        .roadmap-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .rm-card {
+            border-radius: 10px;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+        }
+
+        .rm-card h4 {
+            font-size: 10pt;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .rm-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rm-card ul li {
+            padding: 3px 14px 3px 0;
+            font-size: 8pt;
+            color: #374151;
+            position: relative;
+        }
+
+        .rm-card ul li::before {
+            content: '·';
+            position: absolute;
+            right: 0;
+            color: var(--p);
+            font-size: 14pt;
+            line-height: .9;
+        }
+
+        .rm1 {
+            background: #EFF6FF;
+            border-color: #BFDBFE;
+        }
+
+        .rm2 {
+            background: #ECFDF5;
+            border-color: #A7F3D0;
+        }
+
+        .rm3 {
+            background: #F5F3FF;
+            border-color: #DDD6FE;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            html,
+            body {
+                width: 210mm;
+                background: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-size: 9.5pt !important;
+            }
+
+            .page {
+                width: 210mm !important;
+                min-height: 297mm;
+                height: auto !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                overflow: hidden !important;
+                page-break-after: always;
+                break-after: page;
+                page-break-inside: avoid;
+            }
+
+            .page:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+
+            /* Tighten spacing in print to help content fit */
+            .inner {
+                padding: 6mm 10mm !important;
+            }
+
+            .feature-grid {
+                gap: 6px !important;
+                margin: 5px 0 8px !important;
+                page-break-inside: avoid;
+            }
+
+            .sec-header {
+                margin-bottom: 8px !important;
+                padding-bottom: 5px !important;
+            }
+
+            .sprint-header {
+                margin: 8px 0 5px !important;
+            }
+
+            .roadmap-row {
+                gap: 6px !important;
+                margin: 6px 0 !important;
+                page-break-inside: avoid;
+            }
+
+            .milestone-row {
+                gap: 6px !important;
+                margin: 5px 0 !important;
+                page-break-inside: avoid;
+            }
+
+            .hbox {
+                margin: 6px 0 !important;
+                padding: 5px 9px !important;
+                page-break-inside: avoid;
+            }
+
+            table {
+                margin: 5px 0 8px !important;
+                page-break-inside: avoid;
+            }
+
+            .rm-card {
+                padding: 7px 9px !important;
+            }
+
+            p,
+            .fc p,
+            .ms-body p,
+            .sub-list li,
+            th,
+            td,
+            .rm-card ul li {
+                font-size: 8pt !important;
+                line-height: 1.4 !important;
+            }
+
+            .sec-title {
+                font-size: 12pt !important;
+            }
+
+            .sprint-title {
+                font-size: 11pt !important;
+            }
+
+            .page-bar {
+                padding: 5px 10mm !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ صفحة 1 – الغلاف ══ -->
+    <div class="page cover">
+        <div class="cover-top">
+            <div class="logo-box">
+                <div class="logo-icon">🛵</div>
+                <div class="logo-text">ما<span>كوك</span></div>
+            </div>
+            <div class="badge">خطة السبرينتات التنفيذية</div>
+        </div>
+        <div class="cover-hero">
+            <div class="phase-label">تطوير المنصة · 2026</div>
+            <h1 class="cover-title">خطة تنفيذية<br /><em>3 سبرينتات</em></h1>
+            <p class="cover-sub">خطة تقنية تفصيلية لتقديم مصادقة OTP عبر SMS، إشعارات دفع ذكية، دردشة فورية محسّنة، نظام
+                مكافآت وولاء، بحث ذكي، توصيات بالذكاء الاصطناعي، واشتراك احترافي على منصة ماكوك.</p>
+            <div class="sprint-pills">
+                <div class="pill">
+                    <div class="pill-num" style="background:#3B82F6;">1</div>
+                    <div class="pill-body">
+                        <strong>السبرينت الأول — التواصل وتحسين التجربة</strong>
+                        <span>SMS OTP · إشعارات ذكية · دردشة فورية · تطبيق التوصيل</span>
+                    </div>
+                </div>
+                <div class="pill">
+                    <div class="pill-num" style="background:#10B981;">2</div>
+                    <div class="pill-body">
+                        <strong>السبرينت الثاني — الولاء والمكافآت</strong>
+                        <span>نقاط المكافآت · قسائم هدايا تلقائية عند بلوغ الأهداف</span>
+                    </div>
+                </div>
+                <div class="pill">
+                    <div class="pill-num" style="background:#8B5CF6;">3</div>
+                    <div class="pill-body">
+                        <strong>السبرينت الثالث — الذكاء والنمو</strong>
+                        <span>بحث ذكي · توصيات AI · الاشتراك الاحترافي</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cover-footer">
+            <span>منصة ماكوك · خطة داخلية</span>
+            <span>مارس 2026</span>
+            <span>الإصدار 1.0 · عربي</span>
+        </div>
+    </div>
+
+    <!-- ══ صفحة 2 – السبرينت الأول: OTP + الإشعارات ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">ماكوك</span>
+            <span>السبرينت 1 — SMS OTP والإشعارات الذكية</span>
+            <span>صفحة 2</span>
+        </div>
+        <div class="inner">
+
+            <div class="sprint-header">
+                <span class="sprint-badge sb1">السبرينت الأول</span>
+                <span class="sprint-title">التواصل وتحسين تجربة المستخدم</span>
+            </div>
+
+            <!-- SMS OTP -->
+            <div class="sec-header">
+                <div class="sec-icon ic-b">📱</div>
+                <div>
+                    <div class="sec-num">الميزة 1.1</div>
+                    <div class="sec-title">مصادقة OTP عبر الرسائل القصيرة</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">تعزيز أمان تسجيل الدخول والتسجيل من خلال إرسال
+                رمز التحقق أحادي الاستخدام (OTP) عبر الرسائل القصيرة، مع دعم تسجيل الدخول برقم الهاتف كبديل اختياري عن
+                البريد الإلكتروني.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>OTP عند التسجيل</h4>
+                    </div>
+                    <p>يتحقق المستخدم الجديد من رقم هاتفه قبل تفعيل الحساب. الكود صالح لـ 5 دقائق مع 3 محاولات إعادة
+                        إرسال.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>تسجيل الدخول برقم الهاتف</h4>
+                    </div>
+                    <p>يمكن للمستخدم الدخول برقم الهاتف + OTP دون الحاجة لكلمة مرور — مثالي لعملاء أقل ألفة بالتقنية.
+                    </p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>استعادة كلمة المرور</h4>
+                    </div>
+                    <p>يُرسل رمز OTP إلى رقم المستخدم المسجل للسماح بإعادة تعيين كلمة المرور بدون الحاجة للبريد
+                        الإلكتروني.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>مزود الخدمة والبديل</h4>
+                    </div>
+                    <p>الافتراضي: Vonage أو Twilio. قابل للتغيير من <code>.env</code>. في حالة فشل SMS، يُرسل OTP
+                        بالبريد تلقائياً.</p>
+                </div>
+            </div>
+
+            <!-- Smart Push -->
+            <div class="sec-header" style="margin-top:18px;">
+                <div class="sec-icon ic-o">🔔</div>
+                <div>
+                    <div class="sec-num">الميزة 1.2</div>
+                    <div class="sec-title">إشعارات الدفع الذكية المتقدمة</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">تطوير الإشعارات لتصبح محرّكة بالسياق — تستهدف
+                المستخدمين تلقائياً بناءً على سلوكهم الفعلي داخل التطبيق مثل محتوى سلة المشتريات وتاريخ التصفح.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>إشعار عرض السلة</h4>
+                    </div>
+                    <p>عند إضافة عرض/خصم على منتج موجود في سلة المستخدم، يصله فوراً إشعار: <em>"🔥 خبر سار! [المنتج] في
+                            سلتك أصبح بسعر مخفّض — اطلبه الآن!"</em></p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>تذكير السلة المتروكة</h4>
+                    </div>
+                    <p>إذا مرّت ساعتان دون إتمام الطلب، يُرسل إشعار: <em>"تركت شيئاً في سلتك! أكمل طلبك الآن."</em></p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>إشعار عودة المخزون</h4>
+                    </div>
+                    <p>يُخطر المستخدمون الذين شاهدوا منتجاً نافد المخزون فور توفّره مجدداً.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>إشعار تخفيض السعر</h4>
+                    </div>
+                    <p>إذا انخفض سعر منتج شاهده المستخدم خلال آخر 48 ساعة، يصله إشعار مخصص بالتخفيض الجديد.</p>
+                </div>
+            </div>
+            <div class="hbox">💡 <strong>آلية العمل:</strong> Laravel Job تعمل كل 15 دقيقة: تفحص السلات النشطة → تطابق
+                العروض الجديدة → تتحقق من عدم إرسال إشعار مماثل في آخر 24 ساعة → ترسل عبر FCM Queue.</div>
+
+        </div>
+    </div>
+
+    <!-- ══ صفحة 3 – السبرينت الأول: الدردشة + تطبيق التوصيل ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">ماكوك</span>
+            <span>السبرينت 1 — الدردشة الفورية وتطبيق التوصيل</span>
+            <span>صفحة 3</span>
+        </div>
+        <div class="inner">
+
+            <!-- Chat -->
+            <div class="sec-header">
+                <div class="sec-icon ic-p">💬</div>
+                <div>
+                    <div class="sec-num">الميزة 1.3</div>
+                    <div class="sec-title">تحسين الدردشة الفورية</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">ترقية نظام الدردشة الحالي إلى منظومة محادثات
+                متكاملة بين العميل والسائق — مع تاريخ الرسائل، ومؤشر الكتابة، وعلامات القراءة في الوقت الفعلي.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>مؤشر الكتابة</h4>
+                    </div>
+                    <p>يظهر "السائق يكتب..." في الوقت الفعلي عبر Pusher — يجعل المحادثة تبدو حية وتفاعلية.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>علامات القراءة</h4>
+                    </div>
+                    <p>تيك واحد (مُرسل) → تيكين (وصل) → تيكين أزرق (قُرئ) — يتزامن فورياً عبر Pusher.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>ردود سريعة للسائق</h4>
+                    </div>
+                    <p>أزرار ردود جاهزة: "في طريقي!", "وصلت", "تأخير بسيط" — تقلل الجهد على السائق أثناء القيادة.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>إغلاق الدردشة بعد التسليم</h4>
+                    </div>
+                    <p>تُغلق الدردشة تلقائياً وتُجعل للقراءة فقط عند تسليم الطلب. تبقى متاحة للاطلاع لمدة 7 أيام.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>إرسال الصور</h4>
+                    </div>
+                    <p>يمكن للسائق إرسال صورة تأكيد التسليم، وللعميل إرسال صورة توضيحية للعنوان.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>عداد الرسائل غير المقروءة</h4>
+                    </div>
+                    <p>يتزامن عداد الرسائل غير المقروءة فورياً عبر Pusher دون الحاجة لتحديث أو polling.</p>
+                </div>
+            </div>
+
+            <!-- Delivery App UI -->
+            <div class="sec-header" style="margin-top:18px;">
+                <div class="sec-icon ic-g">🛵</div>
+                <div>
+                    <div class="sec-num">الميزة 1.4</div>
+                    <div class="sec-title">تحسين واجهة تطبيق التوصيل</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">تجربة السائق يجب أن تكون سريعة وواضحة وخالية من
+                الإلهاء. هذا التحديث يختصر عدد الخطوات المطلوبة لقبول الطلبات والتنقل وإتمام التوصيل.</p>
+            <div class="milestone-row">
+                <div class="milestone">
+                    <div class="ms-icon">🗺</div>
+                    <div class="ms-body">
+                        <h4>التنقل بنقرة واحدة</h4>
+                        <p>زر واحد في شاشة تفاصيل الطلب يفتح عنوان العميل مباشرة في Google Maps أو Waze.</p>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="ms-icon">⚡</div>
+                    <div class="ms-body">
+                        <h4>شريط تحديث الحالة السريع</h4>
+                        <p>شريط ثابت في أسفل الشاشة يتيح للسائق تغيير حالة الطلب بنقرة واحدة دون التنقل في القوائم.</p>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="ms-icon">📋</div>
+                    <div class="ms-body">
+                        <h4>بطاقات طلبات محسّنة</h4>
+                        <p>تعرض البطاقة: اسم العميل، المسافة، قيمة التوصيل، وعدد المنتجات — بوضوح تام للقرارات الفورية.
+                        </p>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="ms-icon">🔕</div>
+                    <div class="ms-body">
+                        <h4>وضع عدم الإزعاج</h4>
+                        <p>يمكن للسائق إيقاف إشعارات الطلبات الجديدة مؤقتاً خلال استراحة — يُعاد تلقائياً بعد المدة
+                            المحددة.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hbox hbox-g">✅ <strong>ناتج السبرينت الأول:</strong> تدفق OTP عبر SMS · إشعارات ذكية مرتبطة
+                بالسلة · دردشة فورية محسّنة بمؤشرات الكتابة والقراءة · تطبيق توصيل بتنقل بنقرة واحدة وواجهة طلبات جديدة.
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══ صفحة 4 – السبرينت الثاني: الولاء والقسائم ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">ماكوك</span>
+            <span>السبرينت 2 — نظام الولاء والمكافآت</span>
+            <span>صفحة 4</span>
+        </div>
+        <div class="inner">
+
+            <div class="sprint-header">
+                <span class="sprint-badge sb2">السبرينت الثاني</span>
+                <span class="sprint-title">نظام الولاء والمكافآت</span>
+            </div>
+
+            <div class="sec-header">
+                <div class="sec-icon ic-g">🎁</div>
+                <div>
+                    <div class="sec-num">الميزة 2.1</div>
+                    <div class="sec-title">نظام النقاط والمكافآت</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">نظام نقاط بسيط وشفاف يكافئ العملاء على كل طلب
+                يكتملونه. تتراكم النقاط في محفظة خاصة ويمكن استبدالها خصماً عند الدفع — <strong>بدون مستويات أو
+                    درجات.</strong></p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>كسب النقاط</h4>
+                    </div>
+                    <p>يكسب العميل نقاطاً عند كل طلب مكتمل. مثال: 10 نقاط لكل 50 جنيه. قابل للتعديل بواسطة المدير.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>محفظة النقاط</h4>
+                    </div>
+                    <p>رصيد النقاط ظاهر في ملف المستخدم مع سجل كامل للنقاط المكتسبة والمستبدلة.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>الاستبدال عند الدفع</h4>
+                    </div>
+                    <p>يمكن للعميل تطبيق نقاطه خصماً عند اختيار الدفع. مثال: 100 نقطة = 5 جنيه. يحدد المدير الحد الأدنى
+                        للاستبدال.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>انتهاء صلاحية النقاط</h4>
+                    </div>
+                    <p>تنتهي النقاط بعد فترة عدم نشاط قابلة للضبط (مثلاً: 6 أشهر بدون طلبات) لتشجيع الاستمرار.</p>
+                </div>
+            </div>
+
+            <div class="sec-header" style="margin-top:18px;">
+                <div class="sec-icon ic-y">🏆</div>
+                <div>
+                    <div class="sec-num">الميزة 2.2</div>
+                    <div class="sec-title">قسائم هدايا تلقائية عند بلوغ الأهداف</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">مكافأة العملاء تلقائياً عند وصولهم لأهداف محددة —
+                لحظات مفاجأة تبني ولاءً عاطفياً وتحفز على المزيد من الطلبات.</p>
+
+            <div class="milestone-row">
+                <div class="milestone" style="border-color:#FDE68A;background:#FFFBEB;">
+                    <div class="ms-icon">🎉</div>
+                    <div class="ms-body">
+                        <h4>هدف 5 طلبات</h4>
+                        <p>عند إتمام العميل <strong>طلبه الخامس</strong>، يحصل تلقائياً على قسيمة هدية (مثلاً: 20% خصم
+                            أو 25 جنيه مجاناً) — تُرسل عبر إشعار دفع وبريد إلكتروني.</p>
+                    </div>
+                </div>
+                <div class="milestone" style="border-color:#FDE68A;background:#FFFBEB;">
+                    <div class="ms-icon">💰</div>
+                    <div class="ms-body">
+                        <h4>هدف 5,000 جنيه إجمالي</h4>
+                        <p>عند وصول إجمالي مشتريات العميل إلى <strong>5,000 جنيه</strong>، يحصل على قسيمة مميزة تكافئ
+                            العملاء ذوي الإنفاق المرتفع بشكل حقيقي.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hbox hbox-y">🔧 <strong>آلية العمل:</strong> Laravel Observer يراقب جدول الطلبات عند تغيير
+                الحالة إلى "مُسلَّم". يُعيد حساب عدد طلبات المستخدم وإجمالي إنفاقه. إذا تجاوز عتبة جديدة ولم يُكافَأ
+                عليها من قبل، يُنشئ قسيمة فريدة ويُرسل إشعاراً وبريداً إلكترونياً تلقائياً.
+            </div>
+
+            <div class="sec-header" style="margin-top:16px;">
+                <div class="sec-icon ic-o">📊</div>
+                <div>
+                    <div class="sec-num">الميزة 2.3</div>
+                    <div class="sec-title">لوحة إدارة الولاء</div>
+                </div>
+            </div>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>نظرة عامة على النقاط</h4>
+                    </div>
+                    <p>إجمالي النقاط الممنوحة والمستبدلة والقائمة. تكلفة الالتزام بالنقاط بالجنيه المصري.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>تقرير الأهداف</h4>
+                    </div>
+                    <p>عدد المستخدمين الذين بلغوا كل هدف. معدل استبدال القسائم. الإيرادات المنسوبة لطلبات الولاء.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>تعديل النقاط يدوياً</h4>
+                    </div>
+                    <p>يمكن للمدير إضافة أو خصم نقاط من أي حساب مع ملاحظة إلزامية — مفيد لحل شكاوى العملاء.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>أهداف قابلة للتخصيص</h4>
+                    </div>
+                    <p>يضيف المدير أو يحرر عتبات الأهداف (مثلاً: تغيير 5 طلبات إلى 10، أو إضافة هدف 10,000 جنيه) بدون
+                        تعديل الكود.</p>
+                </div>
+            </div>
+            <div class="hbox hbox-g">✅ <strong>ناتج السبرينت الثاني:</strong> كسب النقاط واستبدالها عند الدفع · محفظة
+                نقاط في ملف المستخدم · قسائم هدايا تلقائية (5 طلبات وهدف 5,000 جنيه) · لوحة إدارة الولاء.</div>
+
+        </div>
+    </div>
+
+    <!-- ══ صفحة 5 – السبرينت الثالث: بحث + AI + اشتراك ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">ماكوك</span>
+            <span>السبرينت 3 — البحث الذكي والتوصيات والاشتراك الاحترافي</span>
+            <span>صفحة 5</span>
+        </div>
+        <div class="inner">
+
+            <div class="sprint-header">
+                <span class="sprint-badge sb3">السبرينت الثالث</span>
+                <span class="sprint-title">محرك الذكاء والنمو</span>
+            </div>
+
+            <div class="sec-header">
+                <div class="sec-icon ic-b">🔍</div>
+                <div>
+                    <div class="sec-num">الميزة 3.1</div>
+                    <div class="sec-title">البحث الذكي عن المنتجات</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">استبدال استعلامات LIKE البسيطة بمحرك بحث نصي
+                متكامل متسامح مع الأخطاء الإملائية عبر <strong>Laravel Scout + Meilisearch</strong> — نتائج فورية وذات
+                صلة.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>بحث متسامح مع الأخطاء</h4>
+                    </div>
+                    <p>"برجر" → "برغر"، "بيتزا" → "بيتسا". يمكنه التعامل مع التشكيلات الشائعة للكتابة.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>اقتراحات تلقائية</h4>
+                    </div>
+                    <p>تظهر الاقتراحات بعد إدخال حرفين. النتائج تتحدث فورياً مع كل حرف مدخل.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>الأخير والأكثر بحثاً</h4>
+                    </div>
+                    <p>يُخزن آخر 10 عمليات بحث للمستخدم. قائمة عالمية بأكثر 10 كلمات بحثاً في آخر 24 ساعة.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>بحث متعدد المصادر</h4>
+                    </div>
+                    <p>استعلام واحد يبحث في: المنتجات، المتاجر، الفئات، والعروض النشطة — مُجمَّعة بترتيب واضح.</p>
+                </div>
+            </div>
+
+            <div class="sec-header" style="margin-top:16px;">
+                <div class="sec-icon ic-g">🤖</div>
+                <div>
+                    <div class="sec-num">الميزة 3.2</div>
+                    <div class="sec-title">توصيات المنتجات بالذكاء الاصطناعي</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:8px;">توظيف تاريخ الطلبات وبيانات التصفح لعرض المنتجات
+                المناسبة في اللحظة المناسبة — يزيد متوسط قيمة الطلب والتفاعل مع التطبيق.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>قسم "اطلب مجدداً"</h4>
+                    </div>
+                    <p>الشاشة الرئيسية تعرض أكثر 5 منتجات طلبها المستخدم مرتبة بالحداثة — الطلب بنقرة واحدة.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>"قد يعجبك أيضاً"</h4>
+                    </div>
+                    <p>عند الدفع: "من طلبوا هذا أضافوا أيضاً..." — فلترة تعاونية بناءً على أنماط الشراء المشتркة.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>الصفحة الرئيسية الشخصية</h4>
+                    </div>
+                    <p>تُعاد ترتيب الفئات والمنتجات المميزة بناءً على درجة ارتباط سجل المستخدم بكل فئة.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>الأكثر مبيعاً في منطقتك</h4>
+                    </div>
+                    <p>أكثر المنتجات مبيعاً في آخر 7 أيام بناءً على مدينة المستخدم أو منطقة التوصيل المختارة.</p>
+                </div>
+            </div>
+
+            <div class="sec-header" style="margin-top:16px;">
+                <div class="sec-icon ic-p">⭐</div>
+                <div>
+                    <div class="sec-num">الميزة 3.3</div>
+                    <div class="sec-title">الاشتراك الاحترافي (Pro)</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:8px;">اشتراك شهري أو سنوي متكرر يفتح مزايا حصرية
+                للمستخدمين النشطين — يخلق مصدر إيراد ثابتاً ويزيد الاحتفاظ بالعملاء.</p>
+            <div class="roadmap-row">
+                <div class="rm-card rm3">
+                    <h4>⭐ مزايا Pro</h4>
+                    <ul>
+                        <li>توصيل مجاني على كل طلب</li>
+                        <li>عروض حصرية للمشتركين فقط</li>
+                        <li>أولوية في دعم العملاء</li>
+                        <li>وصول مبكر للميزات الجديدة</li>
+                        <li>ضعف معدل كسب النقاط</li>
+                    </ul>
+                </div>
+                <div class="rm-card rm2">
+                    <h4>💳 الفوترة</h4>
+                    <ul>
+                        <li>خطة شهرية أو سنوية</li>
+                        <li>تكامل مع Stripe / بوابة محلية</li>
+                        <li>تجديد تلقائي مع تذكيرات</li>
+                        <li>فترة سماح عند فشل الدفع</li>
+                        <li>المدير يمنح تجارب مجانية</li>
+                    </ul>
+                </div>
+                <div class="rm-card rm1">
+                    <h4>🔧 التقنية</h4>
+                    <ul>
+                        <li>جدول <code>subscriptions</code> + نموذج</li>
+                        <li>Middleware: <code>IsProSubscriber</code></li>
+                        <li>Webhook لأحداث الدفع</li>
+                        <li>تجاوز التوصيل المجاني بالطلب</li>
+                        <li>تحليلات الاشتراك للمدير</li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="hbox hbox-p" style="margin-top:12px;">🚀 <strong>النتائج المتوقعة:</strong> +35% زيادة في
+                الاحتفاظ بالمستخدمين · +20% تحسن في معدل تحويل السلات المتروكة · اعتماد الاشتراك الاحترافي من أكثر من
+                15% من المستخدمين النشطين خلال 60 يوماً من الإطلاق.</div>
+        </div>
+    </div>
+
+</body>
+
+</html>

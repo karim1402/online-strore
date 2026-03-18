@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             ModuleSeeder::class,
             OptionGroupSeeder::class,
+            DeliverySettingsSeeder::class,
         ]);
     }
 }

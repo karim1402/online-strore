@@ -101,6 +101,14 @@ Route::prefix('user')->group(function () {
             Route::post('/{orderId}/chat', [\App\Http\Controllers\Api\User\ChatController::class, 'sendMessage'])->name('user.orders.chat');
         });
 
+        // Notifications Routes
+        Route::controller(\App\Http\Controllers\Api\User\NotificationController::class)->prefix('notifications')->group(function () {
+            Route::get('/', 'index')->name('user.notifications.index');
+            Route::get('/unread-count', 'getUnreadCount')->name('user.notifications.unreadCount');
+            Route::post('/mark-all-read', 'markAllAsRead')->name('user.notifications.markAllRead');
+            Route::post('/{id}/read', 'markAsRead')->name('user.notifications.markRead');
+        });
+
         // Voucher Routes
         Route::post('vouchers/verify', [\App\Http\Controllers\Api\User\VoucherController::class, 'verify'])->name('user.vouchers.verify');
     });
@@ -141,6 +149,9 @@ Route::prefix('user')->group(function () {
     
     // Check Service Area (public)
     Route::post('check-service-area', [AddressController::class, 'checkServiceArea'])->name('user.check-service-area');
+
+    // Splash Ad Route (public)
+    Route::get('splash-ad', [\App\Http\Controllers\Api\User\SplashAdController::class, 'getRandom'])->name('user.splash-ad.random');
 
     // Payment Routes (public/protected)
     Route::post('payments/webhook', [\App\Http\Controllers\Api\User\PaymentController::class, 'webhook'])->name('user.payments.webhook');

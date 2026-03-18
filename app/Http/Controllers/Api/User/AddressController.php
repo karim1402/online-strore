@@ -446,7 +446,7 @@ class AddressController extends Controller
     }
     /**
      * Get delivery fees for a given address.
-     * Returns 0 for now — will be dynamic in the future.
+     * Calculates fee based on distance from starting point configured in App Settings.
      */
     public function deliveryFees($id): JsonResponse
     {
@@ -460,9 +460,11 @@ class AddressController extends Controller
                 return $this->errorResponse('errors.not_found', [], 404);
             }
 
+            $totalFee = $address->calculateDeliveryFee();
+
             return $this->successResponse([
                 'address_id'     => (int) $id,
-                'delivery_fees'  => 0,
+                'delivery_fees'  => 0, //$totalFee,
                 'currency'       => 'EGP',
             ], 'success.data_retrieved');
         } catch (\Exception $e) {

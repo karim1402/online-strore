@@ -99,6 +99,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/products/most-viewed', 'mostViewedProducts');
             Route::get('/products/best-sellers', 'bestSellersFlagged');
             Route::get('/products/with-offers', 'productsWithOffers');
+            Route::get('/products/{id}/buyers', 'productBuyers');
 
             // 4. Users
             Route::get('/users/growth', 'userGrowth');
@@ -128,6 +129,7 @@ Route::prefix('admin')->group(function () {
             Route::middleware('permission:users.view,admins')->group(function () {
                 Route::get('/', 'index');
                 Route::get('/{id}', 'show');
+                Route::get('/{id}/orders', 'userOrders');
             });
             
             Route::middleware('permission:users.create,admins')->group(function () {
@@ -205,6 +207,17 @@ Route::prefix('admin')->group(function () {
             Route::post('/', 'store');
             Route::get('/{id}', 'show');
             Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+        });
+
+        // Splash Ads CRUD routes
+        Route::controller(\App\Http\Controllers\Api\Admin\SplashAdController::class)->prefix('splash-ads')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::post('/{id}', 'update'); // For form-data with _method=PUT
             Route::delete('/{id}', 'destroy');
             Route::patch('/{id}/toggle-status', 'toggleStatus');
         });
@@ -576,6 +589,8 @@ Route::prefix('admin')->group(function () {
             Route::put('/working-hours', 'updateWorkingHours');
             Route::get('/app-version/{platform}', 'getAppVersion');
             Route::put('/app-version/{platform}', 'updateAppVersion');
+            Route::get('/delivery-settings', 'getDeliverySettings');
+            Route::put('/delivery-settings', 'updateDeliverySettings');
         });
     });
 });

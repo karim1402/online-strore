@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\User;
 use App\Services\ValidationService;
 use App\Traits\ApiResponse;
@@ -231,6 +232,31 @@ class UserController extends Controller
                 ->log('User status updated by admin');
 
             return $this->successResponse($user->fresh(), 'success.user_status_updated');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('errors.resource_not_found');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Get paginated orders for a user.
+     */
+    public function userOrders(Request $request, int $id): JsonResponse
+    {
+        try {
+            $user = User::findOrFail($id);
+            $perPage = (int) $request->get('limit', 15);
+
+            $query = Order::where('user_id', $user->id)->orderBy('created_at', 'desc');
+
+            if ($request->filled('status')) {
+                $query->where('simple_status', $request->get('status'));
+            }
+
+            $orders = $query->paginate($perPage);
+
+            return $this->successResponse($orders, 'success.data_retrieved');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('errors.resource_not_found');
         } catch (\Throwable $e) {

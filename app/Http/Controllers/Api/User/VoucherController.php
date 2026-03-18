@@ -40,28 +40,19 @@ class VoucherController extends Controller
             $cartItems = $cart->items;
         }
 
-        // Check module restriction before generic validation to give a specific error message
-        if ($voucher->failsModuleRestriction($cartItems)) {
-            $moduleName = $voucher->module->name ?? 'the required module';
-            return response()->json([
-                'success' => false,
-                'message' => LocalizationService::getMessage('errors.voucher_module_restricted', ['module' => $moduleName]),
-                'data'    => [
-                    'valid'            => false,
-                    'code'             => null,
-                    'type'             => null,
-                    'value'            => null,
-                    'discount_amount'  => null,
-                    'min_order_amount' => null,
-                    'module'           => $voucher->module ? ['id' => $voucher->module->id, 'name' => $voucher->module->name] : null,
-                ],
-            ], 400);
-        }
+        $validationResult = $voucher->validateForUser($user, $orderAmount, $cartItems);
 
-        if (!$voucher->isValidForUser($user, $orderAmount, $cartItems)) {
+        if ($validationResult !== true) {
+            $messageKey = $validationResult;
+            $messageParams = [];
+            
+            if ($messageKey === 'errors.voucher_module_restricted') {
+                $messageParams['module'] = $voucher->module->name ?? 'the required module';
+            }
+
             return response()->json([
                 'success' => false,
-                'message' => LocalizationService::getMessage('errors.invalid_voucher'),
+                'message' => LocalizationService::getMessage($messageKey, $messageParams),
                 'data'    => [
                     'valid'            => false,
                     'code'             => null,

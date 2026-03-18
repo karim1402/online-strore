@@ -97,18 +97,26 @@ class PaymentController extends Controller
 
             // Calculate total
             $subtotal = $this->calculateCartTotal($cart);
-            $deliveryFee = 0.00; // Placeholder
+            $deliveryFee = $isDelivery ? $address->calculateDeliveryFee() : 0.00;
             $tax = 0.00;
 
             // Apply Voucher
             $discount = 0.00;
-            $voucher = null;
             if ($request->filled('voucher_code')) {
                 $voucher = \App\Models\Voucher::with('module')->where('code', $request->voucher_code)->first();
-                if ($voucher && $voucher->isValidForUser($user, $subtotal, $cart->items)) {
-                    $discount = $voucher->getDiscountAmount($subtotal);
+                if ($voucher) {
+                    $validationResult = $voucher->validateForUser($user, $subtotal, $cart->items);
+                    if ($validationResult === true) {
+                        $discount = $voucher->getDiscountAmount($subtotal);
+                    } else {
+                        $messageParams = [];
+                        if ($validationResult === 'errors.voucher_module_restricted') {
+                            $messageParams['module'] = $voucher->module->name ?? 'the required module';
+                        }
+                        return $this->errorResponse($validationResult, $messageParams, 422);
+                    }
                 } else {
-                     return $this->errorResponse('errors.voucher_invalid', [], 422);
+                     return $this->errorResponse('errors.not_found', ['resource' => 'Voucher'], 404);
                 }
             }
 
@@ -325,15 +333,14 @@ class PaymentController extends Controller
 
         // Calculate Totals
         $subtotal = $this->calculateCartTotal($cart);
-        $deliveryFee = 0.00;
+        $deliveryFee = $isDelivery ? $address->calculateDeliveryFee() : 0.00;
         $tax = 0.00;
         
         // Re-apply voucher logic
         $discount = 0.00;
-        $voucher = null;
         if ($voucherId > 0) {
             $voucher = \App\Models\Voucher::with('module')->find($voucherId);
-            if ($voucher && $voucher->isValidForUser($user, $subtotal, $cart->items)) {
+            if ($voucher && $voucher->validateForUser($user, $subtotal, $cart->items) === true) {
                 $discount = $voucher->getDiscountAmount($subtotal);
             }
         }

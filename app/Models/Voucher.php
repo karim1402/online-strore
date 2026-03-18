@@ -23,6 +23,8 @@ class Voucher extends Model
         'usage_count',
         'is_active',
         'module_id',
+        'min_user_orders',
+        'min_user_spend',
     ];
 
     protected $casts = [
@@ -32,6 +34,8 @@ class Voucher extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'is_active' => 'boolean',
+        'min_user_orders' => 'integer',
+        'min_user_spend' => 'decimal:2',
     ];
 
     /**
@@ -43,6 +47,66 @@ class Voucher extends Model
     }
 
     /**
+     * Validate the voucher for the given user, order amount, and cart items.
+     * Returns true if valid, or a string error key if invalid.
+     */
+    public function validateForUser($user, $orderAmount, $cartItems = null)
+    {
+        if (!$this->is_active) {
+            return 'errors.voucher_inactive';
+        }
+
+        if ($this->start_date && now()->lt($this->start_date)) {
+            return 'errors.voucher_not_started';
+        }
+
+        if ($this->end_date && now()->gt($this->end_date)) {
+            return 'errors.voucher_expired';
+        }
+
+        if ($this->usage_limit && $this->usage_count >= $this->usage_limit) {
+            return 'errors.voucher_usage_limit_reached';
+        }
+
+        if ($this->min_order_amount && $orderAmount < $this->min_order_amount) {
+            return 'errors.voucher_min_order_amount';
+        }
+
+        if ($user) {
+            $userUsageCount = $this->usages()->where('user_id', $user->id)->count();
+            if ($this->usage_limit_per_user && $userUsageCount >= $this->usage_limit_per_user) {
+                return 'errors.voucher_user_limit_reached';
+            }
+
+            // Loyalty Constraints Checks
+            // We check past successful orders: simple_status == 'delivered' OR simple_status == 'completed'
+            // and payment_status == 'paid' (or cash orders that are delivered).
+            // A common metric implies just checking 'completed' or 'delivered' orders.
+            $successfulOrdersQuery = $user->orders()->whereIn('simple_status', ['delivered', 'completed']);
+
+            if ($this->min_user_orders) {
+                $pastOrdersCount = (clone $successfulOrdersQuery)->count();
+                if ($pastOrdersCount < $this->min_user_orders) {
+                    return 'errors.voucher_min_orders_required';
+                }
+            }
+
+            if ($this->min_user_spend) {
+                $pastTotalSpend = (clone $successfulOrdersQuery)->sum('total');
+                if ($pastTotalSpend < $this->min_user_spend) {
+                    return 'errors.voucher_min_spend_required';
+                }
+            }
+        }
+
+        if ($this->failsModuleRestriction($cartItems)) {
+            return 'errors.voucher_module_restricted';
+        }
+
+        return true;
+    }
+
+    /**
      * Check if the voucher is valid for the given user, order amount, and cart items.
      *
      * @param  \App\Models\User|null  $user
@@ -51,50 +115,7 @@ class Voucher extends Model
      */
     public function isValidForUser($user, $orderAmount, $cartItems = null)
     {
-        if (!$this->is_active) {
-            return false;
-        }
-
-        if ($this->start_date && now()->lt($this->start_date)) {
-            return false;
-        }
-
-        if ($this->end_date && now()->gt($this->end_date)) {
-            return false;
-        }
-
-        if ($this->usage_limit && $this->usage_count >= $this->usage_limit) {
-            return false;
-        }
-
-        if ($this->min_order_amount && $orderAmount < $this->min_order_amount) {
-            return false;
-        }
-
-        if ($user) {
-            $userUsageCount = $this->usages()->where('user_id', $user->id)->count();
-            if ($this->usage_limit_per_user && $userUsageCount >= $this->usage_limit_per_user) {
-                return false;
-            }
-        }
-
-        // Module restriction check: if this voucher is linked to a module,
-        // the cart must contain at least one product from that module.
-        if ($this->module_id) {
-            if (!$cartItems || $cartItems->isEmpty()) {
-                return false;
-            }
-
-            $hasModuleProduct = $cartItems->contains(function ($item) {
-                return optional($item->product)->module_id == $this->module_id;
-            });
-
-            if (!$hasModuleProduct) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->validateForUser($user, $orderAmount, $cartItems) === true;
     }
 
     /**

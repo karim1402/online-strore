@@ -615,6 +615,31 @@ class ReportsController extends Controller
     }
 
 
+    public function productBuyers(Request $request, int $id): JsonResponse
+    {
+        $query = DB::table('users')
+            ->join('orders', 'users.id', '=', 'orders.user_id')
+            ->join('order_items', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.product_id', $id)
+            ->where('orders.simple_status', 'delivered')
+            ->whereNull('orders.deleted_at')
+            ->whereNull('users.deleted_at');
+
+        $this->applyQueryFilter($query, $request, 'orders');
+
+        $data = $query->select(
+            'users.id as user_id',
+            'users.name as user_name',
+            DB::raw('SUM(order_items.quantity) as quantity'),
+            'orders.created_at as order_date'
+        )
+        ->groupBy('orders.id', 'users.id', 'users.name', 'orders.created_at')
+        ->orderBy('orders.created_at', 'desc')
+        ->get();
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
     // ──────────────────────────────────────────
     // 4. USER & CUSTOMER REPORTS
     // ──────────────────────────────────────────
@@ -644,9 +669,19 @@ class ReportsController extends Controller
             ->whereNull('orders.deleted_at')
             ->whereNull('users.deleted_at');
 
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('users.name', 'like', "%{$search}%")
+                  ->orWhere('users.email', 'like', "%{$search}%")
+                  ->orWhere('users.phone', 'like', "%{$search}%");
+            });
+        }
+
         $this->applyQueryFilter($query, $request, 'orders');
 
-        $data = $query->select(
+        $dataQuery = $query->select(
             'users.id',
             'users.name',
             'users.email',
@@ -655,9 +690,15 @@ class ReportsController extends Controller
             DB::raw('SUM(orders.total) as total_spend')
         )
         ->groupBy('users.id', 'users.name', 'users.email', 'users.phone')
-        ->orderBy('total_spend', 'desc')
-        ->limit($request->input('limit', 50))
-        ->get();
+        ->orderBy('total_spend', 'desc');
+
+        $limit = $request->input('limit', 50);
+
+        if ($limit === 'all') {
+            $data = $dataQuery->paginate($request->input('per_page', 15));
+        } else {
+            $data = $dataQuery->limit((int)$limit)->get();
+        }
 
         return $this->successResponse($data, 'success.data_retrieved');
     }

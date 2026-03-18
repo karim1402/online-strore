@@ -140,16 +140,36 @@ class OrderController extends Controller
 
             // Calculate totals
             $subtotal = $this->calculateSubtotal($cart);
-            $deliveryFee = 0.00; // Placeholder
+            $deliveryFee = $request->boolean('is_delivery', true) ? $address->calculateDeliveryFee() : 0.00;
             $tax = 0.00; // Placeholder
             
             // Apply Voucher
             $discount = 0.00;
-            $voucher = null;
             if ($request->filled('voucher_code')) {
                 $voucher = \App\Models\Voucher::with('module')->where('code', $request->voucher_code)->first();
-                if ($voucher && $voucher->isValidForUser($user, $subtotal, $cart->items)) {
-                    $discount = $voucher->getDiscountAmount($subtotal);
+                if ($voucher) {
+                    $validationResult = $voucher->validateForUser($user, $subtotal, $cart->items);
+                    if ($validationResult === true) {
+                        $discount = $voucher->getDiscountAmount($subtotal);
+                    } else {
+                        DB::rollBack();
+                        
+                        $messageParams = [];
+                        if ($validationResult === 'errors.voucher_module_restricted') {
+                            $messageParams['module'] = $voucher->module->name ?? 'the required module';
+                        }
+
+                        return response()->json([
+                            'success' => false,
+                            'message' => LocalizationService::getMessage($validationResult, $messageParams),
+                        ], 422);
+                    }
+                } else {
+                    DB::rollBack();
+                    return response()->json([
+                        'success' => false,
+                        'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Voucher']),
+                    ], 404);
                 }
             }
 
@@ -735,9 +755,10 @@ class OrderController extends Controller
     private function calculateCartTotal($cart)
     {
         $subtotal = $this->calculateSubtotal($cart);
-        $deliveryFee = 10.00;
+        // Note: Delivery fee is not predictably known here without address, 
+        // the actual final logic adds it during checkout/intention.
         $tax = 0.00;
-        return $subtotal + $deliveryFee + $tax;
+        return $subtotal + $tax;
     }
 
     /**

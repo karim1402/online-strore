@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<!-- To export as PDF: Ctrl+P → Save as PDF → A4 → Margins: None → Background graphics: ON -->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Makook – Sprint Execution Plan (English)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        :root {
+            --p: #FF6B35;
+            --pd: #D94F1A;
+            --dark: #1A1A2E;
+            --blue: #3B82F6;
+            --green: #10B981;
+            --purple: #8B5CF6;
+            --yellow: #F59E0B;
+            --border: #E5E7EB;
+            --muted: #6B7280;
+            --soft: #FFF4F0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F3F4F6;
+            color: #111827;
+            font-size: 10.5pt;
+            line-height: 1.65;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 10mm auto;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, .09);
+            page-break-after: always;
+            break-after: page;
+        }
+
+        /* ── COVER ── */
+        .cover {
+            background: linear-gradient(145deg, #1A1A2E 0%, #16213E 55%, #0F3460 100%);
+            color: #fff;
+            min-height: 297mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cover-top {
+            padding: 13mm 15mm 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--p), var(--pd));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+        }
+
+        .logo-text {
+            font-size: 22pt;
+            font-weight: 800;
+            letter-spacing: -.5px;
+        }
+
+        .logo-text span {
+            color: var(--p);
+        }
+
+        .badge {
+            background: rgba(255, 107, 53, .18);
+            border: 1px solid rgba(255, 107, 53, .4);
+            color: var(--p);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 7.5pt;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .cover-hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 18mm;
+        }
+
+        .phase-label {
+            font-size: 8.5pt;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--p);
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+
+        .cover-title {
+            font-size: 28pt;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 18px;
+        }
+
+        .cover-title em {
+            color: var(--p);
+            font-style: normal;
+        }
+
+        .cover-sub {
+            font-size: 10.5pt;
+            color: rgba(255, 255, 255, .62);
+            max-width: 128mm;
+            margin: 0 auto 30px;
+        }
+
+        .sprint-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 130mm;
+            margin: 0 auto;
+        }
+
+        .pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid rgba(255, 255, 255, .13);
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+
+        .pill-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 11pt;
+            flex-shrink: 0;
+        }
+
+        .pill-body {
+            text-align: left;
+        }
+
+        .pill-body strong {
+            display: block;
+            font-size: 9.5pt;
+            font-weight: 700;
+        }
+
+        .pill-body span {
+            font-size: 8pt;
+            color: rgba(255, 255, 255, .5);
+        }
+
+        .cover-footer {
+            padding: 7mm 15mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            color: rgba(255, 255, 255, .38);
+            font-size: 7.5pt;
+        }
+
+        /* ── INNER PAGES ── */
+        .page-bar {
+            background: var(--dark);
+            padding: 7px 15mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgba(255, 255, 255, .65);
+            font-size: 7.5pt;
+        }
+
+        .page-bar .lsm {
+            color: var(--p);
+            font-weight: 700;
+            font-size: 9pt;
+        }
+
+        .inner {
+            padding: 12mm 15mm;
+        }
+
+        .sec-header {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            margin-bottom: 14px;
+            padding-bottom: 9px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .sec-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .ic-o {
+            background: var(--soft);
+        }
+
+        .ic-b {
+            background: #EFF6FF;
+        }
+
+        .ic-g {
+            background: #ECFDF5;
+        }
+
+        .ic-p {
+            background: #F5F3FF;
+        }
+
+        .ic-y {
+            background: #FFFBEB;
+        }
+
+        .sec-title {
+            font-size: 14pt;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .sec-num {
+            font-size: 8.5pt;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* sprint badge */
+        .sprint-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 18px 0 10px;
+        }
+
+        .sprint-badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 8.5pt;
+            font-weight: 700;
+            letter-spacing: .3px;
+        }
+
+        .sb1 {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .sb2 {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .sb3 {
+            background: #F5F3FF;
+            color: #6D28D9;
+        }
+
+        .sprint-title {
+            font-size: 13pt;
+            font-weight: 700;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 11px;
+            margin: 10px 0 16px;
+        }
+
+        .fc {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 11px 13px;
+            background: #FAFAFA;
+        }
+
+        .fc-head {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .do {
+            background: var(--p);
+        }
+
+        .db {
+            background: var(--blue);
+        }
+
+        .dg {
+            background: var(--green);
+        }
+
+        .dp {
+            background: var(--purple);
+        }
+
+        .dy {
+            background: var(--yellow);
+        }
+
+        .fc h4 {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .fc p {
+            font-size: 8.5pt;
+            color: var(--muted);
+            line-height: 1.5;
+        }
+
+        .sub-list {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+        }
+
+        .sub-list li {
+            padding: 5px 0 5px 17px;
+            border-bottom: 1px solid var(--border);
+            font-size: 8.5pt;
+            color: #374151;
+            position: relative;
+        }
+
+        .sub-list li:last-child {
+            border-bottom: none;
+        }
+
+        .sub-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--p);
+            font-weight: 700;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            margin: 10px 0 14px;
+        }
+
+        th {
+            background: var(--dark);
+            color: #fff;
+            padding: 7px 9px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 7.5pt;
+        }
+
+        td {
+            padding: 5px 9px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) td {
+            background: #F9FAFB;
+        }
+
+        .m {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 7pt;
+        }
+
+        .get {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
+        .post {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .patch {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .hbox {
+            border-left: 4px solid var(--p);
+            background: var(--soft);
+            padding: 9px 13px;
+            border-radius: 0 8px 8px 0;
+            margin: 12px 0;
+            font-size: 8.5pt;
+            color: #374151;
+        }
+
+        .hbox-g {
+            border-color: var(--green);
+            background: #ECFDF5;
+        }
+
+        .hbox-p {
+            border-color: var(--purple);
+            background: #F5F3FF;
+        }
+
+        .hbox-b {
+            border-color: var(--blue);
+            background: #EFF6FF;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 9px;
+            margin: 12px 0;
+        }
+
+        .sbox {
+            text-align: center;
+            padding: 11px 7px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+        }
+
+        .sbox .num {
+            font-size: 17pt;
+            font-weight: 800;
+        }
+
+        .sbox .lbl {
+            font-size: 7.5pt;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .co {
+            color: var(--p);
+        }
+
+        .cb {
+            color: var(--blue);
+        }
+
+        .cg {
+            color: var(--green);
+        }
+
+        .cp {
+            color: var(--purple);
+        }
+
+        .milestone-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 11px;
+            margin: 10px 0;
+        }
+
+        .milestone {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 12px 13px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .ms-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .ms-body h4 {
+            font-size: 9.5pt;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .ms-body p {
+            font-size: 8pt;
+            color: var(--muted);
+        }
+
+        /* page 5 roadmap */
+        .roadmap-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .rm-card {
+            border-radius: 10px;
+            padding: 13px 14px;
+            border: 1px solid var(--border);
+        }
+
+        .rm-card h4 {
+            font-size: 10pt;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .rm-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rm-card ul li {
+            padding: 3px 0 3px 14px;
+            font-size: 8pt;
+            color: #374151;
+            position: relative;
+        }
+
+        .rm-card ul li::before {
+            content: '·';
+            position: absolute;
+            left: 0;
+            color: var(--p);
+            font-weight: 700;
+            font-size: 14pt;
+            line-height: .9;
+        }
+
+        .rm1 {
+            background: #EFF6FF;
+            border-color: #BFDBFE;
+        }
+
+        .rm2 {
+            background: #ECFDF5;
+            border-color: #A7F3D0;
+        }
+
+        .rm3 {
+            background: #F5F3FF;
+            border-color: #DDD6FE;
+        }
+
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+
+            html,
+            body {
+                width: 210mm;
+                background: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-size: 9.5pt !important;
+            }
+
+            .page {
+                width: 210mm !important;
+                min-height: 297mm;
+                height: auto !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                box-shadow: none !important;
+                overflow: hidden !important;
+                page-break-after: always;
+                break-after: page;
+                page-break-inside: avoid;
+            }
+
+            .page:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+
+            /* Tighten spacing in print to help content fit */
+            .inner {
+                padding: 6mm 10mm !important;
+            }
+
+            .feature-grid {
+                gap: 6px !important;
+                margin: 5px 0 8px !important;
+                page-break-inside: avoid;
+            }
+
+            .sec-header {
+                margin-bottom: 8px !important;
+                padding-bottom: 5px !important;
+            }
+
+            .sprint-header {
+                margin: 8px 0 5px !important;
+            }
+
+            .roadmap-row {
+                gap: 6px !important;
+                margin: 6px 0 !important;
+                page-break-inside: avoid;
+            }
+
+            .milestone-row {
+                gap: 6px !important;
+                margin: 5px 0 !important;
+                page-break-inside: avoid;
+            }
+
+            .hbox {
+                margin: 6px 0 !important;
+                padding: 5px 9px !important;
+                page-break-inside: avoid;
+            }
+
+            table {
+                margin: 5px 0 8px !important;
+                page-break-inside: avoid;
+            }
+
+            .rm-card {
+                padding: 7px 9px !important;
+            }
+
+            p,
+            .fc p,
+            .ms-body p,
+            .sub-list li,
+            th,
+            td,
+            .rm-card ul li {
+                font-size: 8pt !important;
+                line-height: 1.4 !important;
+            }
+
+            .sec-title {
+                font-size: 12pt !important;
+            }
+
+            .sprint-title {
+                font-size: 11pt !important;
+            }
+
+            .page-bar {
+                padding: 5px 10mm !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══ PAGE 1 – COVER ══ -->
+    <div class="page cover">
+        <div class="cover-top">
+            <div class="logo-box">
+                <div class="logo-icon">🛵</div>
+                <div class="logo-text">ma<span>kook</span></div>
+            </div>
+            <div class="badge">Sprint Execution Plan</div>
+        </div>
+        <div class="cover-hero">
+            <div class="phase-label">Feature Development · 2026</div>
+            <h1 class="cover-title">3-Sprint<br /><em>Execution Plan</em></h1>
+            <p class="cover-sub">A detailed technical plan for delivering SMS OTP, advanced intelligent push
+                notifications, real-time chat, loyalty rewards, smart search, AI recommendations, and a pro subscription
+                tier to the Makook platform.</p>
+            <div class="sprint-pills">
+                <div class="pill">
+                    <div class="pill-num" style="background:#3B82F6;">1</div>
+                    <div class="pill-body">
+                        <strong>Sprint 1 — Communication &amp; UX</strong>
+                        <span>SMS OTP · Smart Push Notifications · Real-Time Chat · Delivery App UI</span>
+                    </div>
+                </div>
+                <div class="pill">
+                    <div class="pill-num" style="background:#10B981;">2</div>
+                    <div class="pill-body">
+                        <strong>Sprint 2 — Loyalty &amp; Rewards</strong>
+                        <span>Points System · Milestone Gift Vouchers · Referral Engine</span>
+                    </div>
+                </div>
+                <div class="pill">
+                    <div class="pill-num" style="background:#8B5CF6;">3</div>
+                    <div class="pill-body">
+                        <strong>Sprint 3 — Intelligence &amp; Growth</strong>
+                        <span>Smart Search · AI Recommendations · Pro Subscription</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="cover-footer">
+            <span>Makook Platform · Internal Sprint Plan</span>
+            <span>March 2026</span>
+            <span>Version 1.0 · English</span>
+        </div>
+    </div>
+
+    <!-- ══ PAGE 2 – SPRINT 1a: SMS OTP + PUSH ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">makook</span>
+            <span>Sprint 1 — SMS OTP &amp; Advanced Push Notifications</span>
+            <span>Page 2</span>
+        </div>
+        <div class="inner">
+
+            <div class="sprint-header">
+                <span class="sprint-badge sb1">Sprint 1</span>
+                <span class="sprint-title">Communication &amp; UX Enhancement</span>
+            </div>
+
+            <!-- SMS OTP -->
+            <div class="sec-header">
+                <div class="sec-icon ic-b">📱</div>
+                <div>
+                    <div class="sec-num">FEATURE 1.1</div>
+                    <div class="sec-title">SMS OTP Authentication</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">Replace or supplement email-based verification
+                with a one-time password sent via SMS. This increases registration conversion and provides a second
+                factor for sensitive actions (login, checkout, password reset).</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Registration OTP</h4>
+                    </div>
+                    <p>New users verify their phone number before account activation. OTP expires in 5 minutes. Up to 3
+                        resend attempts allowed.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Login via Phone</h4>
+                    </div>
+                    <p>Users can log in using phone number + SMS OTP as an alternative to email/password — ideal for
+                        less tech-savvy customers.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Password Reset via SMS</h4>
+                    </div>
+                    <p>A secure OTP is sent to the user's registered number to authorize a password reset without
+                        needing email access.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Provider &amp; Fallback</h4>
+                    </div>
+                    <p>Primary: Vonage (Nexmo) or Twilio. Configurable via <code>.env</code>. Automatic fallback to
+                        email OTP if SMS fails.</p>
+                </div>
+            </div>
+
+            <!-- Smart Push Notifications -->
+            <div class="sec-header" style="margin-top:18px;">
+                <div class="sec-icon ic-o">🔔</div>
+                <div>
+                    <div class="sec-num">FEATURE 1.2</div>
+                    <div class="sec-title">Advanced Smart Push Notifications</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">Go beyond basic order alerts. Introduce
+                intelligent, event-driven notifications that target users based on their real-time cart and browsing
+                behavior — turning passive users into active buyers.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Cart + Offer Trigger</h4>
+                    </div>
+                    <p>When an admin adds a new offer/discount on a product that is currently sitting in a user's cart,
+                        that user instantly receives a push: <em>"🔥 Good news! [Product] in your cart is now on sale —
+                            grab it before it sells out!"</em></p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Cart Abandonment Nudge</h4>
+                    </div>
+                    <p>If a user hasn't checked out after 2 hours with items in cart, an automated push is fired:
+                        <em>"You left something behind! Complete your order now."</em>
+                    </p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Back-in-Stock Alert</h4>
+                    </div>
+                    <p>Users who viewed or wishlisted an out-of-stock product are notified automatically when it becomes
+                        available again.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Price Drop Alert</h4>
+                    </div>
+                    <p>If a product's price drops after a user has viewed it in the past 48 hours, they receive a
+                        personalized price drop notification.</p>
+                </div>
+            </div>
+            <div class="hbox">💡 <strong>Logic:</strong> A scheduled Laravel Job runs every 15 minutes checking: active
+                carts → matching offers → users who haven't received this notification in the last 24h → dispatch FCM
+                via queue.</div>
+
+        </div>
+    </div>
+
+    <!-- ══ PAGE 3 – SPRINT 1b: CHAT + DELIVERY UI ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">makook</span>
+            <span>Sprint 1 — Real-Time Chat &amp; Delivery App UI</span>
+            <span>Page 3</span>
+        </div>
+        <div class="inner">
+
+            <!-- Real-Time Chat -->
+            <div class="sec-header">
+                <div class="sec-icon ic-p">💬</div>
+                <div>
+                    <div class="sec-num">FEATURE 1.3</div>
+                    <div class="sec-title">Optimized Real-Time Chat</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">The current chat is basic. Phase 2 Sprint 1
+                upgrades it into a fully-featured in-app messaging system between customers and their delivery driver —
+                with message history, typing indicators, and read receipts.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>Typing Indicator</h4>
+                    </div>
+                    <p>Real-time "Driver is typing…" indicator powered by Pusher private channels — improves the feel of
+                        responsiveness.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>Read Receipts</h4>
+                    </div>
+                    <p>Messages show a single tick (sent), double tick (delivered), and blue tick (read) — synced in
+                        real-time via Pusher.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>Quick Reply Templates</h4>
+                    </div>
+                    <p>Drivers see pre-set quick reply buttons: "On my way!", "I've arrived", "Slight delay" — reduces
+                        friction for drivers on the road.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>Chat Lock After Delivery</h4>
+                    </div>
+                    <p>Chat is automatically closed and made read-only once the order status reaches "Delivered".
+                        History remains accessible for 7 days.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>Media Messages</h4>
+                    </div>
+                    <p>Customers and drivers can send a single image (e.g. driver sends photo of delivered order,
+                        customer sends location screenshot).</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dp"></div>
+                        <h4>Unread Badge Sync</h4>
+                    </div>
+                    <p>Unread message count is synced in real-time to the app's notification badge — no polling
+                        required.</p>
+                </div>
+            </div>
+
+            <!-- Delivery App UI -->
+            <div class="sec-header" style="margin-top:18px;">
+                <div class="sec-icon ic-g">🛵</div>
+                <div>
+                    <div class="sec-num">FEATURE 1.4</div>
+                    <div class="sec-title">Delivery App UI Optimization</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">The delivery driver's app experience must be
+                fast, clear, and distraction-free. This optimization pass focuses on reducing the steps a driver needs
+                to take to accept, navigate, and complete deliveries.</p>
+            <div class="milestone-row">
+                <div class="milestone">
+                    <div class="ms-icon">🗺</div>
+                    <div class="ms-body">
+                        <h4>One-Tap Navigation</h4>
+                        <p>A single button on the order detail screen opens the customer's address directly in Google
+                            Maps or Waze.</p>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="ms-icon">⚡</div>
+                    <div class="ms-body">
+                        <h4>Quick Status Update Bar</h4>
+                        <p>A persistent bottom bar lets drivers change order status with one tap — no deep navigation
+                            required.</p>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="ms-icon">📋</div>
+                    <div class="ms-body">
+                        <h4>Redesigned Order Cards</h4>
+                        <p>Order cards show: customer name, distance, payout amount, and item count at a glance —
+                            optimized for splitting-second decisions.</p>
+                    </div>
+                </div>
+                <div class="milestone">
+                    <div class="ms-icon">🔕</div>
+                    <div class="ms-body">
+                        <h4>Do Not Disturb Mode</h4>
+                        <p>Drivers can pause new order notifications during a short break — automatically re-enables
+                            after a set duration.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="hbox hbox-g">✅ <strong>Sprint 1 Deliverable:</strong> Fully working SMS OTP flow · Cart-aware
+                push notifications · Upgraded chat with typing indicators &amp; read receipts · Delivery app with
+                one-tap navigation and redesigned order interface.</div>
+
+        </div>
+    </div>
+
+    <!-- ══ PAGE 4 – SPRINT 2: LOYALTY + VOUCHERS ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">makook</span>
+            <span>Sprint 2 — Loyalty &amp; Rewards System</span>
+            <span>Page 4</span>
+        </div>
+        <div class="inner">
+
+            <div class="sprint-header">
+                <span class="sprint-badge sb2">Sprint 2</span>
+                <span class="sprint-title">Loyalty &amp; Rewards System</span>
+            </div>
+
+            <div class="sec-header">
+                <div class="sec-icon ic-g">🎁</div>
+                <div>
+                    <div class="sec-num">FEATURE 2.1</div>
+                    <div class="sec-title">Points-Based Loyalty System</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">Reward customers for every order they complete.
+                Points accumulate in a personal wallet and can be redeemed as a discount on future orders. The system is
+                simple, transparent, and admin-configurable — <strong>no tier levels.</strong></p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>Points Earning</h4>
+                    </div>
+                    <p>Customers earn points for every completed order. Example: 10 points per EGP 50 spent. Admin can
+                        configure the earn rate from the dashboard.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>Points Wallet</h4>
+                    </div>
+                    <p>Each user has a points balance visible in their profile. The wallet shows current balance, all
+                        earned transactions, and all redemptions.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>Redeem at Checkout</h4>
+                    </div>
+                    <p>Users can apply points as a checkout discount (e.g. 100 pts = EGP 5 off). A minimum redemption
+                        threshold is set by admin (e.g. 200 pts min).</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>Points Expiry</h4>
+                    </div>
+                    <p>Points expire after a configurable period of inactivity (e.g. 6 months without an order) to
+                        encourage continued use.</p>
+                </div>
+            </div>
+
+            <div class="sec-header" style="margin-top:18px;">
+                <div class="sec-icon ic-y">🏆</div>
+                <div>
+                    <div class="sec-num">FEATURE 2.2</div>
+                    <div class="sec-title">Milestone Gift Vouchers</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">Automatically reward users when they hit
+                meaningful milestones — creating a "surprise &amp; delight" moment that builds emotional loyalty and
+                directly incentivizes more orders.</p>
+
+            <div class="milestone-row">
+                <div class="milestone" style="border-color:#FDE68A;background:#FFFBEB;">
+                    <div class="ms-icon">🎉</div>
+                    <div class="ms-body">
+                        <h4>5-Order Milestone</h4>
+                        <p>When a user completes their <strong>5th order</strong>, they automatically receive a gift
+                            voucher (e.g. 20% off or EGP 25 free) — delivered via push notification and email.</p>
+                    </div>
+                </div>
+                <div class="milestone" style="border-color:#FDE68A;background:#FFFBEB;">
+                    <div class="ms-icon">💰</div>
+                    <div class="ms-body">
+                        <h4>EGP 5,000 Spend Milestone</h4>
+                        <p>When a user's cumulative spend reaches <strong>EGP 5,000</strong>, they receive a special
+                            voucher — rewarding high-value customers with a meaningful benefit.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hbox" style="border-color:var(--yellow);background:#FFFBEB;margin:10px 0;">
+                🔧 <strong>How it works:</strong> A Laravel Observer listens on the <code>orders</code> table for status
+                changes to <em>delivered</em>. It recalculates the user's total order count and total spend. If a
+                milestone threshold is crossed (and hasn't been awarded before), it generates a unique voucher code and
+                dispatches a push notification + email.
+            </div>
+
+            <div class="sec-header" style="margin-top:16px;">
+                <div class="sec-icon ic-o">📊</div>
+                <div>
+                    <div class="sec-num">FEATURE 2.3</div>
+                    <div class="sec-title">Admin Loyalty Dashboard</div>
+                </div>
+            </div>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Points Overview</h4>
+                    </div>
+                    <p>Total points issued, redeemed, and outstanding. Cost of liability shown in EGP equivalent.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Milestone Report</h4>
+                    </div>
+                    <p>How many users hit each milestone. Voucher redemption rate. Revenue attributed to
+                        loyalty-rewarded orders.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Manual Points Adjustment</h4>
+                    </div>
+                    <p>Admins can add or deduct points from any user account with a mandatory reason note — useful for
+                        customer service resolutions.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot do"></div>
+                        <h4>Configurable Milestones</h4>
+                    </div>
+                    <p>Admin can add, edit, or remove milestone rules (e.g. change 5 orders to 10, or add a 10,000 EGP
+                        milestone) without code changes.</p>
+                </div>
+            </div>
+            <div class="hbox hbox-g">✅ <strong>Sprint 2 Deliverable:</strong> Points earning &amp; redemption at
+                checkout · Points wallet in user profile · Automated milestone gift vouchers (5 orders &amp; EGP 5,000
+                spend) · Admin loyalty management dashboard.</div>
+
+        </div>
+    </div>
+
+    <!-- ══ PAGE 5 – SPRINT 3: SEARCH + AI + SUBSCRIPTION ══ -->
+    <div class="page">
+        <div class="page-bar">
+            <span class="lsm">makook</span>
+            <span>Sprint 3 — Smart Search, AI Recommendations &amp; Pro Subscription</span>
+            <span>Page 5</span>
+        </div>
+        <div class="inner">
+
+            <div class="sprint-header">
+                <span class="sprint-badge sb3">Sprint 3</span>
+                <span class="sprint-title">Intelligence &amp; Growth Engine</span>
+            </div>
+
+            <div class="sec-header">
+                <div class="sec-icon ic-b">🔍</div>
+                <div>
+                    <div class="sec-num">FEATURE 3.1</div>
+                    <div class="sec-title">Smart Product Search</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:10px;">Replace simple LIKE queries with a full-text,
+                fuzzy, typo-tolerant search powered by <strong>Laravel Scout + Meilisearch</strong> — delivering
+                instant, relevant results across products, stores, and categories.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Fuzzy &amp; Typo-Tolerant</h4>
+                    </div>
+                    <p>"burgr" → "burger", "piza" → "pizza". Handles common Arabic/English transliteration variations.
+                    </p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Auto-Complete</h4>
+                    </div>
+                    <p>Suggestions appear after 2 characters. Results update in real-time as the user types — powered by
+                        a debounced API call.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Recent &amp; Trending</h4>
+                    </div>
+                    <p>Each user's last 10 searches are stored locally. A global trending list shows the top 10
+                        most-searched terms in the last 24h.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot db"></div>
+                        <h4>Multi-Entity Search</h4>
+                    </div>
+                    <p>A single query searches across Products, Stores, Categories, and active Offers — results are
+                        grouped by entity type.</p>
+                </div>
+            </div>
+
+            <div class="sec-header" style="margin-top:16px;">
+                <div class="sec-icon ic-g">🤖</div>
+                <div>
+                    <div class="sec-num">FEATURE 3.2</div>
+                    <div class="sec-title">AI-Powered Product Recommendations</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:8px;">Leverage order history and browsing data to serve
+                the right products to the right user at the right moment — increasing average order value and session
+                engagement.</p>
+            <div class="feature-grid">
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>"Order Again" Section</h4>
+                    </div>
+                    <p>The home screen shows the user's top 5 most-ordered products sorted by recency — one-tap reorder.
+                    </p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>"You May Also Like"</h4>
+                    </div>
+                    <p>At checkout: "Customers who ordered this also added…" — collaborative filtering based on
+                        historical co-purchase patterns.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>Personalized Home Feed</h4>
+                    </div>
+                    <p>Categories and featured products on the home screen are reordered based on the user's purchase
+                        history affinity score.</p>
+                </div>
+                <div class="fc">
+                    <div class="fc-head">
+                        <div class="dot dg"></div>
+                        <h4>Trending Near You</h4>
+                    </div>
+                    <p>Shows the top-selling products in the last 7 days based on the user's current city or selected
+                        delivery area.</p>
+                </div>
+            </div>
+
+            <div class="sec-header" style="margin-top:16px;">
+                <div class="sec-icon ic-p">⭐</div>
+                <div>
+                    <div class="sec-num">FEATURE 3.3</div>
+                    <div class="sec-title">Pro Subscription Plan</div>
+                </div>
+            </div>
+            <p style="font-size:9pt;color:#374151;margin-bottom:8px;">A recurring monthly/annual subscription that
+                unlocks premium benefits for power users — creating a reliable recurring revenue stream and increasing
+                retention.</p>
+            <div class="roadmap-row">
+                <div class="rm-card rm3">
+                    <h4>⭐ Pro Benefits</h4>
+                    <ul>
+                        <li>Free delivery on every order</li>
+                        <li>Exclusive member-only offers</li>
+                        <li>Priority support queue</li>
+                        <li>Early access to new features</li>
+                        <li>2× loyalty points earn rate</li>
+                    </ul>
+                </div>
+                <div class="rm-card rm2">
+                    <h4>💳 Billing</h4>
+                    <ul>
+                        <li>Monthly or annual plan</li>
+                        <li>Stripe / local gateway integration</li>
+                        <li>Auto-renewal with reminders</li>
+                        <li>Grace period on failed payments</li>
+                        <li>Admin can grant free trials</li>
+                    </ul>
+                </div>
+                <div class="rm-card rm1">
+                    <h4>🔧 Technical</h4>
+                    <ul>
+                        <li><code>subscriptions</code> table + model</li>
+                        <li>Middleware: <code>IsProSubscriber</code></li>
+                        <li>Webhook for payment events</li>
+                        <li>Free delivery override in order service</li>
+                        <li>Subscription analytics for admin</li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <div class="hbox hbox-p" style="margin-top:12px;">🚀 <strong>Expected Outcomes:</strong> +35% user retention
+                via loyalty · +20% conversion from cart-aware push notifications · Pro subscription adoption &gt;15% of
+                active monthly users within 60 days of launch.</div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>
