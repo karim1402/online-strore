@@ -464,7 +464,7 @@ class AddressController extends Controller
 
             return $this->successResponse([
                 'address_id'     => (int) $id,
-                'delivery_fees'  => 0.00, //$totalFee,
+                'delivery_fees'  => 0, //$totalFee,
                 'currency'       => 'EGP',
             ], 'success.data_retrieved');
         } catch (\Exception $e) {
