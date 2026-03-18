@@ -460,7 +460,26 @@ class AddressController extends Controller
                 return $this->errorResponse('errors.not_found', [], 404);
             }
 
-            $totalFee = $address->calculateDeliveryFee();
+            // Calculate cart subtotal if cart exists
+            $cart = \App\Models\Cart::with(['items.product', 'items.options.productOptionValue', 'items.addons.addon'])
+                ->where('user_id', $user->id)
+                ->first();
+                
+            $subtotal = 0;
+            if ($cart) {
+                foreach ($cart->items as $item) {
+                    $price = $item->product->effective_price;
+                    foreach ($item->options as $opt) {
+                        $price += $opt->productOptionValue->price_value ?? 0;
+                    }
+                    foreach ($item->addons as $addon) {
+                        $price += $addon->addon->price ?? 0;
+                    }
+                    $subtotal += $price * $item->quantity;
+                }
+            }
+
+            $totalFee = $address->calculateDeliveryFee($subtotal);
 
             return $this->successResponse([
                 'address_id'     => (int) $id,

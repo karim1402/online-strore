@@ -134,8 +134,12 @@ class UserAddress extends Model
     /**
      * Calculate delivery fee for this address
      */
-    public function calculateDeliveryFee(): float
+    public function calculateDeliveryFee(float $subtotal = 0): float
     {
+        if ($subtotal >= 150) {
+            return 0.00;
+        }
+
         $baseFee = (float) \App\Models\AppSetting::get('delivery_base_fee', '0');
         $kmFee   = (float) \App\Models\AppSetting::get('delivery_km_fee', '0');
         $startLat = \App\Models\AppSetting::get('delivery_start_lat');
