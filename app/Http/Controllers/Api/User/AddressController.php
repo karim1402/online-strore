@@ -448,7 +448,7 @@ class AddressController extends Controller
      * Get delivery fees for a given address.
      * Calculates fee based on distance from starting point configured in App Settings.
      */
-    public function deliveryFees($id): JsonResponse
+    public function deliveryFees(Request $request, $id): JsonResponse
     {
         try {
             $user = Auth::guard('api')->user();
@@ -479,7 +479,8 @@ class AddressController extends Controller
                 }
             }
 
-            $totalFee = $address->calculateDeliveryFee($subtotal);
+            $isDelivery = $request->boolean('is_delivery', true);
+            $totalFee = $isDelivery ? $address->calculateDeliveryFee($subtotal) : 0.00;
 
             return $this->successResponse([
                 'address_id'     => (int) $id,
