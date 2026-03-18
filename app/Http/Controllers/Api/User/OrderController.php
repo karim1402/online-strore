@@ -145,6 +145,7 @@ class OrderController extends Controller
             
             // Apply Voucher
             $discount = 0.00;
+            $voucher = null;
             if ($request->filled('voucher_code')) {
                 $voucher = \App\Models\Voucher::with('module')->where('code', $request->voucher_code)->first();
                 if ($voucher) {
