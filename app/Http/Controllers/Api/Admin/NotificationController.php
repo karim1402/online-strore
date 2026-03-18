@@ -102,6 +102,27 @@ class NotificationController extends Controller
                 'updated_at' => now(),
             ]);
 
+            // Save individual user notifications
+            if ($targetType === 'specific_users' && !empty($data['user_ids'])) {
+                $userNotifications = [];
+                $now = now();
+                foreach ($data['user_ids'] as $userId) {
+                    $userNotifications[] = [
+                        'user_id' => $userId,
+                        'title' => $data['title'],
+                        'body' => $data['body'],
+                        'image_url' => $imageUrl,
+                        'is_read' => false,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }
+                
+                foreach (array_chunk($userNotifications, 500) as $chunk) {
+                    \App\Models\UserNotification::insert($chunk);
+                }
+            }
+
             return $this->successResponse($result, 'success.notification_sent');
 
         } catch (\Throwable $e) {

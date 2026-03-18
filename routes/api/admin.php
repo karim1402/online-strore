@@ -211,6 +211,17 @@ Route::prefix('admin')->group(function () {
             Route::patch('/{id}/toggle-status', 'toggleStatus');
         });
 
+        // Splash Ads CRUD routes
+        Route::controller(\App\Http\Controllers\Api\Admin\SplashAdController::class)->prefix('splash-ads')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::post('/{id}', 'update'); // For form-data with _method=PUT
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+        });
+
         // Admin Users CRUD routes (permission-based)
         Route::controller(AdminUserController::class)->prefix('admin-users')->group(function () {
             Route::middleware('permission:admin-users.view,admins')->group(function () {
