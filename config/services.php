@@ -47,4 +47,12 @@ return [
         'hmac_secret' => env('PAYMOB_HMAC_SECRET'),
     ],
 
+    'smsmisr' => [
+        'environment' => env('SMSMISR_ENVIRONMENT', 1),
+        'username' => env('SMSMISR_USERNAME'),
+        'password' => env('SMSMISR_PASSWORD'),
+        'sender' => env('SMSMISR_SENDER'),
+        'template' => env('SMSMISR_TEMPLATE'),
+    ],
+
 ];

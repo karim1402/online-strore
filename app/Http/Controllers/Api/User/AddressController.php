@@ -479,8 +479,8 @@ class AddressController extends Controller
                 }
             }
 
-            $isDelivery = $request->boolean('is_delivery', true);
-            $totalFee = $isDelivery ? $address->calculateDeliveryFee($subtotal) : 0.00;
+            // $isDelivery = $request->boolean('is_delivery', true);
+            $totalFee = $address->calculateDeliveryFee($subtotal);
 
             return $this->successResponse([
                 'address_id'     => (int) $id,

@@ -868,6 +868,72 @@ class ReportsController extends Controller
         return $this->successResponse($vouchers, 'success.data_retrieved');
     }
 
+    public function voucherUsers(Request $request, int $voucher_id): JsonResponse
+    {
+        $voucher = Voucher::find($voucher_id);
+        if (!$voucher) {
+            return response()->json(['success' => false, 'message' => 'Voucher not found'], 404);
+        }
+
+        $query = DB::table('voucher_usages')
+            ->join('users', 'voucher_usages.user_id', '=', 'users.id')
+            ->where('voucher_usages.voucher_id', $voucher_id)
+            ->whereNull('users.deleted_at');
+
+        // Search by name, email, or phone
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('users.name', 'like', "%{$search}%")
+                  ->orWhere('users.email', 'like', "%{$search}%")
+                  ->orWhere('users.phone', 'like', "%{$search}%");
+            });
+        }
+
+        // Date filters on voucher_usages.created_at
+        $period = $request->input('period', 'all');
+        $now = Carbon::now();
+        switch ($period) {
+            case 'today':
+                $query->whereDate('voucher_usages.created_at', $now->toDateString());
+                break;
+            case 'week':
+                $query->where('voucher_usages.created_at', '>=', $now->copy()->subWeek()->startOfDay());
+                break;
+            case 'month':
+                $query->where('voucher_usages.created_at', '>=', $now->copy()->subMonth()->startOfDay());
+                break;
+            case 'year':
+                $query->where('voucher_usages.created_at', '>=', $now->copy()->subYear()->startOfDay());
+                break;
+            case 'custom':
+                if ($request->filled('start_date')) {
+                    $query->where('voucher_usages.created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+                }
+                if ($request->filled('end_date')) {
+                    $query->where('voucher_usages.created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+                }
+                break;
+        }
+
+        $dataQuery = $query->select(
+            'users.id as user_id',
+            'users.name as user_name',
+            'users.email',
+            'users.phone',
+            DB::raw('COUNT(voucher_usages.id) as usage_count'),
+            DB::raw('SUM(voucher_usages.discount_amount) as total_discount_received'),
+            DB::raw('MAX(voucher_usages.created_at) as last_used_at')
+        )
+        ->groupBy('users.id', 'users.name', 'users.email', 'users.phone')
+        ->orderBy('last_used_at', 'desc');
+
+        $perPage = $request->input('per_page', $request->input('limit', 15));
+        $data = $dataQuery->paginate((int) $perPage);
+
+        return $this->successResponse($data, 'Voucher users retrieved successfully');
+    }
+
 
     // ──────────────────────────────────────────
     // 7. PAYMENT REPORTS
@@ -1146,6 +1212,20 @@ class ReportsController extends Controller
                 $data = $this->voucherUsageAndEffectiveness($request)->getData(true)['data'] ?? [];
                 $headings = ['Voucher ID', 'Code', 'Type', 'Value', 'Active', 'Usages', 'Total Discount Given', 'Usage Limit', 'Utilization %'];
                 $mapper = fn($row) => [$row['id'], $row['code'], $row['type'], $row['value'], $row['is_active'] ? 'Yes' : 'No', $row['usage_count'], $row['total_discount_given'], $row['limit'] ?? 'Unlimited', $row['utilization_percentage']];
+                break;
+            case 'voucher_users':
+                $voucherId = (int) $request->input('voucher_id');
+                $paginated = $this->voucherUsers($request, $voucherId)->getData(true)['data'] ?? [];
+                $data = $paginated['data'] ?? [];
+                $headings = ['User Name', 'Email', 'Phone', 'Usage Count', 'Total Discount Received', 'Last Used Date'];
+                $mapper = fn($row) => [
+                    $row['user_name'],
+                    $row['email'],
+                    $row['phone'],
+                    $row['usage_count'],
+                    $row['total_discount_received'],
+                    Carbon::parse($row['last_used_at'])->format('Y-m-d H:i:s'),
+                ];
                 break;
             case 'store_status_overview':
                 $data = $this->storeStatusOverview()->getData(true)['data'] ?? [];

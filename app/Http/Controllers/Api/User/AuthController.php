@@ -33,7 +33,7 @@ class AuthController extends Controller
     public function sendOtp(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'email' => 'required|string|email|max:100|unique:users,email',
+            'phone' => 'required|string|min:10|unique:users,phone',
         ]);
 
         if ($validator->fails()) {
@@ -43,9 +43,9 @@ class AuthController extends Controller
         // Generate 4-digit OTP
         $code = rand(1000, 9999);
 
-        // Store or update in email_verifications table
-        \Illuminate\Support\Facades\DB::table('email_verifications')->updateOrInsert(
-            ['email' => $request->email],
+        // Store or update in phone_verifications table
+        \Illuminate\Support\Facades\DB::table('phone_verifications')->updateOrInsert(
+            ['phone' => $request->phone],
             [
                 'code' => $code,
                 'expires_at' => Carbon::now()->addMinutes(15),
@@ -54,12 +54,12 @@ class AuthController extends Controller
             ]
         );
 
-        // Send OTP via email
+        // Send OTP via SMS
         try {
-            Mail::to($request->email)->send(new AccountVerificationMail($code));
+            \App\Services\SmsMisrService::sendOtp($request->phone, $code);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Failed to send OTP email: ' . $e->getMessage());
-            return $this->errorResponse('errors.email_sending_failed', [], 500);
+            \Illuminate\Support\Facades\Log::error('Failed to send OTP SMS: ' . $e->getMessage());
+            return $this->errorResponse('errors.sms_sending_failed', [], 500);
         }
 
         return $this->successResponse(['code' => $code], 'success.otp_sent');
@@ -75,29 +75,29 @@ class AuthController extends Controller
             'email' => 'nullable|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
             'phone' => 'required|string|min:10|unique:users,phone',
-            // 'otp' => 'required|string|size:4',
+            'otp' => 'required|string|size:4',
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        // Verify OTP from email_verifications table
-        // $verification = \Illuminate\Support\Facades\DB::table('email_verifications')
-        //     ->where('email', $request->email)
-        //     ->first();
+        // Verify OTP from phone_verifications table
+        $verification = \Illuminate\Support\Facades\DB::table('phone_verifications')
+            ->where('phone', $request->phone)
+            ->first();
 
-        // if (!$verification) {
-        //     return $this->errorResponse('errors.otp_not_found', [], 400);
-        // }
+        if (!$verification) {
+            return $this->errorResponse('errors.otp_not_found', [], 400);
+        }
 
-        // if ($verification->code !== $request->otp) {
-        //     return $this->errorResponse('errors.invalid_otp', [], 400);
-        // }
+        if ($verification->code !== $request->otp) {
+            return $this->errorResponse('errors.invalid_otp', [], 400);
+        }
 
-        // if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
-        //     return $this->errorResponse('errors.otp_expired', [], 400);
-        // }
+        if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
+            return $this->errorResponse('errors.otp_expired', [], 400);
+        }
 
         // Create user with verified email
         $user = User::create([
@@ -109,9 +109,9 @@ class AuthController extends Controller
         ]);
 
         // Delete the verification record
-        // \Illuminate\Support\Facades\DB::table('email_verifications')
-        //     ->where('email', $request->email)
-        //     ->delete();
+        \Illuminate\Support\Facades\DB::table('phone_verifications')
+            ->where('phone', $request->phone)
+            ->delete();
 
         // Log the registration activity
         activity('user')
@@ -272,7 +272,7 @@ class AuthController extends Controller
     public function verifyEmail(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
+            'phone' => 'required|string|exists:users,phone',
             'code' => 'required|string',
         ]);
 
@@ -280,7 +280,7 @@ class AuthController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('phone', $request->phone)->first();
 
         if ($user->email_verified_at) {
             return $this->errorResponse('errors.email_already_verified', [], 400);
@@ -321,14 +321,14 @@ class AuthController extends Controller
     public function resendVerificationCode(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'email' => 'required|email',
+            'phone' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('phone', $request->phone)->first();
         
         // Generate Verification Code
         $code = rand(1000, 9999);
@@ -342,9 +342,9 @@ class AuthController extends Controller
             $user->verification_code_expires_at = Carbon::now()->addMinutes(15);
             $user->save();
         } else {
-            // User does not exist, treat as registration resend (email_verifications)
-            \Illuminate\Support\Facades\DB::table('email_verifications')->updateOrInsert(
-                ['email' => $request->email],
+            // User does not exist, treat as registration resend (phone_verifications)
+            \Illuminate\Support\Facades\DB::table('phone_verifications')->updateOrInsert(
+                ['phone' => $request->phone],
                 [
                     'code' => $code,
                     'expires_at' => Carbon::now()->addMinutes(15),
@@ -354,11 +354,11 @@ class AuthController extends Controller
             );
         }
 
-        // Send Verification Email
+        // Send Verification SMS
         try {
-            Mail::to($request->email)->send(new AccountVerificationMail($code));
+            \App\Services\SmsMisrService::sendOtp($request->phone, $code);
         } catch (\Exception $e) {
-            return $this->errorResponse('errors.email_sending_failed', [], 500);
+            return $this->errorResponse('errors.sms_sending_failed', [], 500);
         }
 
         return $this->successResponse([
