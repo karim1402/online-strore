@@ -934,6 +934,41 @@ class ReportsController extends Controller
         return $this->successResponse($data, 'Voucher users retrieved successfully');
     }
 
+    public function voucherUserOrders(Request $request, int $voucher_id, int $user_id): JsonResponse
+    {
+        $voucher = Voucher::find($voucher_id);
+        if (!$voucher) {
+            return response()->json(['success' => false, 'message' => 'Voucher not found'], 404);
+        }
+
+        $query = DB::table('voucher_usages')
+            ->join('orders', 'voucher_usages.order_id', '=', 'orders.id')
+            ->where('voucher_usages.voucher_id', $voucher_id)
+            ->where('voucher_usages.user_id', $user_id)
+            ->whereNull('orders.deleted_at')
+            ->select(
+                'orders.id as order_id',
+                'orders.order_number',
+                'orders.created_at',
+                'orders.simple_status as status',
+                'orders.total as order_total',
+                'voucher_usages.discount_amount as discount_applied',
+                'orders.payment_method'
+            )
+            ->orderBy('orders.created_at', 'desc');
+
+        $perPage = $request->input('per_page', $request->input('limit', 15));
+        $data = $query->paginate((int) $perPage);
+
+        // Format order_number display
+        $data->getCollection()->transform(function ($row) {
+            $row->order_number = '#MK-' . $row->order_id;
+            return $row;
+        });
+
+        return $this->successResponse($data, 'User voucher orders retrieved successfully');
+    }
+
 
     // ──────────────────────────────────────────
     // 7. PAYMENT REPORTS
