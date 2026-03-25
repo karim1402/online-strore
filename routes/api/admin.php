@@ -115,6 +115,7 @@ Route::prefix('admin')->group(function () {
             // 6. Vouchers
             Route::get('/vouchers/usage', 'voucherUsageAndEffectiveness');
             Route::get('/vouchers/{voucher_id}/users', 'voucherUsers');
+            Route::get('/vouchers/{voucher_id}/users/{user_id}/orders', 'voucherUserOrders');
 
             // 7. Payments
             Route::get('/payments/success-rate', 'paymentSuccessRate');
