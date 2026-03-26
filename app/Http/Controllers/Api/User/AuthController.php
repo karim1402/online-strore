@@ -32,6 +32,11 @@ class AuthController extends Controller
      */
     public function sendOtp(Request $request): JsonResponse
     {
+        // Check if the phone belongs to a soft-deleted account before running unique validation
+        if ($request->filled('phone') && User::onlyTrashed()->where('phone', $request->phone)->exists()) {
+            return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
+        }
+
         $validator = ValidationService::make($request->all(), [
             'phone' => 'required|string|min:10|unique:users,phone',
         ]);
@@ -70,12 +75,17 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
+        // Check if the phone belongs to a soft-deleted account before running unique validation
+        if ($request->filled('phone') && User::onlyTrashed()->where('phone', $request->phone)->exists()) {
+            return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
+        }
+
         $validator = ValidationService::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'nullable|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
             'phone' => 'required|string|min:10|unique:users,phone',
-            'otp' => 'required|string|size:4',
+            'otp' => 'nullable|string|size:4',
         ]);
 
         if ($validator->fails()) {
@@ -83,21 +93,21 @@ class AuthController extends Controller
         }
 
         // Verify OTP from phone_verifications table
-        $verification = \Illuminate\Support\Facades\DB::table('phone_verifications')
-            ->where('phone', $request->phone)
-            ->first();
+        // $verification = \Illuminate\Support\Facades\DB::table('phone_verifications')
+        //     ->where('phone', $request->phone)
+        //     ->first();
 
-        if (!$verification) {
-            return $this->errorResponse('errors.otp_not_found', [], 400);
-        }
+        // if (!$verification) {
+        //     return $this->errorResponse('errors.otp_not_found', [], 400);
+        // }
 
-        if ($verification->code !== $request->otp) {
-            return $this->errorResponse('errors.invalid_otp', [], 400);
-        }
+        // if ($verification->code !== $request->otp) {
+        //     return $this->errorResponse('errors.invalid_otp', [], 400);
+        // }
 
-        if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
-            return $this->errorResponse('errors.otp_expired', [], 400);
-        }
+        // if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
+        //     return $this->errorResponse('errors.otp_expired', [], 400);
+        // }
 
         // Create user with verified email
         $user = User::create([
