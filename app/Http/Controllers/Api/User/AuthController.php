@@ -167,6 +167,15 @@ class AuthController extends Controller
         }
 
         if (!$token = Auth::guard('api')->attempt($credentials)) {
+            // Check if the credential belongs to a soft-deleted account
+            $deletedUser = isset($credentials['phone'])
+                ? User::onlyTrashed()->where('phone', $credentials['phone'])->exists()
+                : User::onlyTrashed()->where('email', $credentials['email'])->exists();
+
+            if ($deletedUser) {
+                return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
+            }
+
             return $this->errorResponse('errors.invalid_credentials', [], 401);
         }
 
