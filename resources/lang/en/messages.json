@@ -85,6 +85,7 @@
         "validation_failed": "Validation failed",
         "invalid_credentials": "The phone number or password is incorrect",
         "account_disabled": "Account is disabled",
+        "account_deleted_contact_support": "This account has been deleted. Please contact support for assistance.",
         "unauthenticated": "Unauthenticated. Please login first",
         "access_denied": "Access denied. You do not have permission to perform this action",
         "insufficient_permissions": "You don't have permission to perform this action",

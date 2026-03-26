@@ -85,6 +85,7 @@
         "validation_failed": "فشل التحقق من صحة البيانات",
         "invalid_credentials": "رقم الهاتف أو كلمة المرور غير صحيحة",
         "account_disabled": "الحساب معطل",
+        "account_deleted_contact_support": "تم حذف هذا الحساب. يرجى التواصل مع الدعم للمساعدة.",
         "unauthenticated": "غير مصرح. يرجى تسجيل الدخول أولاً",
         "access_denied": "تم رفض الوصول. ليس لديك إذن لتنفيذ هذا الإجراء",
         "insufficient_permissions": "ليس لديك صلاحية لتنفيذ هذا الإجراء",
