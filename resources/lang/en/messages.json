@@ -60,6 +60,8 @@
         "delivery_user_deleted": "Delivery user deleted successfully",
         "delivery_user_status_updated": "Delivery user status updated successfully",
         "users_retrieved": "Users retrieved successfully",
+        "deleted_users_retrieved": "Deleted users retrieved successfully",
+        "user_restored": "User restored successfully",
         "user_created": "User created successfully",
         "user_retrieved": "User retrieved successfully",
         "user_updated": "User updated successfully",

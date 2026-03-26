@@ -240,6 +240,83 @@ class UserController extends Controller
     }
 
     /**
+     * List soft-deleted users with pagination, search.
+     */
+    public function deletedIndex(Request $request): JsonResponse
+    {
+        try {
+            $perPage = (int) $request->get('per_page', 15);
+            $search = $request->get('search');
+
+            $query = User::onlyTrashed()->orderBy('deleted_at', 'desc');
+
+            if ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                });
+            }
+
+            if ($request->filled('from_date')) {
+                $query->whereDate('deleted_at', '>=', $request->from_date);
+            }
+
+            if ($request->filled('to_date')) {
+                $query->whereDate('deleted_at', '<=', $request->to_date);
+            }
+
+            $users = $query->paginate($perPage);
+
+            $statistics = [
+                'total_deleted' => [
+                    'value' => User::onlyTrashed()->count(),
+                    'label' => 'All deleted customers',
+                ],
+            ];
+
+            return response()->json([
+                'success'    => true,
+                'message'    => \App\Services\LocalizationService::getMessage('success.deleted_users_retrieved'),
+                'data'       => $users,
+                'statistics' => $statistics,
+            ]);
+        } catch (\Throwable $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Restore a soft-deleted user.
+     */
+    public function restore(int $id): JsonResponse
+    {
+        try {
+            $user = User::onlyTrashed()->findOrFail($id);
+
+            $user->restore();
+
+            $currentAdmin = auth('admins')->user();
+            activity('user')
+                ->causedBy($currentAdmin)
+                ->performedOn($user)
+                ->withProperties([
+                    'action'       => 'restored',
+                    'restored_by'  => $currentAdmin->name,
+                    'user_name'    => $user->name,
+                    'user_email'   => $user->email,
+                ])
+                ->log('User restored by admin');
+
+            return $this->successResponse($user->fresh(), 'success.user_restored');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->notFoundResponse('errors.resource_not_found');
+        } catch (\Throwable $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
      * Get paginated orders for a user.
      */
     public function userOrders(Request $request, int $id): JsonResponse
