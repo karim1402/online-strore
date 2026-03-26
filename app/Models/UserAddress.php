@@ -136,7 +136,7 @@ class UserAddress extends Model
      */
     public function calculateDeliveryFee(float $subtotal = 0): float
     {
-        if ($subtotal >= 150) {
+        if ($subtotal > 149) {
             return 0.00;
         }
 
