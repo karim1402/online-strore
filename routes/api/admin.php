@@ -130,6 +130,7 @@ Route::prefix('admin')->group(function () {
         Route::controller(UserController::class)->prefix('users')->group(function () {
             Route::middleware('permission:users.view,admins')->group(function () {
                 Route::get('/', 'index');
+                Route::get('/deleted', 'deletedIndex');
                 Route::get('/{id}', 'show');
                 Route::get('/{id}/orders', 'userOrders');
             });
@@ -141,6 +142,7 @@ Route::prefix('admin')->group(function () {
             Route::middleware('permission:users.update,admins')->group(function () {
                 Route::put('/{id}', 'update');
                 Route::patch('/{id}/toggle-status', 'toggleStatus');
+                Route::patch('/{id}/restore', 'restore');
             });
             
             Route::middleware('permission:users.delete,admins')->group(function () {

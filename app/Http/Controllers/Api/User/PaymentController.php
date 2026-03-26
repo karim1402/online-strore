@@ -35,6 +35,8 @@ class PaymentController extends Controller
     public function createIntention(Request $request): JsonResponse
     {
         try {
+            Log::info('createIntention request', $request->all());
+
             $user = auth('api')->user();
 
             $request->validate([

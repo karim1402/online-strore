@@ -60,6 +60,8 @@
         "delivery_user_deleted": "تم حذف مستخدم التوصيل بنجاح",
         "delivery_user_status_updated": "تم تحديث حالة مستخدم التوصيل بنجاح",
         "users_retrieved": "تم جلب المستخدمين بنجاح",
+        "deleted_users_retrieved": "تم جلب المستخدمين المحذوفين بنجاح",
+        "user_restored": "تم استعادة المستخدم بنجاح",
         "user_created": "تم إنشاء المستخدم بنجاح",
         "user_retrieved": "تم جلب المستخدم بنجاح",
         "user_updated": "تم تحديث المستخدم بنجاح",
