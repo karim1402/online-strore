@@ -146,6 +146,7 @@
         "verification_code_expired": "انتهت صلاحية رمز التحقق",
         "current_password_incorrect": "كلمة المرور الحالية غير صحيحة",
         "invalid_voucher": "رمز القسيمة غير صالح",
+        "voucher_min_order_amount": "هذه القسيمة تتطلب حداً أدنى للطلب بقيمة :amount جنيه",
         "voucher_module_restricted": "هذه القسيمة صالحة فقط لمنتجات :module. سلة مشترياتك لا تحتوي على أي منتجات من هذا القسم.",
         "address_outside_service_area": "عذراً، نحن لا نوفر خدمة التوصيل لهذه المنطقة حالياً."
     },
