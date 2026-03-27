@@ -146,6 +146,7 @@
         "verification_code_expired": "Verification code expired",
         "current_password_incorrect": "Current password incorrect",
         "invalid_voucher": "Invalid voucher code",
+        "voucher_min_order_amount": "This voucher requires a minimum order amount of :amount EGP",
         "voucher_module_restricted": "This voucher is only valid for :module products. Your cart does not contain any products from this module.",
         "address_outside_service_area": "Sorry, we do not currently deliver to this area."
     },
