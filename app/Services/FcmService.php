@@ -73,20 +73,29 @@ class FcmService
     public function sendToMultiple(array $tokens, string $title, string $body, array $data = [], ?string $imageUrl = null): array
     {
         if (!$this->messaging) {
+            Log::error('FCM sendToMultiple: messaging is not initialized. Check FIREBASE_CREDENTIALS path and file.');
             return ['success' => 0, 'failure' => count($tokens)];
         }
 
-        $notification = Notification::create($title, $body, $imageUrl);
-        $message = CloudMessage::new()
-            ->withNotification($notification)
-            ->withData($data);
+        try {
+            $notification = Notification::create($title, $body, $imageUrl);
+            $message = CloudMessage::new()
+                ->withNotification($notification)
+                ->withData($data);
 
-        $report = $this->messaging->sendMulticast($message, $tokens);
+            $report = $this->messaging->sendMulticast($message, $tokens);
 
-        return [
-            'success' => $report->successes()->count(),
-            'failure' => $report->failures()->count(),
-        ];
+            return [
+                'success' => $report->successes()->count(),
+                'failure' => $report->failures()->count(),
+            ];
+        } catch (\Exception $e) {
+            Log::error('FCM sendToMultiple error: ' . $e->getMessage(), [
+                'token_count' => count($tokens),
+                'title'       => $title,
+            ]);
+            return ['success' => 0, 'failure' => count($tokens)];
+        }
     }
 
     /**
