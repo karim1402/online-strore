@@ -149,7 +149,7 @@
         "voucher_min_order_amount": "هذه القسيمة تتطلب حداً أدنى للطلب بقيمة :amount جنيه",
         "voucher_module_restricted": "هذه القسيمة صالحة فقط لمنتجات :module. سلة مشترياتك لا تحتوي على أي منتجات من هذا القسم.",
         "address_outside_service_area": "عذراً، نحن لا نوفر خدمة التوصيل لهذه المنطقة حالياً.",
-        "voucher_invalid_time": "هذه القسيمة صالحة فقط من الساعة 5:00 مساءً إلى 5:00 صباحاً."
+        "voucher_invalid_time": "هذه القسيمة صالحة فقط من الساعة 9:00 مساءً إلى 9:00 صباحاً."
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
