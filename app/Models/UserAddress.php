@@ -136,8 +136,20 @@ class UserAddress extends Model
      */
     public function calculateDeliveryFee(float $subtotal = 0): float
     {
+        // Free delivery if subtotal is above threshold
         if ($subtotal > 149) {
             return 0.00;
+        }
+
+        // Free delivery for the user's first two delivered orders
+        if ($this->user_id) {
+            $deliveredOrdersCount = \App\Models\Order::where('user_id', $this->user_id)
+                // ->where('simple_status', 'delivered')
+                ->count();
+
+            if ($deliveredOrdersCount < 2) {
+                return 0.00;
+            }
         }
 
         $baseFee = (float) \App\Models\AppSetting::get('delivery_base_fee', '0');

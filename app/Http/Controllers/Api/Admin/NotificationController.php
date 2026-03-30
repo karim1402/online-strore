@@ -126,6 +126,9 @@ class NotificationController extends Controller
             return $this->successResponse($result, 'success.notification_sent');
 
         } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('NotificationController send error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
             return $this->errorResponse('errors.server_error', [], 500);
         }
     }
