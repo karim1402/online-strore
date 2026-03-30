@@ -103,10 +103,10 @@ class Voucher extends Model
             return 'errors.voucher_module_restricted';
         }
 
-        // Night Voucher Validation (Only valid from 9:00 PM to 9:00 AM)
+        // Night Voucher Validation (Only valid from 5:00 PM to 5:00 AM)
         if ($this->id == 10000) {
             $hour = now()->format('H');
-            if ($hour >= 9 && $hour < 21) {
+            if ($hour >= 5 && $hour < 17) {
                 return 'errors.voucher_invalid_time';
             }
         }
