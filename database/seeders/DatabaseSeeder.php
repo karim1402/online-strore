@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             ModuleSeeder::class,
             OptionGroupSeeder::class,
             DeliverySettingsSeeder::class,
+            NightVoucherSeeder::class,
         ]);
     }
 }
