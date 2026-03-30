@@ -148,7 +148,8 @@
         "invalid_voucher": "Invalid voucher code",
         "voucher_min_order_amount": "This voucher requires a minimum order amount of :amount EGP",
         "voucher_module_restricted": "This voucher is only valid for :module products. Your cart does not contain any products from this module.",
-        "address_outside_service_area": "Sorry, we do not currently deliver to this area."
+        "address_outside_service_area": "Sorry, we do not currently deliver to this area.",
+        "voucher_invalid_time": "This voucher is only valid from 9:00 PM to 9:00 AM."
     },
     "validation": {
         "required": "The :attribute field is required",
