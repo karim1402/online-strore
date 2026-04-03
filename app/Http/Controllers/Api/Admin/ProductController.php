@@ -386,9 +386,16 @@ class ProductController extends Controller
             }
 
             // Verify category and subcategory if changing
-            if ($request->filled('category_id') || $request->filled('subcategory_id')) {
+            if ($request->filled('category_id') || $request->has('subcategory_id')) {
                 $categoryId = $request->filled('category_id') ? $request->category_id : $product->category_id;
-                $subcategoryId = $request->filled('subcategory_id') ? $request->subcategory_id : $product->subcategory_id;
+                
+                // If category is changing and no subcategory_id is provided, clear it
+                // If category is NOT changing, keep old subcategory unless explicitly provided
+                if ($request->filled('category_id') && !$request->has('subcategory_id')) {
+                    $subcategoryId = null;
+                } else {
+                    $subcategoryId = $request->has('subcategory_id') ? $request->subcategory_id : $product->subcategory_id;
+                }
 
                 $category = Category::find($categoryId);
                 if (!$category) {
