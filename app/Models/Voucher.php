@@ -10,6 +10,28 @@ class Voucher extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * Product IDs that block promo code usage and force delivery fee to 10.
+     */
+    public const RESTRICTED_PRODUCT_IDS = [1502, 1503, 1504, 1505, 1506];
+
+    /**
+     * Check if a collection of cart items contains any restricted product.
+     *
+     * @param  \Illuminate\Support\Collection|null  $cartItems  Cart items with loaded product
+     * @return bool
+     */
+    public static function cartHasRestrictedProducts($cartItems): bool
+    {
+        if (!$cartItems || $cartItems->isEmpty()) {
+            return false;
+        }
+
+        return $cartItems->contains(function ($item) {
+            return in_array(optional($item->product)->id, self::RESTRICTED_PRODUCT_IDS);
+        });
+    }
+
     protected $fillable = [
         'code',
         'type',
@@ -101,6 +123,11 @@ class Voucher extends Model
 
         if ($this->failsModuleRestriction($cartItems)) {
             return 'errors.voucher_module_restricted';
+        }
+
+        // Block voucher if cart contains restricted products
+        if ($cartItems && self::cartHasRestrictedProducts($cartItems)) {
+            return 'errors.voucher_restricted_products';
         }
 
         // Night Voucher Validation (Only valid from 9:00 PM to 9:00 AM)

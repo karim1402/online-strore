@@ -140,7 +140,7 @@ class OrderController extends Controller
 
             // Calculate totals
             $subtotal = $this->calculateSubtotal($cart);
-            $deliveryFee = $request->boolean('is_delivery', true) ? $address->calculateDeliveryFee($subtotal) : 0.00;
+            $deliveryFee = $request->boolean('is_delivery', true) ? $address->calculateDeliveryFee($subtotal, $cart->items) : 0.00;
             $tax = 0.00; // Placeholder
             
             // Apply Voucher
