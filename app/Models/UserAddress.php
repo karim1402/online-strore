@@ -133,9 +133,17 @@ class UserAddress extends Model
 
     /**
      * Calculate delivery fee for this address
+     *
+     * @param float $subtotal
+     * @param \Illuminate\Support\Collection|null $cartItems  Cart items with loaded product
      */
-    public function calculateDeliveryFee(float $subtotal = 0): float
+    public function calculateDeliveryFee(float $subtotal = 0, $cartItems = null): float
     {
+        // If cart contains restricted products, delivery fee is fixed at 10
+        if ($cartItems && \App\Models\Voucher::cartHasRestrictedProducts($cartItems)) {
+            return 10.00;
+        }
+
         // Free delivery if subtotal is above threshold
         if ($subtotal > 149) {
             return 0.00;

@@ -480,7 +480,8 @@ class AddressController extends Controller
             }
 
             // $isDelivery = $request->boolean('is_delivery', true);
-            $totalFee = $address->calculateDeliveryFee($subtotal);
+            $cartItems = $cart ? $cart->items : null;
+            $totalFee = $address->calculateDeliveryFee($subtotal, $cartItems);
 
             return $this->successResponse([
                 'address_id'     => (int) $id,
