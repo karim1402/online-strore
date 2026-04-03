@@ -13,7 +13,7 @@ class Voucher extends Model
     /**
      * Product IDs that block promo code usage and force delivery fee to 10.
      */
-    public const RESTRICTED_PRODUCT_IDS = [1502, 1503, 1504, 1505, 1506];
+    public const RESTRICTED_PRODUCT_IDS = [1045, 1053, 1502, 1503, 1504, 1505, 1506];
 
     /**
      * Check if a collection of cart items contains any restricted product.
