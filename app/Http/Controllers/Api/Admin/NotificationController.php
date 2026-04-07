@@ -54,7 +54,7 @@ class NotificationController extends Controller
                 'title'                  => 'required|string|max:255',
                 'body'                   => 'required|string',
                 'image'                  => 'nullable|image|max:2048',
-                'target_type'            => 'nullable|string|in:all_users,specific_users,one_time_orderers,multiple_orderers,never_ordered,never_logged_in,inactive_users,high_spenders,cancelled_order_users,new_registrants,cash_on_delivery_users,online_payment_users',
+                'target_type'            => 'nullable|string|in:all_users,specific_users,one_time_orderers,multiple_orderers,never_ordered,never_logged_in,inactive_users,high_spenders,cancelled_order_users,new_registrants,cash_on_delivery_users,online_payment_users,all_devices',
                 'user_ids'               => 'required_if:target_type,specific_users|array',
                 'user_ids.*'             => 'exists:users,id',
                 'min_order_count'        => 'nullable|integer|min:2',
@@ -163,6 +163,14 @@ class NotificationController extends Controller
                     $userIds = Order::where('payment_method', '!=', 'cash')
                         ->distinct()->pluck('user_id')->toArray();
                     $tokens  = FcmToken::getAllUserTokens($userIds);
+                    break;
+
+                case 'all_devices':
+                    $tokens  = FcmToken::getAllTokens();
+                    // Optional: You could still load user_ids just for in-app history, but for simplicity
+                    // or for avoiding spam to users that are logged out, we can get all authenticated user ids
+                    $userIds = FcmToken::where('tokenable_type', User::class)
+                        ->distinct()->pluck('tokenable_id')->toArray();
                     break;
 
                 default: // all_users
