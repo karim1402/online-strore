@@ -151,7 +151,6 @@ class ProductController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
-                'search_keywords' => 'nullable|string',
                 'quantity_en' => 'nullable|string|max:255',
                 'quantity_ar' => 'nullable|string|max:255',
                 'base_price' => 'required|numeric|min:0',
@@ -216,7 +215,6 @@ class ProductController extends Controller
                 'name_ar' => $request->name_ar,
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
-                'search_keywords' => $request->search_keywords,
                 'search_keywords' => $request->search_keywords,
                 'quantity_en' => $request->quantity_en,
                 'quantity_ar' => $request->quantity_ar,
@@ -343,13 +341,10 @@ class ProductController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
-                'search_keywords' => 'nullable|string',
-                'search_keywords' => 'nullable|string',
                 'quantity_en' => 'nullable|string|max:255',
                 'quantity_ar' => 'nullable|string|max:255',
                 'base_price' => 'nullable|numeric|min:0',
                 'offer_price' => 'nullable|numeric|min:0',
-                'is_active' => 'nullable|boolean',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
                 'metadata' => 'nullable|array',
@@ -468,6 +463,26 @@ class ProductController extends Controller
             }
 
             $product->save();
+
+            // Handle Smart Notifications Dispatch
+            try {
+                if ($product->wasChanged('offer_price') && $product->offer_price !== null) {
+                    $originalOffer = $product->getOriginal('offer_price');
+                    if ($originalOffer === null || $product->offer_price < $originalOffer) {
+                        \App\Jobs\SendCartOfferNotificationJob::dispatch($product->id);
+                        \App\Jobs\SendPriceDropNotificationJob::dispatch($product->id, $product->offer_price);
+                    }
+                } elseif ($product->wasChanged('base_price')) {
+                    $originalBase = $product->getOriginal('base_price');
+                    if ($originalBase !== null && $product->base_price < $originalBase) {
+                        \App\Jobs\SendPriceDropNotificationJob::dispatch($product->id, $product->base_price);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Non-blocking if jobs fail to dispatch
+                \Illuminate\Support\Facades\Log::error('Failed to dispatch price/offer jobs: ' . $e->getMessage());
+            }
+
 
             // Handle option groups update
             if ($request->has('option_groups')) {
