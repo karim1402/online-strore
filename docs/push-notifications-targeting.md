@@ -34,6 +34,7 @@ The notification send endpoint now supports **audience targeting**. Instead of a
 
 | Value | Description | Extra Params Required |
 |---|---|---|
+| `all_devices` | All devices that have installed the app (including guests) | — |
 | `all_users` | All registered users with an FCM token | — |
 | `specific_users` | Manually provided list of user IDs | `user_ids[]` *(required)* |
 | `one_time_orderers` | Users who placed **exactly 1** order | — |
@@ -71,6 +72,18 @@ Content-Type: multipart/form-data
 title         = "🎉 Special Offer!"
 body          = "Get 20% off your next order today only."
 target_type   = all_users
+```
+
+---
+
+### 1.1 Send to All Devices (Including Guests)
+```
+POST /api/admin/notifications/send
+Content-Type: multipart/form-data
+
+title         = "🚨 App Update Available!"
+body          = "Update now to get the latest features."
+target_type   = all_devices
 ```
 
 ---
