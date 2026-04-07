@@ -260,6 +260,15 @@ class ProductController extends Controller
         // Increment view count
         $product->incrementViewCount();
 
+        // Track user view for smart notifications
+        if (auth('api')->check()) {
+            \Illuminate\Support\Facades\DB::table('product_views')->insert([
+                'user_id' => auth('api')->id(),
+                'product_id' => $product->id,
+                'viewed_at' => now()
+            ]);
+        }
+
         // Transform product data
         $productData = [
             'id' => $product->id,
@@ -437,6 +446,15 @@ class ProductController extends Controller
 
         // Increment view count
         $product->incrementViewCount();
+
+        // Track user view for smart notifications
+        if (auth('api')->check()) {
+            \Illuminate\Support\Facades\DB::table('product_views')->insert([
+                'user_id' => auth('api')->id(),
+                'product_id' => $product->id,
+                'viewed_at' => now()
+            ]);
+        }
 
         // Transform product data
         $productData = [
