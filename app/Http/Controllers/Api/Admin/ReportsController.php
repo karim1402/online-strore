@@ -554,18 +554,39 @@ class ReportsController extends Controller
             ->where('orders.simple_status', 'delivered')
             ->whereNull('orders.deleted_at');
 
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('products.name_en', 'like', "%{$search}%")
+                  ->orWhere('products.name_ar', 'like', "%{$search}%");
+            });
+        }
+
         $this->applyQueryFilter($query, $request, 'orders');
 
-        $data = $query->select(
+        $dataQuery = $query->select(
             'products.id',
             'products.name_en',
             DB::raw('SUM(order_items.quantity) as units_sold'),
             DB::raw('SUM(order_items.total_price) as revenue')
         )
         ->groupBy('products.id', 'products.name_en')
-        ->orderBy($request->input('sort_by', 'units_sold'), 'desc')
-        ->limit($request->input('limit', 50))
-        ->get();
+        ->orderBy($request->input('sort_by', 'units_sold'), 'desc');
+
+        $limit = $request->input('limit', 50);
+        if ($limit === 'all') {
+            $data = $dataQuery->get();
+        } else {
+            $data = $dataQuery->limit((int) $limit)->get();
+        }
+
+        $productIds = $data->pluck('id');
+        $products = Product::whereIn('id', $productIds)->with(['primaryImage', 'images'])->get()->keyBy('id');
+
+        $data->transform(function($item) use ($products) {
+            $item->image_url = $products[$item->id]->image_url ?? null;
+            return $item;
+        });
 
         return $this->successResponse($data, 'success.data_retrieved');
     }
@@ -638,6 +659,79 @@ class ReportsController extends Controller
         ->get();
 
         return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+    public function productOrders(Request $request, int $id): JsonResponse
+    {
+        $query = Order::query()
+            ->whereHas('items', function ($q) use ($id) {
+                $q->where('product_id', $id);
+            })
+            ->with([
+                'user:id,name,email,phone',
+                'items' => function ($q) use ($id) { $q->where('product_id', $id); }
+            ])
+            ->select([
+                'orders.id',
+                'orders.order_number',
+                'orders.total',
+                'orders.order_status',
+                'orders.simple_status',
+                'orders.payment_method',
+                'orders.payment_status',
+                'orders.is_delivery',
+                'orders.delivery_fee',
+                'orders.created_at',
+                'orders.user_id',
+                'orders.address_snapshot',
+                'orders.notes',
+            ]);
+
+        $this->applyPeriodFilter($query, $request, 'orders.created_at');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($uq) use ($search) {
+                      $uq->where('name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        $limit = $request->input('limit', 15);
+        $orders = $query->orderByDesc('created_at')->paginate($limit === 'all' ? 1000 : (int) $limit);
+
+        $orders->getCollection()->transform(function ($order) {
+            $item = $order->items->first();
+            
+            $formattedOrder = [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'quantity' => $item ? $item->quantity : 0,
+                'unit_price' => $item ? $item->unit_price : '0.00',
+                'item_total' => $item ? number_format($item->quantity * $item->unit_price, 2, '.', '') : '0.00',
+                'order_total' => $order->total,
+                'order_status' => $order->order_status,
+                'simple_status' => $order->simple_status,
+                'payment_method' => $order->payment_method,
+                'payment_status' => $order->payment_status,
+                'is_delivery' => (bool)$order->is_delivery,
+                'delivery_fee' => $order->delivery_fee,
+                'created_at' => $order->created_at,
+                'customer' => $order->user ? [
+                    'id' => $order->user->id,
+                    'name' => $order->user->name,
+                    'email' => $order->user->email,
+                    'phone' => $order->user->phone,
+                ] : null,
+                'address_snapshot' => $order->address_snapshot,
+                'notes' => $order->notes,
+            ];
+            
+            return $formattedOrder;
+        });
+
+        return $this->successResponse($orders, 'Product orders retrieved successfully');
     }
 
     // ──────────────────────────────────────────
