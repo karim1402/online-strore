@@ -100,6 +100,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/products/best-sellers', 'bestSellersFlagged');
             Route::get('/products/with-offers', 'productsWithOffers');
             Route::get('/products/{id}/buyers', 'productBuyers');
+            Route::get('/products/{id}/orders', 'productOrders');
 
             // 4. Users
             Route::get('/users/growth', 'userGrowth');
