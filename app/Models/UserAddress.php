@@ -149,13 +149,13 @@ class UserAddress extends Model
             return 0.00;
         }
 
-        // Free delivery for the user's first two delivered orders
+        // Free delivery for the user's first order if subtotal is over 100
         if ($this->user_id) {
             $deliveredOrdersCount = \App\Models\Order::where('user_id', $this->user_id)
                 // ->where('simple_status', 'delivered')
                 ->count();
 
-            if ($deliveredOrdersCount < 2) {
+            if ($deliveredOrdersCount < 1 && $subtotal > 100) {
                 return 0.00;
             }
         }
