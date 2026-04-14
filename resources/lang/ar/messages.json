@@ -249,7 +249,7 @@
             "cancelled": "ملغى"
         },
         "simple_status": {
-            "in_progress": "قيد التنفيذ",
+            "in_progress": "قيد التحضير",
             "ready_to_pick": "جاهز للاستلام",
             "in_delivery": "قيد التوصيل",
             "delivered": "تم التوصيل",
