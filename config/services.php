@@ -43,6 +43,7 @@ return [
     'paymob' => [
         'secret_key' => env('PAYMOB_SECRET_KEY'),
         'integration_id' => env('PAYMOB_INTEGRATION_ID'),
+        'apple_pay_integration_id' => env('PAYMOB_APPLE_PAY_INTEGRATION_ID'),
         'base_url' => env('PAYMOB_BASE_URL', 'https://accept.paymob.com'),
         'hmac_secret' => env('PAYMOB_HMAC_SECRET'),
     ],

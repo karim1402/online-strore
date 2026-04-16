@@ -10,6 +10,7 @@ class PaymobService
     protected $baseUrl;
     protected $secretKey;
     protected $integrationId;
+    protected $applePayIntegrationId;
     protected $hmacSecret;
 
     public function __construct()
@@ -17,6 +18,7 @@ class PaymobService
         $this->baseUrl = config('services.paymob.base_url');
         $this->secretKey = config('services.paymob.secret_key');
         $this->integrationId = config('services.paymob.integration_id');
+        $this->applePayIntegrationId = config('services.paymob.apple_pay_integration_id');
         $this->hmacSecret = config('services.paymob.hmac_secret');
     }
 
@@ -34,9 +36,10 @@ class PaymobService
             $payload = [
                 'amount' => $data['amount_cents'], // Amount in cents
                 'currency' => $data['currency'] ?? 'EGP',
-                'payment_methods' => [
-                    (int) $this->integrationId
-                ],
+                'payment_methods' => array_values(array_filter([
+                    (int) $this->integrationId,
+                    $this->applePayIntegrationId ? (int) $this->applePayIntegrationId : null,
+                ])),
                 'items' => $data['items'] ?? [],
                 'billing_data' => $data['billing_data'],
                 'special_reference' => $data['special_reference'] ?? null,
