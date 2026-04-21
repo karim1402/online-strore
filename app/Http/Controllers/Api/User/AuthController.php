@@ -92,22 +92,24 @@ class AuthController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        // Verify OTP from phone_verifications table
-        // $verification = \Illuminate\Support\Facades\DB::table('phone_verifications')
-        //     ->where('phone', $request->phone)
-        //     ->first();
+        if ($request->filled('otp')) {
+            // Verify OTP from phone_verifications table
+            $verification = \Illuminate\Support\Facades\DB::table('phone_verifications')
+                ->where('phone', $request->phone)
+                ->first();
 
-        // if (!$verification) {
-        //     return $this->errorResponse('errors.otp_not_found', [], 400);
-        // }
+            if (!$verification) {
+                return $this->errorResponse('errors.otp_not_found', [], 400);
+            }
 
-        // if ($verification->code !== $request->otp) {
-        //     return $this->errorResponse('errors.invalid_otp', [], 400);
-        // }
+            if ($verification->code !== $request->otp) {
+                return $this->errorResponse('errors.invalid_otp', [], 400);
+            }
 
-        // if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
-        //     return $this->errorResponse('errors.otp_expired', [], 400);
-        // }
+            if (Carbon::now()->gt(Carbon::parse($verification->expires_at))) {
+                return $this->errorResponse('errors.otp_expired', [], 400);
+            }
+        }
 
         // Create user with verified email
         $user = User::create([
