@@ -26,7 +26,11 @@ class AdminUserController extends Controller
             $status = $request->get('status'); // true/false/null
             $role = $request->get('role_id');
 
-            $query = Admin::with('roles')->orderBy('id', 'desc');
+            $query = Admin::with('roles')
+                ->whereDoesntHave('roles', function ($q) {
+                    $q->where('id', 1);
+                })
+                ->orderBy('id', 'desc');
 
             if ($search) {
                 $query->where(function ($q) use ($search) {
