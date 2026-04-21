@@ -21,31 +21,33 @@ class ForgotPasswordController extends Controller
     public function sendResetCode(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
+            'phone' => 'required|string|exists:users,phone',
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        // Delete existing tokens
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
-
-        // Generate OTP
+        // Generate 4-digit OTP
         $code = rand(1000, 9999);
 
-        // Store OTP
-        DB::table('password_reset_tokens')->insert([
-            'email' => $request->email,
-            'token' => $code, // Storing unhashed for simplicity as it's a short OTP. Secure approach would be hash but then verify is harder without bcrypt. Code is short lifetime.
-            'created_at' => Carbon::now()
-        ]);
+        // Store or update in phone_verifications table
+        DB::table('phone_verifications')->updateOrInsert(
+            ['phone' => $request->phone],
+            [
+                'code' => $code,
+                'expires_at' => Carbon::now()->addMinutes(15),
+                'updated_at' => Carbon::now(),
+                'created_at' => Carbon::now(),
+            ]
+        );
 
-        // Send Email
+        // Send OTP via SMS
         try {
-            Mail::to($request->email)->send(new PasswordResetMail($code));
+            \App\Services\SmsMisrService::sendOtp($request->phone, $code);
         } catch (\Exception $e) {
-            return $this->errorResponse('errors.email_sending_failed', [
+            \Illuminate\Support\Facades\Log::error('Failed to send OTP SMS: ' . $e->getMessage());
+            return $this->errorResponse('errors.sms_sending_failed', [
                 'code' => $code,
             ], 500);
         }
@@ -58,7 +60,7 @@ class ForgotPasswordController extends Controller
     public function reset(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'email' => 'required|email|exists:users,email',
+            'phone' => 'required|string|exists:users,phone',
             'code' => 'required|string',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -67,29 +69,29 @@ class ForgotPasswordController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
-        $record = DB::table('password_reset_tokens')
-            ->where('email', $request->email)
-            ->where('token', $request->code)
+        $record = DB::table('phone_verifications')
+            ->where('phone', $request->phone)
+            ->where('code', $request->code)
             ->first();
 
         if (!$record) {
             return $this->errorResponse('errors.invalid_reset_code', [], 400);
         }
 
-        // Check expiration (e.g., 15 minutes)
-        if (Carbon::parse($record->created_at)->addMinutes(15)->isPast()) {
-            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        // Check expiration
+        if (Carbon::now()->gt(Carbon::parse($record->expires_at))) {
+            DB::table('phone_verifications')->where('phone', $request->phone)->delete();
             return $this->errorResponse('errors.reset_code_expired', [], 400);
         }
 
         // Update Password
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('phone', $request->phone)->first();
         $user->forceFill([
             'password' => Hash::make($request->password)
         ])->save();
 
         // Delete token
-        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        DB::table('phone_verifications')->where('phone', $request->phone)->delete();
 
         // Log the password reset activity
         activity('user')
