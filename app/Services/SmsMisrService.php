@@ -18,14 +18,18 @@ class SmsMisrService
     {
         try {
             $response = Http::post('https://smsmisr.com/api/OTP/', [
-                'environment' => 2,
+                'environment' => 1,
                 'username' => '34144164-6497-41a0-acd4-d982c40d45f5',// config('services.smsmisr.username'),
-                'password' => "43bf84fc100733e73f3a000a5e0cf6b9bf3d69f4eae91f6b07634d74b0d2e361",//config('services.smsmisr.password'),
-                'sender' => 'b611afb996655a94c8e942a823f1421de42bf8335d24ba1f84c437b2ab11ca27', //config('services.smsmisr.sender'),
-                'mobile' => "01024357231",
-                'template' => "0f9217c9d760c1c0ed47b8afb5425708da7d98729016a8accfc14f9cc8d1ba83",
+                'password' => "5a308f6040662a0243846d345b0a1d5c9d5a3a115ef76f93f1a0a9ce3f710654",//config('services.smsmisr.password'),
+                'sender' => 'b4dc28584837651e020f9916cc9fa682353fe86205478f8570e4695fe884d4d8', //config('services.smsmisr.sender'),
+                'mobile' => $phone,
+                'template' => "e83faf6025ec41d0f40256d2812629f5fa9291d05c8322f31eea834302501da8",
                 'otp' => $otp
             ]);
+
+            // dd($response->body());
+
+            
 
             if ($response->successful()) {
                 // The API usually returns `code` 1901 when successful
