@@ -37,6 +37,19 @@ class AuthController extends Controller
             return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
         }
 
+        // If phone starts with "2", strip it and check if that number already exists
+        if ($request->filled('phone') && str_starts_with($request->phone, '2')) {
+            $phoneWithout2 = substr($request->phone, 1);
+            if (User::where('phone', $phoneWithout2)->exists()) {
+                return $this->validationErrorWithFirstMessage(
+                    ValidationService::make(['phone' => $request->phone], ['phone' => 'required|string|unique:users,phone'])
+                );
+            }
+            if (User::onlyTrashed()->where('phone', $phoneWithout2)->exists()) {
+                return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
+            }
+        }
+
         $validator = ValidationService::make($request->all(), [
             'phone' => 'required|string|min:10|unique:users,phone',
         ]);
