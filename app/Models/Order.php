@@ -262,4 +262,17 @@ class Order extends Model
     {
         return LocalizationService::getMessage("order.simple_status.{$this->simple_status}");
     }
+
+    /**
+     * Restore stock for items in module 31
+     */
+    public function restoreStock()
+    {
+        foreach ($this->items as $item) {
+            $product = $item->product;
+            if ($product && $product->module_id == 31 && $product->stock !== null) {
+                $product->increment('stock', $item->quantity);
+            }
+        }
+    }
 }

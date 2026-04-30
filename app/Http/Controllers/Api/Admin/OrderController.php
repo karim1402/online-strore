@@ -189,6 +189,16 @@ class OrderController extends Controller
                     ], 422);
                 }
 
+                // Check stock for SME products (module 31)
+                if ($product->module_id == 31 && $product->stock !== null) {
+                    if ($product->stock < $itemData['quantity']) {
+                        return $this->errorResponse('errors.product_out_of_stock', [
+                            'product_id' => $product->id,
+                            'error' => "Product '{$product->name}' is out of stock",
+                        ], 422);
+                    }
+                }
+
                 $baseProductPrice = $product->offer_price ?? $product->base_price;
                 $itemPrice = $baseProductPrice;
                 $itemSubtotal = 0;
@@ -303,6 +313,10 @@ class OrderController extends Controller
 
                 // Create order items
                 foreach ($validatedItems as $itemData) {
+                    if ($itemData['product']->module_id == 31 && $itemData['product']->stock !== null) {
+                        $itemData['product']->decrement('stock', $itemData['quantity']);
+                    }
+
                     $itemSubtotal = $itemData['price'] * $itemData['quantity'];
                     
                     // Calculate addons total for this item
@@ -526,6 +540,8 @@ class OrderController extends Controller
 
             $order->simple_status = 'cancelled';
             $order->save();
+
+            $order->restoreStock();
 
             $order->load(['user', 'store', 'items.options', 'items.addons']);
 

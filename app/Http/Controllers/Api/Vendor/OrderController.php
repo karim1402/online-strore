@@ -134,6 +134,8 @@ class OrderController extends Controller
             $order->simple_status = 'cancelled';
             $order->save();
 
+            $order->restoreStock();
+
             $order->load(['user', 'store', 'items.options', 'items.addons']);
 
             return $this->successResponse($order, 'order.cancelled_successfully');

@@ -131,6 +131,7 @@ class ProductController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
+                'stock' => 'nullable|integer|min:0',
                 'base_price' => 'required|numeric|min:0',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
@@ -188,6 +189,7 @@ class ProductController extends Controller
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
                 'search_keywords' => $request->search_keywords,
+                'stock' => $request->stock,
                 'base_price' => $request->base_price,
                 'is_active' => $request->boolean('is_active', true),
                 'sort_order' => $request->get('sort_order', 0),
@@ -305,6 +307,7 @@ class ProductController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'search_keywords' => 'nullable|string',
+                'stock' => 'nullable|integer|min:0',
                 'base_price' => 'nullable|numeric|min:0',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
@@ -371,6 +374,9 @@ class ProductController extends Controller
             }
             if ($request->has('search_keywords')) {
                 $product->search_keywords = $request->search_keywords;
+            }
+            if ($request->has('stock')) {
+                $product->stock = $request->stock;
             }
             if ($request->filled('base_price')) {
                 $product->base_price = $request->base_price;

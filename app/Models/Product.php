@@ -36,6 +36,7 @@ class Product extends Model
         'offer_price',
         'quantity_en',
         'quantity_ar',
+        'stock',
     ];
 
     protected $casts = [
@@ -47,6 +48,7 @@ class Product extends Model
         'sales_count' => 'integer',
         'metadata' => 'array',
         'sort_order' => 'integer',
+        'stock' => 'integer',
     ];
 
     protected $appends = ['name', 'description', 'image_url', 'best_seller_image_url', 'effective_price', 'quantity', 'module_id'];

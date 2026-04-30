@@ -231,15 +231,9 @@ class ReportsController extends Controller
     public function paymentMethodsBreakdown(Request $request): JsonResponse
     {
         $query = Order::where('simple_status', 'delivered');
+        $this->applyPeriodFilter($query, $request);
 
-        if ($request->filled('start_date')) {
-            $query->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
-        }
-        if ($request->filled('end_date')) {
-            $query->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
-        }
-
-        $rows = $query->select('payment_method', DB::raw('COUNT(id) as count'))
+        $rows = $query->select('payment_method', DB::raw('COUNT(id) as count'), DB::raw('SUM(total) as revenue'))
             ->groupBy('payment_method')
             ->get();
 
@@ -256,6 +250,7 @@ class ReportsController extends Controller
                 'label'      => $labels[$row->payment_method] ?? ucfirst($row->payment_method),
                 'count'      => (int) $row->count,
                 'percentage' => $total > 0 ? round(((int) $row->count / $total) * 100, 1) : 0,
+                'revenue'    => round((float) $row->revenue, 2),
             ];
         });
 
@@ -620,7 +615,8 @@ class ReportsController extends Controller
     {
         $query = Product::whereNotNull('offer_price')
             ->where('is_active', true)
-            ->select('id', 'name_en', 'base_price', 'offer_price');
+            ->with('category:id,name_en')
+            ->select('id', 'name_en', 'category_id', 'base_price', 'offer_price');
 
         $this->applyPeriodFilter($query, $request);
 
@@ -789,7 +785,7 @@ class ReportsController extends Controller
         $limit = $request->input('limit', 50);
 
         if ($limit === 'all') {
-            $data = $dataQuery->paginate($request->input('per_page', 15));
+            $data = $dataQuery->get();
         } else {
             $data = $dataQuery->limit((int)$limit)->get();
         }
@@ -823,10 +819,36 @@ class ReportsController extends Controller
     public function driverPerformance(Request $request): JsonResponse
     {
         $query = DB::table('deliveries')
-            ->leftJoin('orders', 'deliveries.id', '=', 'orders.delivery_id')
+            ->leftJoin('orders', function ($join) use ($request) {
+                $join->on('deliveries.id', '=', 'orders.delivery_id');
+                
+                $period = $request->input('period', 'all');
+                $now = \Carbon\Carbon::now();
+                
+                switch ($period) {
+                    case 'today':
+                        $join->whereDate('orders.created_at', $now->toDateString());
+                        break;
+                    case 'week':
+                        $join->where('orders.created_at', '>=', $now->copy()->subWeek()->startOfDay());
+                        break;
+                    case 'month':
+                        $join->where('orders.created_at', '>=', $now->copy()->subMonth()->startOfDay());
+                        break;
+                    case 'year':
+                        $join->where('orders.created_at', '>=', $now->copy()->subYear()->startOfDay());
+                        break;
+                    case 'custom':
+                        if ($request->filled('start_date')) {
+                            $join->where('orders.created_at', '>=', \Carbon\Carbon::parse($request->input('start_date'))->startOfDay());
+                        }
+                        if ($request->filled('end_date')) {
+                            $join->where('orders.created_at', '<=', \Carbon\Carbon::parse($request->input('end_date'))->endOfDay());
+                        }
+                        break;
+                }
+            })
             ->whereNull('deliveries.deleted_at');
-
-        $this->applyQueryFilter($query, $request, 'orders');
 
         $data = $query->select(
             'deliveries.id as driver_id',
@@ -851,8 +873,6 @@ class ReportsController extends Controller
     public function driverAvailability(Request $request): JsonResponse
     {
         $query = Delivery::select('status', 'availability', DB::raw('COUNT(*) as count'));
-
-        $this->applyPeriodFilter($query, $request);
 
         $data = $query->groupBy('status', 'availability')->get();
 
@@ -1278,8 +1298,8 @@ class ReportsController extends Controller
                 break;
             case 'payment_methods':
                 $data = $this->paymentMethodsBreakdown($request)->getData(true)['data'] ?? [];
-                $headings = ['Method', 'Label', 'Count', 'Percentage %'];
-                $mapper = fn($row) => [$row['method'], $row['label'], $row['count'], $row['percentage']];
+                $headings = ['Payment Method', 'Orders Count', 'Revenue', 'Percentage %'];
+                $mapper = fn($row) => [$row['label'], $row['count'], $row['revenue'], $row['percentage']];
                 break;
             case 'order_distribution':
                 $data = $this->orderDistribution($request)->getData(true)['data']['statuses'] ?? [];
@@ -1297,27 +1317,47 @@ class ReportsController extends Controller
                 $mapper = fn($row) => [$row['month'], $row['month_label'], $row['successful'], $row['failed'], $row['total']];
                 break;
             case 'top_selling_products':
+                $request->merge(['limit' => 'all']);
                 $data = $this->topSellingProducts($request)->getData(true)['data'] ?? [];
                 $headings = ['Product ID', 'Product Name', 'Units Sold', 'Revenue'];
                 $mapper = fn($row) => [$row['id'], $row['name_en'], $row['units_sold'], $row['revenue']];
                 break;
             case 'most_viewed_products':
-                $data = $this->mostViewedProducts()->getData(true)['data'] ?? [];
+                $data = $this->mostViewedProducts($request)->getData(true)['data'] ?? [];
                 $headings = ['Product ID', 'Product Name', 'Views', 'Active'];
                 $mapper = fn($row) => [$row['id'], $row['name_en'], $row['view_count'], $row['is_active'] ? 'Yes' : 'No'];
                 break;
             case 'best_sellers':
-                $data = $this->bestSellersFlagged()->getData(true)['data'] ?? [];
-                $headings = ['Product ID', 'Product Name', 'Category', 'Base Price', 'Offer Price'];
-                $mapper = fn($row) => [$row['id'], $row['name_en'], $row['category']['name_en'] ?? '', $row['base_price'], $row['offer_price']];
+                $data = $this->bestSellersFlagged($request)->getData(true)['data'] ?? [];
+                $headings = ['Product ID', 'Product Name', 'Category', 'Base Price', 'Offer Price', 'Status'];
+                $mapper = fn($row) => [
+                    $row['id'],
+                    $row['name_en'],
+                    isset($row['category']['name_en']) ? $row['category']['name_en'] : '',
+                    $row['base_price'] ?? 0,
+                    $row['offer_price'] ?? 0,
+                    !empty($row['is_active']) ? 'Active' : 'Inactive',
+                ];
                 break;
             case 'products_with_offers':
-                $data = $this->productsWithOffers()->getData(true)['data'] ?? [];
-                $headings = ['Product ID', 'Product Name', 'Base Price', 'Offer Price', 'Discount %'];
-                $mapper = fn($row) => [$row['id'], $row['name_en'], $row['base_price'], $row['offer_price'], $row['discount_percentage']];
+                $data = $this->productsWithOffers($request)->getData(true)['data'] ?? [];
+                $headings = ['Product ID', 'Product Name', 'Category', 'Base Price', 'Offer Price', 'Discount %', 'Offer Start Date', 'Offer End Date', 'Status'];
+                $mapper = fn($row) => [
+                    $row['id'],
+                    $row['name_en'],
+                    isset($row['category']['name_en']) ? $row['category']['name_en'] : '',
+                    $row['base_price'] ?? 0,
+                    $row['offer_price'] ?? 0,
+                    $row['discount_percentage'] ?? 0,
+                    '', // Offer Start Date not in DB currently
+                    '', // Offer End Date not in DB currently
+                    !empty($row['is_active']) ? 'Active' : 'Inactive',
+                ];
                 break;
             case 'top_customers':
-                $data = $this->topCustomers($request)->getData(true)['data'] ?? [];
+                $request->merge(['limit' => 'all']);
+                $paginated = $this->topCustomers($request)->getData(true)['data'] ?? [];
+                $data = $paginated['data'] ?? $paginated;
                 $headings = ['Customer ID', 'Name', 'Email', 'Phone', 'Orders', 'Total Spend'];
                 $mapper = fn($row) => [$row['id'], $row['name'], $row['email'], $row['phone'], $row['order_count'], $row['total_spend']];
                 break;
@@ -1329,13 +1369,24 @@ class ReportsController extends Controller
                 break;
             case 'driver_performance':
                 $data = $this->driverPerformance($request)->getData(true)['data'] ?? [];
-                $headings = ['Driver ID', 'Name', 'Vehicle Type', 'Successful Deliveries', 'Failed Deliveries'];
-                $mapper = fn($row) => [$row['id'], $row['name'], $row['vehicle_type'], $row['successful_deliveries'], $row['failed_deliveries']];
+                $headings = ['Driver ID', 'Driver Name', 'Completed Deliveries', 'Average Rating'];
+                $mapper = fn($row) => [
+                    $row['driver_id'],
+                    $row['driver_name'],
+                    $row['deliveries_completed'],
+                    $row['average_rating'] ?? '0.0',
+                ];
                 break;
             case 'driver_availability':
-                $data = $this->driverAvailability()->getData(true)['data'] ?? [];
-                $headings = ['Status', 'Availability', 'Count'];
-                $mapper = fn($row) => [$row['status'], $row['availability'], $row['count']];
+                $data = $this->driverAvailability($request)->getData(true)['data'] ?? [];
+                $total = collect($data)->sum('count');
+                $headings = ['Status', 'Availability', 'Count', 'Percentage of Fleet'];
+                $mapper = fn($row) => [
+                    ucfirst($row['status'] ?? ''),
+                    ucfirst($row['availability'] ?? ''),
+                    $row['count'],
+                    $total > 0 ? round(((int) $row['count'] / $total) * 100, 1) . '%' : '0%',
+                ];
                 break;
             case 'voucher_usage':
                 $data = $this->voucherUsageAndEffectiveness($request)->getData(true)['data'] ?? [];
@@ -1357,7 +1408,7 @@ class ReportsController extends Controller
                 ];
                 break;
             case 'store_status_overview':
-                $data = $this->storeStatusOverview()->getData(true)['data'] ?? [];
+                $data = $this->storeStatusOverview($request)->getData(true)['data'] ?? [];
                 $headings = ['Status', 'Count'];
                 $mapper = fn($row) => [$row['status'], $row['count']];
                 break;
@@ -1400,7 +1451,7 @@ class ReportsController extends Controller
                 $mapper = fn($row) => $row;
                 break;
             default:
-                return response()->json(['success' => false, 'message' => 'Invalid report type for export'], 400);
+                return response()->json(['success' => false, 'message' => "Unknown report type: {$reportType}"], 422);
         }
 
         return Excel::download(new ReportExport(collect($data), $headings, $mapper), "{$reportType}_export_" . now()->format('YmdHis') . ".xlsx");
