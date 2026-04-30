@@ -125,6 +125,10 @@ Route::prefix('admin')->group(function () {
 
             // 8. Stores
             Route::get('/stores/status-overview', 'storeStatusOverview');
+
+            // 9. Attribution
+            Route::get('/attribution/campaign-performance', 'campaignPerformance');
+            Route::get('/attribution/source-performance', 'sourcePerformance');
         });
         
         // Regular Users CRUD routes (permission-based)

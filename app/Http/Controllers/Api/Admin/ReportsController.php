@@ -1185,6 +1185,67 @@ class ReportsController extends Controller
 
 
     // ──────────────────────────────────────────
+    // 9. ATTRIBUTION REPORTS
+    // ──────────────────────────────────────────
+
+    public function campaignPerformance(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered')
+                      ->whereNotNull('campaign_attribution');
+        
+        $this->applyPeriodFilter($query, $request);
+
+        // Using JSON_UNQUOTE(JSON_EXTRACT(...)) to group by campaign
+        $data = $query->select(
+            DB::raw("JSON_UNQUOTE(JSON_EXTRACT(campaign_attribution, '$.utm_campaign')) as campaign"),
+            DB::raw('COUNT(id) as total_orders'),
+            DB::raw('SUM(total) as total_revenue'),
+            DB::raw('AVG(total) as avg_order_value')
+        )
+        ->groupBy('campaign')
+        ->orderByDesc('total_revenue')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'campaign' => empty($row->campaign) ? 'Organic / Unknown' : $row->campaign,
+                'total_orders' => (int) $row->total_orders,
+                'total_revenue' => round((float) $row->total_revenue, 2),
+                'avg_order_value' => round((float) $row->avg_order_value, 2),
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+    public function sourcePerformance(Request $request): JsonResponse
+    {
+        $query = Order::where('simple_status', 'delivered')
+                      ->whereNotNull('campaign_attribution');
+        
+        $this->applyPeriodFilter($query, $request);
+
+        // Using JSON_UNQUOTE(JSON_EXTRACT(...)) to group by source
+        $data = $query->select(
+            DB::raw("JSON_UNQUOTE(JSON_EXTRACT(campaign_attribution, '$.utm_source')) as source"),
+            DB::raw('COUNT(id) as total_orders'),
+            DB::raw('SUM(total) as total_revenue')
+        )
+        ->groupBy('source')
+        ->orderByDesc('total_revenue')
+        ->get()
+        ->map(function ($row) {
+            return [
+                'source' => empty($row->source) ? 'Organic / Unknown' : $row->source,
+                'total_orders' => (int) $row->total_orders,
+                'total_revenue' => round((float) $row->total_revenue, 2),
+            ];
+        });
+
+        return $this->successResponse($data, 'success.data_retrieved');
+    }
+
+
+    // ──────────────────────────────────────────
     // HELPERS
     // ──────────────────────────────────────────
 
@@ -1449,6 +1510,16 @@ class ReportsController extends Controller
                 ];
                 $headings = ['Order Type', 'Count', 'Percentage %'];
                 $mapper = fn($row) => $row;
+                break;
+            case 'campaign_performance':
+                $data = $this->campaignPerformance($request)->getData(true)['data'] ?? [];
+                $headings = ['Campaign Name', 'Total Orders', 'Total Revenue', 'Average Order Value'];
+                $mapper = fn($row) => [$row['campaign'], $row['total_orders'], $row['total_revenue'], $row['avg_order_value']];
+                break;
+            case 'source_performance':
+                $data = $this->sourcePerformance($request)->getData(true)['data'] ?? [];
+                $headings = ['Source', 'Total Orders', 'Total Revenue'];
+                $mapper = fn($row) => [$row['source'], $row['total_orders'], $row['total_revenue']];
                 break;
             default:
                 return response()->json(['success' => false, 'message' => "Unknown report type: {$reportType}"], 422);
