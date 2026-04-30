@@ -28,7 +28,7 @@ class CartController extends Controller
 
         $cart = Cart::with([
             // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active,stock',
+            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
             'items.product.category:id,module_id',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -135,15 +135,6 @@ class CartController extends Controller
                 // Update quantity of existing item
                 $newQuantity = $existingItem->quantity + $request->quantity;
                 
-                // Check stock for SME products
-                if ($product->module_id == 31 && $product->stock !== null && $newQuantity > $product->stock) {
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Cannot add more than available stock ({$product->stock})",
-                    ], 422);
-                }
-                
                 // Check if new quantity exceeds maximum
                 // if ($newQuantity > 99) {
                 //     DB::rollBack();
@@ -168,15 +159,6 @@ class CartController extends Controller
                         'errors' => [
                             'cart' => [LocalizationService::getMessage('cart.max_items')],
                         ],
-                    ], 422);
-                }
-
-                // Check stock for SME products
-                if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Cannot add more than available stock ({$product->stock})",
                     ], 422);
                 }
 
@@ -214,7 +196,7 @@ class CartController extends Controller
             // Reload cart with relationships
             $cart->load([
                 // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active,stock',
+                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -292,15 +274,6 @@ class CartController extends Controller
             ], 404);
         }
 
-        $product = $cartItem->product;
-        // Check stock for SME products
-        if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-            return response()->json([
-                'success' => false,
-                'message' => "Cannot update quantity to more than available stock ({$product->stock})",
-            ], 422);
-        }
-
         // Update quantity
         $cartItem->update(['quantity' => $request->quantity]);
 
@@ -308,7 +281,7 @@ class CartController extends Controller
         $cart = $cartItem->cart;
        $cart->load([
             // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active,stock',
+            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
             'items.product.category:id,module_id',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -374,18 +347,8 @@ class CartController extends Controller
 
         DB::beginTransaction();
         try {
-            $product = $cartItem->product;
             // Update quantity if provided
             if ($request->has('quantity')) {
-                // Check stock for SME products
-                if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-                    DB::rollBack();
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Cannot update quantity to more than available stock ({$product->stock})",
-                    ], 422);
-                }
-
                 $cartItem->update(['quantity' => $request->quantity]);
             }
 
@@ -424,7 +387,7 @@ class CartController extends Controller
             $cart = $cartItem->cart;
             $cart->load([
                 // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active,stock',
+                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -503,7 +466,7 @@ class CartController extends Controller
         // Reload cart
         $cart->load([
             // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active,stock',
+            'items.product:id,category_id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
             'items.product.category:id,module_id',
             'items.product.primaryImage',
             'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
@@ -592,15 +555,6 @@ class CartController extends Controller
 
         DB::beginTransaction();
         try {
-            // Check stock for SME products
-            if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-                DB::rollBack();
-                return response()->json([
-                    'success' => false,
-                    'message' => "Cannot add more than available stock ({$product->stock})",
-                ], 422);
-            }
-
             // Delete old cart
             Cart::where('user_id', $user->id)->delete();
 
@@ -643,7 +597,7 @@ class CartController extends Controller
             // Reload cart
             $cart->load([
                 // 'store:id,name_en,name_ar,description_en,description_ar,logo,status',
-                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active,stock',
+                'items.product:id,name_en,name_ar,description_en,description_ar,base_price,offer_price,is_active',
                 'items.product.primaryImage',
                 'items.options.productOptionValue.productOption.optionGroup:id,name_en,name_ar',
                 'items.options.productOptionValue.optionValue:id,value_en,value_ar',
@@ -756,7 +710,6 @@ class CartController extends Controller
                         'base_price' => $item->product->base_price,
                         'offer_price' => $item->product->offer_price,
                         'is_active' => $item->product->is_active,
-                        'stock' => $item->product->stock,
                         'primary_image' => $item->product->primaryImage ? [
                             'id' => $item->product->primaryImage->id,
                             'image_url' => $item->product->primaryImage->image_url,
