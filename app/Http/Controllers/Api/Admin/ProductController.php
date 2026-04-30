@@ -153,6 +153,7 @@ class ProductController extends Controller
                 'search_keywords' => 'nullable|string',
                 'quantity_en' => 'nullable|string|max:255',
                 'quantity_ar' => 'nullable|string|max:255',
+                'stock' => 'nullable|integer|min:0',
                 'base_price' => 'required|numeric|min:0',
                 'offer_price' => 'nullable|numeric|min:0',
                 'is_active' => 'nullable|boolean',
@@ -218,6 +219,7 @@ class ProductController extends Controller
                 'search_keywords' => $request->search_keywords,
                 'quantity_en' => $request->quantity_en,
                 'quantity_ar' => $request->quantity_ar,
+                'stock' => $request->stock,
                 'base_price' => $request->base_price,
                 'offer_price' => ($request->offer_price < 1) ? null : $request->offer_price,
                 'is_active' => $request->boolean('is_active', true),
@@ -343,6 +345,7 @@ class ProductController extends Controller
                 'search_keywords' => 'nullable|string',
                 'quantity_en' => 'nullable|string|max:255',
                 'quantity_ar' => 'nullable|string|max:255',
+                'stock' => 'nullable|integer|min:0',
                 'base_price' => 'nullable|numeric|min:0',
                 'offer_price' => 'nullable|numeric|min:0',
                 'is_active' => 'nullable|boolean',
@@ -431,6 +434,9 @@ class ProductController extends Controller
             }
             if ($request->has('quantity_ar')) {
                 $product->quantity_ar = $request->quantity_ar;
+            }
+            if ($request->has('stock')) {
+                $product->stock = $request->stock;
             }
             if ($request->filled('base_price')) {
                 $product->base_price = $request->base_price;
