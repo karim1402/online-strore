@@ -48,6 +48,7 @@ class OrderController extends Controller
             // 'payment_created_at' => 'nullable|string',
             // 'merchant_commission' => 'nullable|numeric',
             // 'accept_fees' => 'nullable|numeric',
+            'attribution' => 'nullable|array',
         ]);
 
         $request->payment_method = 'cash';
@@ -228,6 +229,7 @@ class OrderController extends Controller
                 'scheduled_time' => $request->scheduled_time ?: null,
                 'is_cash_handed_over' => $request->payment_method === 'online',
                 'is_paid_to_vendor' => $request->payment_method === 'cash',
+                'campaign_attribution' => $request->attribution,
             ]);
 
             // Record Voucher Usage
