@@ -10,6 +10,8 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ReportExport;
 
 class UserController extends Controller
 {
@@ -234,8 +236,34 @@ class UserController extends Controller
             return $this->successResponse($user->fresh(), 'success.user_status_updated');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->notFoundResponse('errors.resource_not_found');
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Export all users with name, phone, orders count and created_at.
+     */
+    public function export(Request $request)
+    {
+        try {
+            $users = User::withCount('orders')->orderBy('id', 'desc')->get();
+            
+            $headings = ['Name', 'Phone', 'Total Orders', 'Created At'];
+            
+            $mapper = fn($row) => [
+                $row['name'],
+                $row['phone'],
+                $row['orders_count'],
+                \Carbon\Carbon::parse($row['created_at'])->format('Y-m-d H:i:s')
+            ];
+
+            return Excel::download(
+                new ReportExport(collect($users), $headings, $mapper),
+                "users_export_" . now()->format('YmdHis') . ".xlsx"
+            );
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
