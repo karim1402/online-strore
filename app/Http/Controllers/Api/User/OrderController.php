@@ -246,9 +246,9 @@ class OrderController extends Controller
             foreach ($cart->items as $cartItem) {
                 $product = $cartItem->product;
 
-                if ($product->module_id == 31 && $product->stock !== null) {
-                    $product->decrement('stock', $cartItem->quantity);
-                }
+                // if ($product->module_id == 31 && $product->stock !== null) {
+                //     $product->decrement('stock', $cartItem->quantity);
+                // }
 
                 // Create product snapshot
                 $productSnapshot = [
@@ -564,7 +564,7 @@ class OrderController extends Controller
         $order->reason = $request->input('reason');
         $order->save();
 
-        $order->restoreStock();
+        // $order->restoreStock();
 
         // Log activity
         activity()
@@ -745,14 +745,14 @@ class OrderController extends Controller
             }
 
             // Check stock for SME products (module 31)
-            if ($product->module_id == 31 && $product->stock !== null) {
-                if ($product->stock < $item->quantity) {
-                    $errors[] = [
-                        'product_id' => $product->id,
-                        'error' => "Product '{$product->name}' is out of stock",
-                    ];
-                }
-            }
+            // if ($product->module_id == 31 && $product->stock !== null) {
+            //     if ($product->stock < $item->quantity) {
+            //         $errors[] = [
+            //             'product_id' => $product->id,
+            //             'error' => "Product '{$product->name}' is out of stock",
+            //         ];
+            //     }
+            // }
 
             // Check store is approved
             // if ($product->store->status !== 'approved') {
