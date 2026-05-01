@@ -860,7 +860,7 @@ class ProductController extends Controller
     /**
      * Export all products as Excel
      */
-    public function export()
+    public function export(Request $request)
     {
         try {
             $products = Product::select('id', 'name_en', 'name_ar', 'base_price', 'offer_price')
@@ -869,6 +869,7 @@ class ProductController extends Controller
                 ->get();
 
             $headings = ['ID', 'Name EN', 'Name AR', 'Base Price', 'Offer Price', 'Link'];
+
             $mapper = fn($row) => [
                 $row['id'],
                 $row['name_en'],
@@ -879,11 +880,11 @@ class ProductController extends Controller
             ];
 
             return Excel::download(
-                new \App\Exports\ReportExport(collect($products->toArray()), $headings, $mapper),
-                'products_export_' . now()->format('YmdHis') . '.xlsx'
+                new \App\Exports\ReportExport(collect($products), $headings, $mapper),
+                "products_export_" . now()->format('YmdHis') . ".xlsx"
             );
         } catch (\Exception $e) {
-            return $this->errorResponse('errors.server_error', [], 500);
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 
