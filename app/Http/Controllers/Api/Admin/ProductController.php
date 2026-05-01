@@ -858,7 +858,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Export all products as CSV
+     * Export all products as Excel
      */
     public function export()
     {
@@ -868,20 +868,20 @@ class ProductController extends Controller
                 ->orderBy('id')
                 ->get();
 
-            $csvData = "\xEF\xBB\xBF"; // UTF-8 BOM for Arabic support
-            $csvData .= "ID,Name EN,Name AR,Base Price,Offer Price,Link\n";
+            $headings = ['ID', 'Name EN', 'Name AR', 'Base Price', 'Offer Price', 'Link'];
+            $mapper = fn($row) => [
+                $row['id'],
+                $row['name_en'],
+                $row['name_ar'],
+                $row['base_price'] ?? 0,
+                $row['offer_price'] ?? 0,
+                'https://makookeg.com/open-app/?id=' . $row['id'],
+            ];
 
-            foreach ($products as $product) {
-                $nameEn = '"' . str_replace('"', '""', $product->name_en) . '"';
-                $nameAr = '"' . str_replace('"', '""', $product->name_ar) . '"';
-                $link = 'https://makookeg.com/open-app/?id=' . $product->id;
-                $csvData .= "{$product->id},{$nameEn},{$nameAr},{$product->base_price},{$product->offer_price},{$link}\n";
-            }
-
-            return response($csvData, 200, [
-                'Content-Type' => 'text/csv; charset=UTF-8',
-                'Content-Disposition' => 'attachment; filename="products_export.csv"',
-            ]);
+            return Excel::download(
+                new \App\Exports\ReportExport(collect($products->toArray()), $headings, $mapper),
+                'products_export_' . now()->format('YmdHis') . '.xlsx'
+            );
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
