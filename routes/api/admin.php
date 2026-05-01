@@ -359,9 +359,10 @@ Route::prefix('admin')->group(function () {
         Route::controller(ProductController::class)->prefix('products')->group(function () {
             Route::middleware('permission:stores.view,admins')->group(function () {
                 Route::get('/', 'index');
+                Route::get('/export', 'export');
                 Route::get('/{id}', 'show');
             });
-            
+
             Route::middleware('permission:stores.create,admins')->group(function () {
                 Route::post('/', 'store');
                 Route::post('/{id}/duplicate', 'duplicate');
