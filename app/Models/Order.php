@@ -51,6 +51,7 @@ class Order extends Model
         'discount',
         'reason',
         'scheduled_time',
+        'campaign_attribution',
     ];
 
     protected $casts = [
@@ -64,6 +65,7 @@ class Order extends Model
         'is_paid_to_vendor' => 'boolean',
         'is_delivery' => 'boolean',
         'scheduled_time' => 'string',
+        'campaign_attribution' => 'array',
     ];
 
     /**

@@ -14,11 +14,13 @@ class Cart extends Model
     protected $fillable = [
         'user_id',
         'store_id',
+        'campaign_attribution',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'campaign_attribution' => 'array',
     ];
 
     /**

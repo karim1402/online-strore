@@ -43,6 +43,7 @@ class PaymentController extends Controller
                 'address_id'     => 'required|exists:user_addresses,id',
                 'is_delivery'    => 'nullable|boolean',
                 'scheduled_time' => 'nullable|date_format:H:i',
+                'attribution'    => 'nullable|array',
             ]);
 
             // Check working hours
@@ -71,6 +72,11 @@ class PaymentController extends Controller
 
             if (!$cart || $cart->items->isEmpty()) {
                 return $this->errorResponse('errors.cart_empty', [], 400);
+            }
+
+            // Save attribution to cart temporarily
+            if ($request->has('attribution')) {
+                $cart->update(['campaign_attribution' => $request->attribution]);
             }
 
             // Get Address
@@ -370,6 +376,7 @@ class PaymentController extends Controller
             'is_delivery'        => $isDelivery,
             'is_cash_handed_over' => false, // Online payment already captured
             'scheduled_time'     => $scheduledTime ?: null,
+            'campaign_attribution' => $cart->campaign_attribution,
         ]);
 
         // Record Voucher Usage

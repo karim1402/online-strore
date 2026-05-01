@@ -48,6 +48,7 @@ class OrderController extends Controller
             // 'payment_created_at' => 'nullable|string',
             // 'merchant_commission' => 'nullable|numeric',
             // 'accept_fees' => 'nullable|numeric',
+            'attribution' => 'nullable|array',
         ]);
 
         $request->payment_method = 'cash';
@@ -228,6 +229,7 @@ class OrderController extends Controller
                 'scheduled_time' => $request->scheduled_time ?: null,
                 'is_cash_handed_over' => $request->payment_method === 'online',
                 'is_paid_to_vendor' => $request->payment_method === 'cash',
+                'campaign_attribution' => $request->attribution,
             ]);
 
             // Record Voucher Usage
@@ -245,6 +247,10 @@ class OrderController extends Controller
             // Copy cart items to order items
             foreach ($cart->items as $cartItem) {
                 $product = $cartItem->product;
+
+                // if ($product->module_id == 31 && $product->stock !== null) {
+                //     $product->decrement('stock', $cartItem->quantity);
+                // }
 
                 // Create product snapshot
                 $productSnapshot = [
@@ -560,6 +566,8 @@ class OrderController extends Controller
         $order->reason = $request->input('reason');
         $order->save();
 
+        // $order->restoreStock();
+
         // Log activity
         activity()
             ->performedOn($order)
@@ -737,6 +745,16 @@ class OrderController extends Controller
                 ];
                 continue;
             }
+
+            // Check stock for SME products (module 31)
+            // if ($product->module_id == 31 && $product->stock !== null) {
+            //     if ($product->stock < $item->quantity) {
+            //         $errors[] = [
+            //             'product_id' => $product->id,
+            //             'error' => "Product '{$product->name}' is out of stock",
+            //         ];
+            //     }
+            // }
 
             // Check store is approved
             // if ($product->store->status !== 'approved') {
