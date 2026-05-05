@@ -66,10 +66,6 @@ class FeaturedSection extends Model
         if ($this->image) {
             return Storage::disk('public')->url($this->image);
         }
-        $item = $this->getItem();
-        if ($item?->image) {
-            return Storage::disk('public')->url($item->image);
-        }
         return null;
     }
 
