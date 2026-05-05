@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan *)"
+      "Bash(php artisan *)",
+      "PowerShell(php artisan tinker --execute='$count = App\\\\Models\\\\FeaturedSection::count\\(\\); print\\($count . \" featured sections created\" . PHP_EOL\\); App\\\\Models\\\\FeaturedSection::all\\(\\)->each\\(function\\($s\\) { print\\($s->id . \" | \" . $s->type . \" | item_id=\" . $s->item_id . \" | name_en=\" . $s->name_en . \" | order=\" . $s->sort_order . PHP_EOL\\); }\\);')",
+      "PowerShell(php artisan tinker --execute=\"App\\\\Models\\\\FeaturedSection::select\\('id','type','item_id','sort_order','is_active'\\)->get\\(\\)->toJson\\(JSON_PRETTY_PRINT\\);\")",
+      "PowerShell(php artisan tinker --execute=\"dump\\(App\\\\Models\\\\FeaturedSection::count\\(\\)\\);\")"
     ]
   }
 }
