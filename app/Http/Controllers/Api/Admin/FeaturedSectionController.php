@@ -9,6 +9,7 @@ use App\Models\Category;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class FeaturedSectionController extends Controller
@@ -39,6 +40,7 @@ class FeaturedSectionController extends Controller
             'item_id' => 'required|integer',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
+            'image' => 'nullable|image|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -58,6 +60,10 @@ class FeaturedSectionController extends Controller
 
         if ($duplicate) {
             return $this->errorResponse('errors.validation_failed', [], 422);
+        }
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('featured_sections', 'public');
         }
 
         $section = FeaturedSection::create($data);
@@ -89,6 +95,7 @@ class FeaturedSectionController extends Controller
             'item_id' => 'nullable|integer',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
+            'image' => 'nullable|image|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -107,6 +114,13 @@ class FeaturedSectionController extends Controller
             }
         }
 
+        if ($request->hasFile('image')) {
+            if ($section->image && Storage::disk('public')->exists($section->image)) {
+                Storage::disk('public')->delete($section->image);
+            }
+            $data['image'] = $request->file('image')->store('featured_sections', 'public');
+        }
+
         $section->update($data);
 
         return $this->successResponse($section->fresh(), 'success.updated');
@@ -118,6 +132,10 @@ class FeaturedSectionController extends Controller
 
         if (!$section) {
             return $this->notFoundResponse();
+        }
+
+        if ($section->image && Storage::disk('public')->exists($section->image)) {
+            Storage::disk('public')->delete($section->image);
         }
 
         $section->delete();

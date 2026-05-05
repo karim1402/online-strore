@@ -19,6 +19,7 @@ class FeaturedSection extends Model
         'item_id',
         'sort_order',
         'is_active',
+        'image',
     ];
 
     protected $casts = [
@@ -62,6 +63,9 @@ class FeaturedSection extends Model
 
     public function getImageUrlAttribute()
     {
+        if ($this->image) {
+            return Storage::disk('public')->url($this->image);
+        }
         $item = $this->getItem();
         if ($item?->image) {
             return Storage::disk('public')->url($item->image);
@@ -82,7 +86,7 @@ class FeaturedSection extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['type', 'item_id', 'sort_order', 'is_active'])
+            ->logOnly(['type', 'item_id', 'sort_order', 'is_active', 'image'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(fn(string $eventName) => "Featured Section {$eventName}")
