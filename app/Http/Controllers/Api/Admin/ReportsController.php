@@ -185,12 +185,11 @@ class ReportsController extends Controller
     {
         $query = Order::where('simple_status', 'delivered');
 
-        // Apply start_date / end_date filters
         if ($request->filled('start_date')) {
-            $query->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+            $query->where('created_at', '>=', $this->parseStartDate($request->input('start_date')));
         }
         if ($request->filled('end_date')) {
-            $query->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+            $query->where('created_at', '<=', $this->parseEndDate($request->input('end_date')));
         }
 
         $period = $request->input('period', 'day');
@@ -840,10 +839,10 @@ class ReportsController extends Controller
                         break;
                     case 'custom':
                         if ($request->filled('start_date')) {
-                            $join->where('orders.created_at', '>=', \Carbon\Carbon::parse($request->input('start_date'))->startOfDay());
+                            $join->where('orders.created_at', '>=', $this->parseStartDate($request->input('start_date')));
                         }
                         if ($request->filled('end_date')) {
-                            $join->where('orders.created_at', '<=', \Carbon\Carbon::parse($request->input('end_date'))->endOfDay());
+                            $join->where('orders.created_at', '<=', $this->parseEndDate($request->input('end_date')));
                         }
                         break;
                 }
@@ -885,10 +884,10 @@ class ReportsController extends Controller
             ->where('is_delivery', true);
 
         if ($request->filled('start_date')) {
-            $query->where('created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+            $query->where('created_at', '>=', $this->parseStartDate($request->input('start_date')));
         }
         if ($request->filled('end_date')) {
-            $query->where('created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+            $query->where('created_at', '<=', $this->parseEndDate($request->input('end_date')));
         }
 
         $data = $query->select(
@@ -1138,10 +1137,10 @@ class ReportsController extends Controller
         $query = Payment::query();
 
         if ($request->filled('start_date')) {
-            $query->where('payment_created_at', '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+            $query->where('payment_created_at', '>=', $this->parseStartDate($request->input('start_date')));
         }
         if ($request->filled('end_date')) {
-            $query->where('payment_created_at', '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+            $query->where('payment_created_at', '<=', $this->parseEndDate($request->input('end_date')));
         }
 
         $data = $query->select(
@@ -1249,6 +1248,18 @@ class ReportsController extends Controller
     // HELPERS
     // ──────────────────────────────────────────
 
+    private function parseStartDate(string $value): Carbon
+    {
+        $parsed = Carbon::parse($value);
+        return str_contains($value, ':') ? $parsed : $parsed->startOfDay();
+    }
+
+    private function parseEndDate(string $value): Carbon
+    {
+        $parsed = Carbon::parse($value);
+        return str_contains($value, ':') ? $parsed : $parsed->endOfDay();
+    }
+
     private function applyPeriodFilter($query, Request $request, $column = 'created_at'): void
     {
         $period = $request->input('period', 'all');
@@ -1269,10 +1280,10 @@ class ReportsController extends Controller
                 break;
             case 'custom':
                 if ($request->filled('start_date')) {
-                    $query->where($column, '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+                    $query->where($column, '>=', $this->parseStartDate($request->input('start_date')));
                 }
                 if ($request->filled('end_date')) {
-                    $query->where($column, '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+                    $query->where($column, '<=', $this->parseEndDate($request->input('end_date')));
                 }
                 break;
         }
@@ -1299,10 +1310,10 @@ class ReportsController extends Controller
                 break;
             case 'custom':
                 if ($request->filled('start_date')) {
-                    $query->where($column, '>=', Carbon::parse($request->input('start_date'))->startOfDay());
+                    $query->where($column, '>=', $this->parseStartDate($request->input('start_date')));
                 }
                 if ($request->filled('end_date')) {
-                    $query->where($column, '<=', Carbon::parse($request->input('end_date'))->endOfDay());
+                    $query->where($column, '<=', $this->parseEndDate($request->input('end_date')));
                 }
                 break;
         }
