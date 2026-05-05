@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Admin\DeliveryUserController;
 use App\Http\Controllers\Api\Admin\UserController;
 use App\Http\Controllers\Api\Admin\VendorInvoiceController;
 use App\Http\Controllers\Api\Admin\AppSettingController;
+use App\Http\Controllers\Api\Admin\FeaturedSectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -602,6 +603,18 @@ Route::prefix('admin')->group(function () {
             Route::put('/app-version/{platform}', 'updateAppVersion');
             Route::get('/delivery-settings', 'getDeliverySettings');
             Route::put('/delivery-settings', 'updateDeliverySettings');
+        });
+
+        // Featured Sections CRUD routes
+        Route::controller(FeaturedSectionController::class)->prefix('featured-sections')->group(function () {
+            Route::get('/', 'index');
+            Route::post('/', 'store');
+            Route::get('/available-items', 'getAvailableItems');
+            Route::get('/{id}', 'show');
+            Route::put('/{id}', 'update');
+            Route::delete('/{id}', 'destroy');
+            Route::patch('/{id}/toggle-status', 'toggleStatus');
+            Route::post('/update-sort-order', 'updateSortOrder');
         });
     });
 });

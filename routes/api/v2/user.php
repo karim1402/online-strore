@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V2\User\SplashAdController;
 use App\Http\Controllers\Api\V2\User\WorkingHoursController;
 use App\Http\Controllers\Api\V2\User\SettingsController;
 use App\Http\Controllers\Api\V2\User\ChatController;
+use App\Http\Controllers\Api\V2\User\FeaturedSectionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -161,6 +162,9 @@ Route::prefix('user')->group(function () {
     // Home Ads
     Route::get('home-ads',               [HomeAdController::class, 'index'])->name('v2.user.home-ads.index');
     Route::get('home-ads/{id}/products', [HomeAdController::class, 'showProducts'])->name('v2.user.home-ads.products');
+
+    // Featured Sections
+    Route::get('featured-sections', [FeaturedSectionController::class, 'index'])->name('v2.user.featured-sections.index');
 
     // Service Area check
     Route::post('check-service-area', [AddressController::class, 'checkServiceArea'])->name('v2.user.check-service-area');
