@@ -112,7 +112,7 @@ class AuthController extends Controller
                 ->first();
 
             if (!$verification) {
-                return $this->errorResponse('errors.otp_not_found', [], 400);
+                return $this->errorResponse('errors.invalid_otp', [], 400);
             }
 
             if ($verification->code !== $request->otp) {
