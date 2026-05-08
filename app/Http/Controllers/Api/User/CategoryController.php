@@ -287,7 +287,7 @@ class CategoryController extends Controller
                         }])
                         ->withExists('productOptions')
                         ->orderBy('sort_order', 'asc')
-                        ->limit(20);
+                        ->limit(200);
                 }]);
             }])
             ->orderBy('sort_order', 'asc')
