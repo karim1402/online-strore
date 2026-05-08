@@ -190,8 +190,12 @@ class AuthController extends Controller
             // Input is an email
             $credentials = ['email' => $loginField, 'password' => $request->password];
         } else {
-            // Input is a phone number
-            $credentials = ['phone' => $loginField, 'password' => $request->password];
+            // Input is a phone number — normalize by stripping leading "2"
+            $phone = $loginField;
+            if (str_starts_with($phone, '2')) {
+                $phone = substr($phone, 1);
+            }
+            $credentials = ['phone' => $phone, 'password' => $request->password];
         }
 
         if (!$token = Auth::guard('api')->attempt($credentials)) {
