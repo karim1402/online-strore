@@ -229,8 +229,8 @@
         "max_quantity_per_item": "You cannot add more of this item",
         "product_unavailable": "Product is no longer available",
         "store_unavailable": "Store is not available",
-        "stock_exceeded_add": "Cannot add more than available stock (:stock)",
-        "stock_exceeded_update": "Cannot update quantity to more than available stock (:stock)",
+        "stock_exceeded_add": "Cannot add more than available stock for ':name' (:stock)",
+        "stock_exceeded_update": "Cannot update quantity to more than available stock for ':name' (:stock)",
         "out_of_stock": "Product ':name' is out of stock"
     },
     "order": {
