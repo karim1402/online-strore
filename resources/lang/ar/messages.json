@@ -226,7 +226,10 @@
         "quantity_limit_exceeded": "تم تجاوز حد الكمية",
         "max_quantity_per_item": "لا يمكنك إضافة المزيد من هذا العنصر",
         "product_unavailable": "المنتج لم يعد متوفراً",
-        "store_unavailable": "المتجر غير متوفر"
+        "store_unavailable": "المتجر غير متوفر",
+        "stock_exceeded_add": "لا يمكن إضافة أكثر من المخزون المتاح (:stock)",
+        "stock_exceeded_update": "لا يمكن تحديث الكمية إلى أكثر من المخزون المتاح (:stock)",
+        "out_of_stock": "المنتج ':name' غير متوفر في المخزون"
     },
     "order": {
         "placed_successfully": "تم تقديم الطلب بنجاح",

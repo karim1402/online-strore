@@ -140,7 +140,7 @@ class CartController extends Controller
                     DB::rollBack();
                     return response()->json([
                         'success' => false,
-                        'message' => "Cannot add more than available stock ({$product->stock})",
+                        'message' => LocalizationService::getMessage('cart.stock_exceeded_add', ['stock' => $product->stock]),
                     ], 422);
                 }
                 
@@ -176,7 +176,7 @@ class CartController extends Controller
                     DB::rollBack();
                     return response()->json([
                         'success' => false,
-                        'message' => "Cannot add more than available stock ({$product->stock})",
+                        'message' => LocalizationService::getMessage('cart.stock_exceeded_add', ['stock' => $product->stock]),
                     ], 422);
                 }
 
@@ -297,7 +297,7 @@ class CartController extends Controller
         if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
             return response()->json([
                 'success' => false,
-                'message' => "Cannot update quantity to more than available stock ({$product->stock})",
+                'message' => LocalizationService::getMessage('cart.stock_exceeded_update', ['stock' => $product->stock]),
             ], 422);
         }
 
@@ -382,7 +382,7 @@ class CartController extends Controller
                     DB::rollBack();
                     return response()->json([
                         'success' => false,
-                        'message' => "Cannot update quantity to more than available stock ({$product->stock})",
+                        'message' => LocalizationService::getMessage('cart.stock_exceeded_update', ['stock' => $product->stock]),
                     ], 422);
                 }
 
@@ -597,7 +597,7 @@ class CartController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'success' => false,
-                    'message' => "Cannot add more than available stock ({$product->stock})",
+                    'message' => LocalizationService::getMessage('cart.stock_exceeded_add', ['stock' => $product->stock]),
                 ], 422);
             }
 

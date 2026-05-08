@@ -751,7 +751,7 @@ class OrderController extends Controller
                 if ($product->stock < $item->quantity) {
                     $errors[] = [
                         'product_id' => $product->id,
-                        'error' => "Product '{$product->name}' is out of stock",
+                        'error' => LocalizationService::getMessage('cart.out_of_stock', ['name' => $product->name]),
                     ];
                 }
             }
