@@ -566,7 +566,7 @@ class OrderController extends Controller
         $order->reason = $request->input('reason');
         $order->save();
 
-        // $order->restoreStock();
+        $order->restoreStock();
 
         // Log activity
         activity()
@@ -749,9 +749,12 @@ class OrderController extends Controller
             // Check stock for SME products (module 31)
             if ($product->module_id == 31 && $product->stock !== null) {
                 if ($product->stock < $item->quantity) {
+                    $locale = app()->getLocale();
+                    $productName = ($locale === 'ar' ? $product->name_ar : $product->name_en)
+                        ?: ($product->name_en ?: $product->name_ar);
                     $errors[] = [
                         'product_id' => $product->id,
-                        'error' => LocalizationService::getMessage('cart.out_of_stock', ['name' => $product->name]),
+                        'error' => LocalizationService::getMessage('cart.out_of_stock', ['name' => $productName]),
                     ];
                 }
             }
