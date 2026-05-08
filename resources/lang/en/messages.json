@@ -150,7 +150,8 @@
         "voucher_module_restricted": "This voucher is only valid for :module products. Your cart does not contain any products from this module.",
         "address_outside_service_area": "Sorry, we do not currently deliver to this area.",
         "voucher_invalid_time": "Only available after 9:00 PM.",
-        "voucher_restricted_products": "Promo codes cannot be used with one or more products in your cart."
+        "voucher_restricted_products": "Promo codes cannot be used with one or more products in your cart.",
+        "phone_not_found": "Phone number not found"
     },
     "validation": {
         "required": "The :attribute field is required",

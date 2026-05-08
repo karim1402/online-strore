@@ -21,19 +21,35 @@ class ForgotPasswordController extends Controller
     public function sendResetCode(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'phone' => 'required|string|exists:users,phone',
+            'phone' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorWithFirstMessage($validator);
         }
 
+        // Resolve the phone: try as-is first, then without leading "2"
+        $phone = $request->phone;
+        $user = User::where('phone', $phone)->first();
+
+        if (!$user && str_starts_with($phone, '2')) {
+            $phoneWithout2 = substr($phone, 1);
+            $user = User::where('phone', $phoneWithout2)->first();
+            if ($user) {
+                $phone = $phoneWithout2;
+            }
+        }
+
+        if (!$user) {
+            return $this->errorResponse('errors.phone_not_found', [], 404);
+        }
+
         // Generate 4-digit OTP
         $code = rand(1000, 9999);
 
-        // Store or update in phone_verifications table
+        // Store or update in phone_verifications table using the resolved phone
         DB::table('phone_verifications')->updateOrInsert(
-            ['phone' => $request->phone],
+            ['phone' => $phone],
             [
                 'code' => $code,
                 'expires_at' => Carbon::now()->addMinutes(15),
@@ -42,7 +58,7 @@ class ForgotPasswordController extends Controller
             ]
         );
 
-        // Send OTP via SMS
+        // Send OTP via SMS (use original request phone for delivery)
         try {
             \App\Services\SmsMisrService::sendOtp($request->phone, $code);
         } catch (\Exception $e) {
@@ -60,7 +76,7 @@ class ForgotPasswordController extends Controller
     public function reset(Request $request): JsonResponse
     {
         $validator = ValidationService::make($request->all(), [
-            'phone' => 'required|string|exists:users,phone',
+            'phone' => 'required|string',
             'code' => 'required|string',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -69,8 +85,24 @@ class ForgotPasswordController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
+        // Resolve the phone: try as-is first, then without leading "2"
+        $phone = $request->phone;
+        $user = User::where('phone', $phone)->first();
+
+        if (!$user && str_starts_with($phone, '2')) {
+            $phoneWithout2 = substr($phone, 1);
+            $user = User::where('phone', $phoneWithout2)->first();
+            if ($user) {
+                $phone = $phoneWithout2;
+            }
+        }
+
+        if (!$user) {
+            return $this->errorResponse('errors.phone_not_found', [], 404);
+        }
+
         $record = DB::table('phone_verifications')
-            ->where('phone', $request->phone)
+            ->where('phone', $phone)
             ->where('code', $request->code)
             ->first();
 
@@ -80,18 +112,17 @@ class ForgotPasswordController extends Controller
 
         // Check expiration
         if (Carbon::now()->gt(Carbon::parse($record->expires_at))) {
-            DB::table('phone_verifications')->where('phone', $request->phone)->delete();
+            DB::table('phone_verifications')->where('phone', $phone)->delete();
             return $this->errorResponse('errors.reset_code_expired', [], 400);
         }
 
         // Update Password
-        $user = User::where('phone', $request->phone)->first();
         $user->forceFill([
             'password' => Hash::make($request->password)
         ])->save();
 
         // Delete token
-        DB::table('phone_verifications')->where('phone', $request->phone)->delete();
+        DB::table('phone_verifications')->where('phone', $phone)->delete();
 
         // Log the password reset activity
         activity('user')

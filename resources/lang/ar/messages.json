@@ -150,7 +150,8 @@
         "voucher_module_restricted": "هذه القسيمة صالحة فقط لمنتجات :module. سلة مشترياتك لا تحتوي على أي منتجات من هذا القسم.",
         "address_outside_service_area": "عذراً، نحن لا نوفر خدمة التوصيل لهذه المنطقة حالياً.",
         "voucher_invalid_time": "متاح فقط بعد الساعة 9:00 مساءً.",
-        "voucher_restricted_products": "لا يمكن استخدام أكواد الخصم مع منتج أو أكثر في سلتك."
+        "voucher_restricted_products": "لا يمكن استخدام أكواد الخصم مع منتج أو أكثر في سلتك.",
+        "phone_not_found": "رقم الهاتف غير مسجل"
     },
     "validation": {
         "required": "حقل :attribute مطلوب",
