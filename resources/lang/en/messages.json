@@ -150,7 +150,8 @@
         "voucher_module_restricted": "This voucher is only valid for :module products. Your cart does not contain any products from this module.",
         "address_outside_service_area": "Sorry, we do not currently deliver to this area.",
         "voucher_invalid_time": "Only available after 9:00 PM.",
-        "voucher_restricted_products": "Promo codes cannot be used with one or more products in your cart."
+        "voucher_restricted_products": "Promo codes cannot be used with one or more products in your cart.",
+        "phone_not_found": "Phone number not found"
     },
     "validation": {
         "required": "The :attribute field is required",
@@ -228,7 +229,10 @@
         "quantity_limit_exceeded": "Quantity limit exceeded",
         "max_quantity_per_item": "You cannot add more of this item",
         "product_unavailable": "Product is no longer available",
-        "store_unavailable": "Store is not available"
+        "store_unavailable": "Store is not available",
+        "stock_exceeded_add": "Cannot add more than available stock for ':name' (:stock)",
+        "stock_exceeded_update": "Cannot update quantity to more than available stock for ':name' (:stock)",
+        "out_of_stock": "Product ':name' is out of stock"
     },
     "order": {
         "placed_successfully": "Order placed successfully",

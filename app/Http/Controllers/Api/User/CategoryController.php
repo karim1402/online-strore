@@ -79,8 +79,7 @@ class CategoryController extends Controller
                                 $q->select('id', 'name_en', 'name_ar', 'status');
                             }])
                             ->withExists('productOptions')
-                            ->orderBy('sort_order', 'asc')
-                            ->limit(20);
+                            ->orderBy('sort_order', 'asc');
                     }])
                     ->orderBy('sort_order', 'asc');
             }, 'products' => function ($query) {
@@ -89,8 +88,7 @@ class CategoryController extends Controller
                     ->with(['primaryImage', 'store' => function($q) {
                         $q->select('id', 'name_en', 'name_ar', 'status');
                     }])
-                    ->orderBy('sort_order', 'asc')
-                    ->limit(20);
+                    ->orderBy('sort_order', 'asc');
             }])
             ->first();
 
@@ -277,8 +275,7 @@ class CategoryController extends Controller
                     ->with(['primaryImage', 'store' => function($q) {
                         $q->select('id', 'name_en', 'name_ar', 'status');
                     }])
-                    ->orderBy('sort_order', 'asc')
-                    ->limit(20);
+                    ->orderBy('sort_order', 'asc');
             }, 'children' => function ($q) {
                 $q->active()->with(['products' => function ($pq) {
                     $pq->active()
@@ -286,8 +283,7 @@ class CategoryController extends Controller
                             $sq->select('id', 'name_en', 'name_ar', 'status');
                         }])
                         ->withExists('productOptions')
-                        ->orderBy('sort_order', 'asc')
-                        ->limit(20);
+                        ->orderBy('sort_order', 'asc');
                 }]);
             }])
             ->orderBy('sort_order', 'asc')

@@ -32,38 +32,38 @@ class AuthController extends Controller
      */
     public function sendOtp(Request $request): JsonResponse
     {
-        // Check if the phone belongs to a soft-deleted account before running unique validation
-        if ($request->filled('phone') && User::onlyTrashed()->where('phone', $request->phone)->exists()) {
-            return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
-        }
-
-        // If phone starts with "2", strip it and check if that number already exists
-        if ($request->filled('phone') && str_starts_with($request->phone, '2')) {
-            $phoneWithout2 = substr($request->phone, 1);
-            if (User::where('phone', $phoneWithout2)->exists()) {
-                $fakeValidator = ValidationService::make(['phone' => $phoneWithout2], ['phone' => 'required|string|unique:users,phone']);
-                $fakeValidator->fails();
-                return $this->validationErrorWithFirstMessage($fakeValidator);
-            }
-            if (User::onlyTrashed()->where('phone', $phoneWithout2)->exists()) {
-                return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
-            }
-        }
-
         $validator = ValidationService::make($request->all(), [
-            'phone' => 'required|string|min:10|unique:users,phone',
+            'phone' => 'required|string|min:10',
         ]);
 
         if ($validator->fails()) {
             return $this->validationErrorWithFirstMessage($validator);
         }
 
+        // Normalize phone: strip leading "2" (Egyptian country code)
+        $phone = $request->phone;
+        if (str_starts_with($phone, '2')) {
+            $phone = substr($phone, 1);
+        }
+
+        // Check if the phone belongs to a soft-deleted account
+        if (User::onlyTrashed()->where('phone', $phone)->exists()) {
+            return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
+        }
+
+        // Check uniqueness with normalized phone
+        if (User::where('phone', $phone)->exists()) {
+            $fakeValidator = ValidationService::make(['phone' => $phone], ['phone' => 'required|string|unique:users,phone']);
+            $fakeValidator->fails();
+            return $this->validationErrorWithFirstMessage($fakeValidator);
+        }
+
         // Generate 4-digit OTP
         $code = rand(1000, 9999);
 
-        // Store or update in phone_verifications table
+        // Store or update in phone_verifications table using normalized phone
         \Illuminate\Support\Facades\DB::table('phone_verifications')->updateOrInsert(
-            ['phone' => $request->phone],
+            ['phone' => $phone],
             [
                 'code' => $code,
                 'expires_at' => Carbon::now()->addMinutes(15),
@@ -72,7 +72,7 @@ class AuthController extends Controller
             ]
         );
 
-        // Send OTP via SMS
+        // Send OTP via SMS (use original phone for delivery)
         try {
             \App\Services\SmsMisrService::sendOtp($request->phone, $code);
         } catch (\Exception $e) {
@@ -88,16 +88,11 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
-        // Check if the phone belongs to a soft-deleted account before running unique validation
-        if ($request->filled('phone') && User::onlyTrashed()->where('phone', $request->phone)->exists()) {
-            return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
-        }
-
         $validator = ValidationService::make($request->all(), [
             'name' => 'required|string|between:2,100',
             'email' => 'nullable|string|email|max:100|unique:users',
             'password' => 'required|string|min:6',
-            'phone' => 'required|string|min:10|unique:users,phone',
+            'phone' => 'required|string|min:10',
             'otp' => 'nullable|string|size:4',
         ]);
 
@@ -105,10 +100,28 @@ class AuthController extends Controller
             return $this->validationErrorWithFirstMessage($validator);
         }
 
+        // Normalize phone: strip leading "2" (Egyptian country code)
+        $phone = $request->phone;
+        if (str_starts_with($phone, '2')) {
+            $phone = substr($phone, 1);
+        }
+
+        // Check if the phone belongs to a soft-deleted account
+        if (User::onlyTrashed()->where('phone', $phone)->exists()) {
+            return $this->errorResponse('errors.account_deleted_contact_support', [], 403);
+        }
+
+        // Check uniqueness with normalized phone
+        if (User::where('phone', $phone)->exists()) {
+            $fakeValidator = ValidationService::make(['phone' => $phone], ['phone' => 'required|string|unique:users,phone']);
+            $fakeValidator->fails();
+            return $this->validationErrorWithFirstMessage($fakeValidator);
+        }
+
         if ($request->filled('otp')) {
-            // Verify OTP from phone_verifications table
+            // Verify OTP from phone_verifications table using normalized phone
             $verification = \Illuminate\Support\Facades\DB::table('phone_verifications')
-                ->where('phone', $request->phone)
+                ->where('phone', $phone)
                 ->first();
 
             if (!$verification) {
@@ -124,18 +137,18 @@ class AuthController extends Controller
             }
         }
 
-        // Create user with verified email
+        // Create user with normalized phone
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email??null,
             'password' => Hash::make($request->password),
-            'phone' => $request->phone,
+            'phone' => $phone,
             'email_verified_at' => Carbon::now(),
         ]);
 
-        // Delete the verification record
+        // Delete the verification record using normalized phone
         \Illuminate\Support\Facades\DB::table('phone_verifications')
-            ->where('phone', $request->phone)
+            ->where('phone', $phone)
             ->delete();
 
         // Log the registration activity
@@ -177,8 +190,12 @@ class AuthController extends Controller
             // Input is an email
             $credentials = ['email' => $loginField, 'password' => $request->password];
         } else {
-            // Input is a phone number
-            $credentials = ['phone' => $loginField, 'password' => $request->password];
+            // Input is a phone number — normalize by stripping leading "2"
+            $phone = $loginField;
+            if (str_starts_with($phone, '2')) {
+                $phone = substr($phone, 1);
+            }
+            $credentials = ['phone' => $phone, 'password' => $request->password];
         }
 
         if (!$token = Auth::guard('api')->attempt($credentials)) {

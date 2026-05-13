@@ -138,9 +138,12 @@ class CartController extends Controller
                 // Check stock for SME products
                 if ($product->module_id == 31 && $product->stock !== null && $newQuantity > $product->stock) {
                     DB::rollBack();
+                    $locale = app()->getLocale();
+                    $productName = ($locale === 'ar' ? $product->name_ar : $product->name_en)
+                        ?: ($product->name_en ?: $product->name_ar);
                     return response()->json([
                         'success' => false,
-                        'message' => "Cannot add more than available stock ({$product->stock})",
+                        'message' => LocalizationService::getMessage('cart.stock_exceeded_add', ['name' => $productName, 'stock' => $product->stock]),
                     ], 422);
                 }
                 
@@ -172,13 +175,16 @@ class CartController extends Controller
                 }
 
                 // Check stock for SME products
-                // if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-                //     DB::rollBack();
-                //     return response()->json([
-                //         'success' => false,
-                //         'message' => "Cannot add more than available stock ({$product->stock})",
-                //     ], 422);
-                // }
+                if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
+                    DB::rollBack();
+                    $locale = app()->getLocale();
+                    $productName = ($locale === 'ar' ? $product->name_ar : $product->name_en)
+                        ?: ($product->name_en ?: $product->name_ar);
+                    return response()->json([
+                        'success' => false,
+                        'message' => LocalizationService::getMessage('cart.stock_exceeded_add', ['name' => $productName, 'stock' => $product->stock]),
+                    ], 422);
+                }
 
                 // Create new cart item
                 $cartItem = CartItem::create([
@@ -294,12 +300,15 @@ class CartController extends Controller
 
         $product = $cartItem->product;
         // Check stock for SME products
-        // if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-        //     return response()->json([
-        //         'success' => false,
-        //         'message' => "Cannot update quantity to more than available stock ({$product->stock})",
-        //     ], 422);
-        // }
+        if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
+            $locale = app()->getLocale();
+            $productName = ($locale === 'ar' ? $product->name_ar : $product->name_en)
+                ?: ($product->name_en ?: $product->name_ar);
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('cart.stock_exceeded_update', ['name' => $productName, 'stock' => $product->stock]),
+            ], 422);
+        }
 
         // Update quantity
         $cartItem->update(['quantity' => $request->quantity]);
@@ -378,13 +387,16 @@ class CartController extends Controller
             // Update quantity if provided
             if ($request->has('quantity')) {
                 // Check stock for SME products
-                // if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-                //     DB::rollBack();
-                //     return response()->json([
-                //         'success' => false,
-                //         'message' => "Cannot update quantity to more than available stock ({$product->stock})",
-                //     ], 422);
-                // }
+                if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
+                    DB::rollBack();
+                    $locale = app()->getLocale();
+                    $productName = ($locale === 'ar' ? $product->name_ar : $product->name_en)
+                        ?: ($product->name_en ?: $product->name_ar);
+                    return response()->json([
+                        'success' => false,
+                        'message' => LocalizationService::getMessage('cart.stock_exceeded_update', ['name' => $productName, 'stock' => $product->stock]),
+                    ], 422);
+                }
 
                 $cartItem->update(['quantity' => $request->quantity]);
             }
@@ -593,13 +605,16 @@ class CartController extends Controller
         DB::beginTransaction();
         try {
             // Check stock for SME products
-            // if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
-            //     DB::rollBack();
-            //     return response()->json([
-            //         'success' => false,
-            //         'message' => "Cannot add more than available stock ({$product->stock})",
-            //     ], 422);
-            // }
+            if ($product->module_id == 31 && $product->stock !== null && $request->quantity > $product->stock) {
+                DB::rollBack();
+                $locale = app()->getLocale();
+                $productName = ($locale === 'ar' ? $product->name_ar : $product->name_en)
+                    ?: ($product->name_en ?: $product->name_ar);
+                return response()->json([
+                    'success' => false,
+                    'message' => LocalizationService::getMessage('cart.stock_exceeded_add', ['name' => $productName, 'stock' => $product->stock]),
+                ], 422);
+            }
 
             // Delete old cart
             Cart::where('user_id', $user->id)->delete();
