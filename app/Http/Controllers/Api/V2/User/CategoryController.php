@@ -45,7 +45,7 @@ class CategoryController extends Controller
                 'name_ar' => $category->name_ar,
                 'description_en' => $category->description_en,
                 'description_ar' => $category->description_ar,
-                'image_url' => $category->image_url,
+                'image_url' => $category->image_v2_url ?? $category->image_url,
                 'is_active' => $category->is_active,
                 'sort_order' => $category->sort_order,
             ];
@@ -106,7 +106,7 @@ class CategoryController extends Controller
             'name_ar' => $category->name_ar,
             'description_en' => $category->description_en,
             'description_ar' => $category->description_ar,
-            'image_url' => $category->image_url,
+            'image_url' => $category->image_v2_url ?? $category->image_url,
             'is_active' => $category->is_active,
             'sort_order' => $category->sort_order,
             'products' => $category->products->map(function ($product) {
@@ -297,7 +297,7 @@ class CategoryController extends Controller
                 'name_ar' => $category->name_ar,
                 'description_en' => $category->description_en,
                 'description_ar' => $category->description_ar,
-                'image_url' => $category->image_url,
+                'image_url' => $category->image_v2_url ?? $category->image_url,
                 'sort_order' => $category->sort_order,
                 'products' => $category->products->map(function ($product) {
                     return [

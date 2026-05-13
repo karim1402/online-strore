@@ -61,6 +61,8 @@ class CategoryController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->paginate(15);
 
+            $categories->through(fn($c) => $this->transformCategory($c));
+
             return $this->successResponse($categories, 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -86,7 +88,7 @@ class CategoryController extends Controller
                 return $this->errorResponse('errors.not_found', [], 404);
             }
 
-            return $this->successResponse($category, 'success.data_retrieved');
+            return $this->successResponse($this->transformCategory($category), 'success.data_retrieved');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
@@ -125,7 +127,7 @@ class CategoryController extends Controller
             // Handle image upload
             $imagePath = null;
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('categories', 'public');
+                $imagePath = $request->file('image')->store('categories/v2', 'public');
             }
 
             $category = Category::create([
@@ -135,7 +137,7 @@ class CategoryController extends Controller
                 'name_ar' => $request->name_ar,
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
-                'image' => $imagePath,
+                'image_v2' => $imagePath,
                 'is_active' => $request->boolean('is_active', true),
                 'sort_order' => $request->get('sort_order', 0),
             ]);
@@ -144,10 +146,10 @@ class CategoryController extends Controller
 
             DB::commit();
 
-            return $this->successResponse($category, 'success.category_created', [], 201);
+            return $this->successResponse($this->transformCategory($category), 'success.category_created', [], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             // Clean up uploaded image if category creation failed
             if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
                 Storage::disk('public')->delete($imagePath);
@@ -188,13 +190,13 @@ class CategoryController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Delete old image
-                if ($category->image && Storage::disk('public')->exists($category->image)) {
-                    Storage::disk('public')->delete($category->image);
+                // Delete old V2 image
+                if ($category->image_v2 && Storage::disk('public')->exists($category->image_v2)) {
+                    Storage::disk('public')->delete($category->image_v2);
                 }
-                
-                // Upload new image
-                $category->image = $request->file('image')->store('categories', 'public');
+
+                // Upload new image to V2 folder
+                $category->image_v2 = $request->file('image')->store('categories/v2', 'public');
             }
 
             // Handle parent_id update
@@ -231,7 +233,7 @@ class CategoryController extends Controller
 
             DB::commit();
 
-            return $this->successResponse($category, 'success.category_updated');
+            return $this->successResponse($this->transformCategory($category), 'success.category_updated');
         } catch (\Exception $e) {
             DB::rollBack();
             return $this->errorResponse('errors.server_error', [], 500);
@@ -252,9 +254,9 @@ class CategoryController extends Controller
 
             DB::beginTransaction();
 
-            // Delete category image
-            if ($category->image && Storage::disk('public')->exists($category->image)) {
-                Storage::disk('public')->delete($category->image);
+            // Delete category V2 image
+            if ($category->image_v2 && Storage::disk('public')->exists($category->image_v2)) {
+                Storage::disk('public')->delete($category->image_v2);
             }
 
             $category->delete();
@@ -284,7 +286,7 @@ class CategoryController extends Controller
             $category->save();
             $category->load(['module:id,name_en,name_ar', 'parent', 'children', 'products']);
 
-            return $this->successResponse($category, 'success.status_updated');
+            return $this->successResponse($this->transformCategory($category), 'success.status_updated');
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
@@ -335,6 +337,8 @@ class CategoryController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->paginate($request->get('per_page', 1500));
 
+            $categories->through(fn($c) => $this->transformCategory($c));
+
             return $this->successResponse([
                 'module' => $module,
                 'categories' => $categories
@@ -374,5 +378,12 @@ class CategoryController extends Controller
             DB::rollBack();
             return $this->errorResponse('errors.server_error', [], 500);
         }
+    }
+
+    private function transformCategory(Category $category): array
+    {
+        $data = $category->toArray();
+        $data['image_url'] = $category->image_v2_url ?? $category->image_url;
+        return $data;
     }
 }

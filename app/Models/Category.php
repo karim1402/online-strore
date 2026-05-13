@@ -23,6 +23,7 @@ class Category extends Model
         'description_en',
         'description_ar',
         'image',
+        'image_v2',
         'is_active',
         'sort_order',
     ];
@@ -122,6 +123,14 @@ class Category extends Model
     {
         if ($this->image) {
             return Storage::disk('public')->url($this->image);
+        }
+        return null;
+    }
+
+    public function getImageV2UrlAttribute()
+    {
+        if ($this->image_v2) {
+            return Storage::disk('public')->url($this->image_v2);
         }
         return null;
     }

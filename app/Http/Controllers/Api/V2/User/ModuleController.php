@@ -32,7 +32,7 @@ class ModuleController extends Controller
                 'name_ar' => $module->name_ar,
                 'description_en' => $module->description_en,
                 'description_ar' => $module->description_ar,
-                'image_url' => (App::getLocale() === 'ar' && $module->image_ar) ? $module->image_ar_url : $module->image_url,
+                'image_url' => (App::getLocale() === 'ar' && ($module->image_ar_v2 ?? $module->image_ar)) ? ($module->image_ar_v2_url ?? $module->image_ar_url) : ($module->image_v2_url ?? $module->image_url),
                 'status' => $module->status,
                 'sort_order' => $module->sort_order,
             ];
@@ -78,7 +78,7 @@ class ModuleController extends Controller
             'name_ar' => $module->name_ar,
             'description_en' => $module->description_en,
             'description_ar' => $module->description_ar,
-            'image_url' => (App::getLocale() === 'ar' && $module->image_ar) ? $module->image_ar_url : $module->image_url,
+            'image_url' => (App::getLocale() === 'ar' && ($module->image_ar_v2 ?? $module->image_ar)) ? ($module->image_ar_v2_url ?? $module->image_ar_url) : ($module->image_v2_url ?? $module->image_url),
             'status' => $module->status,
             'sort_order' => $module->sort_order,
         ];

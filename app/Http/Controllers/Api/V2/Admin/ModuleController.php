@@ -44,6 +44,8 @@ class ModuleController extends Controller
 
             $modules = $query->ordered()->paginate($perPage);
 
+            $modules->through(fn($m) => $this->transformModule($m));
+
             return $this->successResponse($modules, 'success.modules_retrieved');
 
         } catch (\Exception $e) {
@@ -79,19 +81,21 @@ class ModuleController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('modules', 'public');
-                $data['image'] = $imagePath;
+                $imagePath = $request->file('image')->store('modules/v2', 'public');
+                $data['image_v2'] = $imagePath;
+                unset($data['image']);
             }
 
             // Handle Arabic image upload
             if ($request->hasFile('image_ar')) {
-                $imageArPath = $request->file('image_ar')->store('modules', 'public');
-                $data['image_ar'] = $imageArPath;
+                $imageArPath = $request->file('image_ar')->store('modules/v2', 'public');
+                $data['image_ar_v2'] = $imageArPath;
+                unset($data['image_ar']);
             }
 
             $module = Module::create($data);
 
-            return $this->successResponse($module, 'success.module_created', [], 201);
+            return $this->successResponse($this->transformModule($module), 'success.module_created', [], 201);
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -109,7 +113,7 @@ class ModuleController extends Controller
         try {
             $module = Module::findOrFail($id);
 
-            return $this->successResponse($module, 'success.module_retrieved');
+            return $this->successResponse($this->transformModule($module), 'success.module_retrieved');
 
         } catch (\Exception $e) {
             return $this->notFoundResponse('errors.resource_not_found');
@@ -147,29 +151,31 @@ class ModuleController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Delete old image if exists
-                if ($module->image && Storage::disk('public')->exists($module->image)) {
-                    Storage::disk('public')->delete($module->image);
+                // Delete old V2 image if exists
+                if ($module->image_v2 && Storage::disk('public')->exists($module->image_v2)) {
+                    Storage::disk('public')->delete($module->image_v2);
                 }
-                
-                $imagePath = $request->file('image')->store('modules', 'public');
-                $data['image'] = $imagePath;
+
+                $imagePath = $request->file('image')->store('modules/v2', 'public');
+                $data['image_v2'] = $imagePath;
+                unset($data['image']);
             }
 
             // Handle Arabic image upload
             if ($request->hasFile('image_ar') && $request->file('image_ar')->isValid()) {
-                // Delete old image if exists
-                if ($module->image_ar && Storage::disk('public')->exists($module->image_ar)) {
-                    Storage::disk('public')->delete($module->image_ar);
+                // Delete old V2 Arabic image if exists
+                if ($module->image_ar_v2 && Storage::disk('public')->exists($module->image_ar_v2)) {
+                    Storage::disk('public')->delete($module->image_ar_v2);
                 }
-                
-                $imageArPath = $request->file('image_ar')->store('modules', 'public');
-                $data['image_ar'] = $imageArPath;
+
+                $imageArPath = $request->file('image_ar')->store('modules/v2', 'public');
+                $data['image_ar_v2'] = $imageArPath;
+                unset($data['image_ar']);
             }
 
             $module->update($data);
 
-            return $this->successResponse($module->fresh(), 'success.module_updated');
+            return $this->successResponse($this->transformModule($module->fresh()), 'success.module_updated');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -187,14 +193,14 @@ class ModuleController extends Controller
         try {
             $module = Module::findOrFail($id);
 
-            // Delete associated image if exists
-            if ($module->image && Storage::disk('public')->exists($module->image)) {
-                Storage::disk('public')->delete($module->image);
+            // Delete associated V2 image if exists
+            if ($module->image_v2 && Storage::disk('public')->exists($module->image_v2)) {
+                Storage::disk('public')->delete($module->image_v2);
             }
 
-            // Delete associated Arabic image if exists
-            if ($module->image_ar && Storage::disk('public')->exists($module->image_ar)) {
-                Storage::disk('public')->delete($module->image_ar);
+            // Delete associated V2 Arabic image if exists
+            if ($module->image_ar_v2 && Storage::disk('public')->exists($module->image_ar_v2)) {
+                Storage::disk('public')->delete($module->image_ar_v2);
             }
 
             $module->delete();
@@ -218,7 +224,7 @@ class ModuleController extends Controller
             $module = Module::findOrFail($id);
             $module->update(['status' => !$module->status]);
 
-            return $this->successResponse($module->fresh(), 'success.module_status_updated');
+            return $this->successResponse($this->transformModule($module->fresh()), 'success.module_status_updated');
 
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
@@ -240,5 +246,13 @@ class ModuleController extends Controller
         } catch (\Exception $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
+    }
+
+    private function transformModule(Module $module): array
+    {
+        $data = $module->toArray();
+        $data['image_url'] = $module->image_v2_url ?? $module->image_url;
+        $data['image_ar_url'] = $module->image_ar_v2_url ?? $module->image_ar_url;
+        return $data;
     }
 }
