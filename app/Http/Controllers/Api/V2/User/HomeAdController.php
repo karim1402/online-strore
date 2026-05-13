@@ -16,7 +16,7 @@ class HomeAdController extends Controller
      */
     public function index(): JsonResponse
     {
-        $ads = HomeAd::active()->ordered()->get();
+        $ads = HomeAd::active()->ordered()->get()->map(fn($ad) => $this->transformAd($ad));
 
         $data = [
             'banners' => $ads->where('type', 'banner')->values(),
@@ -75,5 +75,12 @@ class HomeAdController extends Controller
             'products' => $localizedProducts,
             'count' => count($localizedProducts),
         ]);
+    }
+
+    private function transformAd(HomeAd $ad): array
+    {
+        $data = $ad->toArray();
+        $data['image_url'] = $ad->image_v2_url ?? $ad->image_url;
+        return $data;
     }
 }

@@ -15,6 +15,7 @@ class HomeAd extends Model
         'link_type',
         'module_id',
         'image',
+        'image_v2',
         'sort_order',
         'is_active',
     ];
@@ -65,6 +66,17 @@ class HomeAd extends Model
                 return $this->image;
             }
             return Storage::disk('public')->url($this->image);
+        }
+        return null;
+    }
+
+    public function getImageV2UrlAttribute(): ?string
+    {
+        if ($this->image_v2) {
+            if (filter_var($this->image_v2, FILTER_VALIDATE_URL)) {
+                return $this->image_v2;
+            }
+            return Storage::disk('public')->url($this->image_v2);
         }
         return null;
     }

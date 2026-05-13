@@ -31,6 +31,8 @@ class HomeAdController extends Controller
 
         $ads = $query->paginate($request->get('per_page', 15));
 
+        $ads->through(fn($ad) => $this->transformAd($ad));
+
         return $this->successResponse($ads);
     }
 
@@ -64,8 +66,9 @@ class HomeAdController extends Controller
 
         // Handle Image Upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('home_ads', 'public');
-            $data['image'] = $path;
+            $path = $request->file('image')->store('home_ads/v2', 'public');
+            $data['image_v2'] = $path;
+            unset($data['image']);
         }
 
         $ad = HomeAd::create($data);
@@ -74,7 +77,7 @@ class HomeAdController extends Controller
             $ad->products()->sync($request->product_ids);
         }
 
-        return $this->successResponse($ad->load(['module', 'products']), 'success.created', [], 201);
+        return $this->successResponse($this->transformAd($ad->load(['module', 'products'])), 'success.created', [], 201);
     }
 
     /**
@@ -88,7 +91,7 @@ class HomeAdController extends Controller
             return $this->notFoundResponse();
         }
 
-        return $this->successResponse($ad);
+        return $this->successResponse($this->transformAd($ad));
     }
 
     /**
@@ -128,13 +131,14 @@ class HomeAdController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            // Delete old image
-            if ($ad->image && Storage::disk('public')->exists($ad->image)) {
-                Storage::disk('public')->delete($ad->image);
+            // Delete old V2 image
+            if ($ad->image_v2 && Storage::disk('public')->exists($ad->image_v2)) {
+                Storage::disk('public')->delete($ad->image_v2);
             }
 
-            $path = $request->file('image')->store('home_ads', 'public');
-            $data['image'] = $path;
+            $path = $request->file('image')->store('home_ads/v2', 'public');
+            $data['image_v2'] = $path;
+            unset($data['image']);
         }
 
         $ad->update($data);
@@ -152,7 +156,7 @@ class HomeAdController extends Controller
             $ad->products()->detach();
         }
 
-        return $this->successResponse($ad->load(['module', 'products']), 'success.updated');
+        return $this->successResponse($this->transformAd($ad->load(['module', 'products'])), 'success.updated');
     }
 
     /**
@@ -188,6 +192,13 @@ class HomeAdController extends Controller
 
         $ad->update(['is_active' => !$ad->is_active]);
 
-        return $this->successResponse($ad->load(['module', 'products']), 'success.updated');
+        return $this->successResponse($this->transformAd($ad->load(['module', 'products'])), 'success.updated');
+    }
+
+    private function transformAd(HomeAd $ad): array
+    {
+        $data = $ad->toArray();
+        $data['image_url'] = $ad->image_v2_url ?? $ad->image_url;
+        return $data;
     }
 }
