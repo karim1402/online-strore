@@ -1,10 +1,44 @@
 <?php
 
-namespace App\Http\Controllers\Api\V2\User;
+namespace App\Http\Controllers\Api\User;
 
-use App\Http\Controllers\Api\User\WorkingHoursController as V1WorkingHoursController;
+use App\Http\Controllers\Controller;
+use App\Models\AppSetting;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 
-class WorkingHoursController extends V1WorkingHoursController
+class WorkingHoursController extends Controller
 {
-    // Inherits all v1 methods. Override below as needed.
+    use ApiResponse;
+
+    /**
+     * Check if the app is currently open.
+     * Uses Egypt timezone (Africa/Cairo).
+     */
+    public function index(): JsonResponse
+    {
+        $hours = AppSetting::getWorkingHours();
+        $now = Carbon::now(AppSetting::TIMEZONE);
+        $isOpen = AppSetting::isOpen();
+
+        $messageKey = $isOpen
+            ? 'working_hours.service_available'
+            : 'working_hours.service_not_available';
+
+        $replace = $isOpen
+            ? []
+            : [
+                'opening_time' => Carbon::parse($hours['opening_time'])->format('g:i A'),
+                'closing_time' => Carbon::parse($hours['closing_time'])->format('g:i A'),
+            ];
+
+        return $this->successResponse([
+            'is_open' => $isOpen,
+            'opening_time' => $hours['opening_time'],
+            'closing_time' => $hours['closing_time'],
+            'current_time' => $now->format('H:i'),
+            'timezone' => AppSetting::TIMEZONE,
+        ], $messageKey, $replace);
+    }
 }

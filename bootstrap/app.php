@@ -27,6 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->prefix('api/v2')
                 ->group(function () {
                     require base_path('routes/api/v2/user.php');
+                    require base_path('routes/api/v2/admin.php');
                 });
         }
     )

@@ -1,0 +1,988 @@
+<?php
+
+namespace App\Http\Controllers\Api\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\CartItem;
+use App\Models\ProductImage;
+use App\Models\ProductOption;
+use App\Models\ProductOptionValue;
+use App\Models\Store;
+use App\Models\Category;
+use App\Models\OptionGroup;
+use App\Models\OptionValue;
+use App\Services\ValidationService;
+use App\Traits\ApiResponse;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ProductsImport;
+use App\Imports\FoodProductsImport;
+use App\Imports\UpdateProductImagesImport;
+
+class ProductController extends Controller
+{
+    use ApiResponse;
+
+    /**
+     * Get all products with optional filtering
+     */
+    public function index(Request $request): JsonResponse
+    {
+
+        try {
+            $query = Product::where('id','!=', 74 )->with(['store:id,name_en,name_ar', 'category:id,name_en,name_ar', 'subcategory:id,name_en,name_ar', 'images']);
+
+            // Filter by store
+            if ($request->filled('store_id')) {
+                $query->where('store_id', $request->store_id);
+            }
+
+            // Filter by category
+            if ($request->filled('category_id')) {
+                $query->where('category_id', $request->category_id);
+            }
+
+            // Filter by subcategory
+            if ($request->filled('subcategory_id')) {
+                $query->where('subcategory_id', $request->subcategory_id);
+            }
+
+            // Filter by module (through category)
+            if ($request->filled('module_id')) {
+                $query->whereHas('category', function ($q) use ($request) {
+                    $q->where('module_id', $request->module_id);
+                });
+            }
+
+            // Filter by active status
+            if ($request->has('is_active')) {
+                $query->where('is_active', $request->boolean('is_active'));
+            }
+
+            // Search by name
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where(function ($q) use ($search) {
+                    $q->where('name_en', 'like', "%{$search}%")
+                        ->orWhere('name_ar', 'like', "%{$search}%")
+                        ->orWhere('search_keywords', 'like', "%{$search}%");
+                });
+            }
+
+            // Sort options
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+            
+            if (in_array($sortBy, ['created_at', 'base_price', 'view_count', 'sales_count', 'sort_order'])) {
+                $query->orderBy($sortBy, $sortOrder);
+            }
+
+            $products = $query->paginate($request->get('per_page', 15));
+
+            return $this->successResponse($products, 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Get a single product by ID
+     */
+    public function show($id): JsonResponse
+    {
+        try {
+            $product = Product::with([
+                'store:id,name_en,name_ar',
+                'category:id,name_en,name_ar',
+                'subcategory:id,name_en,name_ar',
+                'images',
+                'productOptions.optionGroup',
+                'productOptions.productOptionValues.optionValue',
+                'addons'
+            ])->find($id);
+
+            if (!$product) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            // Increment view count
+            $product->incrementViewCount();
+
+            return $this->successResponse($product, 'success.data_retrieved');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Create a new product
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $addon_ids = $request->input('addon_ids');
+
+        if (is_string($addon_ids)) {
+            $decoded = json_decode($addon_ids, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $addon_ids = $decoded;
+            } else {
+                $addon_ids = explode(',', $addon_ids);
+            }
+        }
+
+        $addon_ids = array_map('intval', (array) $addon_ids);
+
+        $request->merge([
+            'addon_ids' => $addon_ids,
+        ]);
+
+        Storage::put('test.txt', json_encode($request->addon_ids));
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'store_id' => 'nullable|integer|exists:stores,id',
+                'category_id' => 'required|integer|exists:categories,id',
+                'subcategory_id' => 'nullable|integer|exists:categories,id',
+                'name_en' => 'required|string|max:255',
+                'name_ar' => 'required|string|max:255',
+                'description_en' => 'nullable|string',
+                'description_ar' => 'nullable|string',
+                'search_keywords' => 'nullable|string',
+                'quantity_en' => 'nullable|string|max:255',
+                'quantity_ar' => 'nullable|string|max:255',
+                'stock' => 'nullable|integer|min:0',
+                'base_price' => 'required|numeric|min:0',
+                'offer_price' => 'nullable|numeric|min:0',
+                'is_active' => 'nullable|boolean',
+                'sort_order' => 'nullable|integer|min:0',
+                'metadata' => 'nullable|array',
+                'images' => 'required|array',
+                'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:2048',
+                'is_best_seller' => 'nullable|boolean',
+                'best_seller_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'primary_image_index' => 'nullable|integer|min:0',
+                'option_groups' => 'nullable|array',
+                'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
+                'option_groups.*.is_required' => 'nullable|boolean',
+                'option_groups.*.sort_order' => 'nullable|integer|min:0',
+                'option_groups.*.option_values' => 'nullable|array',
+                'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
+                'option_groups.*.option_values.*.price_type' => 'nullable|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
+                'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
+                'addon_ids' => 'nullable|array',
+                'addon_ids.*' => 'integer|exists:addons,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            // Verify store exists if provided
+            if ($request->filled('store_id')) {
+                $store = Store::find($request->store_id);
+                if (!$store) {
+                    return $this->errorResponse('errors.store_not_found', [], 404);
+                }
+            }
+
+            // Verify category exists
+            $category = Category::find($request->category_id);
+            if (!$category) {
+                return $this->errorResponse('errors.category_not_found', [], 404);
+            }
+
+            // Verify subcategory if provided
+            if ($request->filled('subcategory_id')) {
+                $subcategory = Category::where('id', $request->subcategory_id)
+                    ->where('parent_id', $request->category_id)
+                    ->first();
+                if (!$subcategory) {
+                    return $this->errorResponse('errors.subcategory_not_found_in_category', [], 404);
+                }
+            }
+
+            // Create product
+            $product = Product::create([
+                'store_id' => $request->store_id,
+                'category_id' => $request->category_id,
+                'subcategory_id' => $request->subcategory_id,
+                'name_en' => $request->name_en,
+                'name_ar' => $request->name_ar,
+                'description_en' => $request->description_en,
+                'description_ar' => $request->description_ar,
+                'search_keywords' => $request->search_keywords,
+                'quantity_en' => $request->quantity_en,
+                'quantity_ar' => $request->quantity_ar,
+                'stock' => $request->stock,
+                'base_price' => $request->base_price,
+                'offer_price' => ($request->offer_price < 1) ? null : $request->offer_price,
+                'is_active' => $request->boolean('is_active', true),
+                'sort_order' => $request->get('sort_order', 0),
+                'metadata' => $request->metadata,
+                'is_best_seller' => $request->boolean('is_best_seller', false),
+            ]);
+
+            // Handle Best Seller Image
+            if ($request->hasFile('best_seller_image')) {
+                $path = $request->file('best_seller_image')->store('products/bestseller', 'public');
+                $product->best_seller_image = $path;
+                $product->save();
+            }
+
+            // Handle image uploads
+            if ($request->hasFile('images')) {
+                $images = $request->file('images');
+                $primaryImageIndex = $request->has('primary_image_index') ? (int)$request->primary_image_index : 0;
+                
+                // Validate primary_image_index is within range
+                if ($primaryImageIndex < 0 || $primaryImageIndex >= count($images)) {
+                    $primaryImageIndex = 0;
+                }
+                
+                foreach ($images as $index => $image) {
+                    $imagePath = $image->store('products', 'public');
+                    
+                    // Check if this image index matches the primary_image_index
+                    $isPrimary = ($index == $primaryImageIndex);
+                    
+                    ProductImage::create([
+                        'product_id' => $product->id,
+                        'image_path' => $imagePath,
+                        'is_primary' => $isPrimary,
+                        'sort_order' => $index,
+                    ]);
+                }
+            }
+
+            // Handle option groups assignment
+            if ($request->filled('option_groups')) {
+                foreach ($request->option_groups as $optionGroup) {
+                    // Check if option group already assigned
+                    $productOption = ProductOption::where('product_id', $product->id)
+                        ->where('option_group_id', $optionGroup['option_group_id'])
+                        ->first();
+
+                    if (!$productOption) {
+                        $productOption = ProductOption::create([
+                            'product_id' => $product->id,
+                            'option_group_id' => $optionGroup['option_group_id'],
+                            'is_required' => $optionGroup['is_required'] ?? false,
+                            'sort_order' => $optionGroup['sort_order'] ?? 0,
+                        ]);
+                    }
+
+                    // Handle option values if provided
+                    if (isset($optionGroup['option_values']) && is_array($optionGroup['option_values'])) {
+                        foreach ($optionGroup['option_values'] as $optionValue) {
+                            // Check if option value belongs to this option group
+                            $valueExists = OptionValue::where('id', $optionValue['option_value_id'])
+                                ->where('option_group_id', $optionGroup['option_group_id'])
+                                ->exists();
+
+                            if ($valueExists) {
+                                // Check if not already assigned
+                                $povExists = ProductOptionValue::where('product_option_id', $productOption->id)
+                                    ->where('option_value_id', $optionValue['option_value_id'])
+                                    ->exists();
+
+                                if (!$povExists) {
+                                    ProductOptionValue::create([
+                                        'product_option_id' => $productOption->id,
+                                        'option_value_id' => $optionValue['option_value_id'],
+                                        'price_type' => 'fixed', // Always fixed
+                                        'price_value' => $optionValue['price_value'],
+                                        'is_available' => $optionValue['is_available'] ?? true,
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Handle addons assignment
+            if ($request->filled('addon_ids')) {
+                $product->addons()->sync($request->addon_ids);
+            }
+
+            $product->load(['store', 'category', 'subcategory', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
+
+            DB::commit();
+
+            return $this->successResponse($product, 'success.product_created', [], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Update a product
+     */
+    public function update(Request $request, $id): JsonResponse
+    {
+        try {
+            $product = Product::find($id);
+
+            if (!$product) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            $validator = ValidationService::make($request->all(), [
+                'store_id' => 'nullable|integer|exists:stores,id',
+                'category_id' => 'nullable|integer|exists:categories,id',
+                'subcategory_id' => 'nullable|integer|exists:categories,id',
+                'name_en' => 'nullable|string|max:255',
+                'name_ar' => 'nullable|string|max:255',
+                'description_en' => 'nullable|string',
+                'description_ar' => 'nullable|string',
+                'search_keywords' => 'nullable|string',
+                'quantity_en' => 'nullable|string|max:255',
+                'quantity_ar' => 'nullable|string|max:255',
+                'stock' => 'nullable|integer|min:0',
+                'base_price' => 'nullable|numeric|min:0',
+                'offer_price' => 'nullable|numeric|min:0',
+                'is_active' => 'nullable|boolean',
+                'sort_order' => 'nullable|integer|min:0',
+                'metadata' => 'nullable|array',
+                'option_groups' => 'nullable|array',
+                'is_best_seller' => 'nullable|boolean',
+                'best_seller_image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'option_groups.*.option_group_id' => 'required_with:option_groups|integer|exists:option_groups,id',
+                'option_groups.*.is_required' => 'nullable|boolean',
+                'option_groups.*.sort_order' => 'nullable|integer|min:0',
+                'option_groups.*.option_values' => 'nullable|array',
+                'option_groups.*.option_values.*.option_value_id' => 'required_with:option_groups.*.option_values|integer|exists:option_values,id',
+                'option_groups.*.option_values.*.price_type' => 'nullable|in:fixed,additional,percentage',
+                'option_groups.*.option_values.*.price_value' => 'required_with:option_groups.*.option_values|numeric|min:0',
+                'option_groups.*.option_values.*.is_available' => 'nullable|boolean',
+                'addon_ids' => 'nullable|array',
+                'addon_ids.*' => 'integer|exists:addons,id',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            // Update store_id if provided
+            if ($request->has('store_id')) {
+                if ($request->store_id) {
+                    $store = Store::find($request->store_id);
+                    if (!$store) {
+                        return $this->errorResponse('errors.store_not_found', [], 404);
+                    }
+                }
+                $product->store_id = $request->store_id;
+            }
+
+            // Verify category and subcategory if changing
+            if ($request->filled('category_id') || $request->has('subcategory_id')) {
+                $categoryId = $request->filled('category_id') ? $request->category_id : $product->category_id;
+                
+                // If category is changing and no subcategory_id is provided, clear it
+                // If category is NOT changing, keep old subcategory unless explicitly provided
+                if ($request->filled('category_id') && !$request->has('subcategory_id')) {
+                    $subcategoryId = null;
+                } else {
+                    $subcategoryId = $request->has('subcategory_id') ? $request->subcategory_id : $product->subcategory_id;
+                }
+
+                $category = Category::find($categoryId);
+                if (!$category) {
+                    return $this->errorResponse('errors.category_not_found', [], 404);
+                }
+
+                if ($subcategoryId) {
+                    $subcategory = Category::where('id', $subcategoryId)
+                        ->where('parent_id', $categoryId)
+                        ->first();
+                    if (!$subcategory) {
+                        return $this->errorResponse('errors.subcategory_not_found_in_category', [], 404);
+                    }
+                }
+
+                $product->category_id = $categoryId;
+                $product->subcategory_id = $subcategoryId;
+            }
+
+            // Update product fields
+            if ($request->filled('name_en')) {
+                $product->name_en = $request->name_en;
+            }
+            if ($request->filled('name_ar')) {
+                $product->name_ar = $request->name_ar;
+            }
+            if ($request->has('description_en')) {
+                $product->description_en = $request->description_en;
+            }
+            if ($request->has('description_ar')) {
+                $product->description_ar = $request->description_ar;
+            }
+            if ($request->has('search_keywords')) {
+                $product->search_keywords = $request->search_keywords;
+            }
+            if ($request->has('quantity_en')) {
+                $product->quantity_en = $request->quantity_en;
+            }
+            if ($request->has('quantity_ar')) {
+                $product->quantity_ar = $request->quantity_ar;
+            }
+            if ($request->has('stock')) {
+                $product->stock = $request->stock;
+            }
+            if ($request->filled('base_price')) {
+                $product->base_price = $request->base_price;
+            }
+            if ($request->has('offer_price')) {
+                $product->offer_price = ($request->offer_price < 1) ? null : $request->offer_price;
+            }
+            if ($request->has('is_active')) {
+                $product->is_active = $request->boolean('is_active');
+            }
+            if ($request->has('sort_order')) {
+                $product->sort_order = $request->sort_order;
+            }
+            if ($request->has('metadata')) {
+                $product->metadata = $request->metadata;
+            }
+            if ($request->has('is_best_seller')) {
+                $product->is_best_seller = $request->boolean('is_best_seller');
+            }
+            
+            // Handle Best Seller Image Update
+            if ($request->hasFile('best_seller_image')) {
+                // Delete old image if exists
+                if ($product->best_seller_image && Storage::disk('public')->exists($product->best_seller_image)) {
+                    Storage::disk('public')->delete($product->best_seller_image);
+                }
+                
+                $path = $request->file('best_seller_image')->store('products/bestseller', 'public');
+                $product->best_seller_image = $path;
+            }
+
+            $product->save();
+
+            // Handle Smart Notifications Dispatch
+            try {
+                if ($product->wasChanged('offer_price') && $product->offer_price !== null) {
+                    $originalOffer = $product->getOriginal('offer_price');
+                    if ($originalOffer === null || $product->offer_price < $originalOffer) {
+                        \App\Jobs\SendCartOfferNotificationJob::dispatch($product->id);
+                        \App\Jobs\SendPriceDropNotificationJob::dispatch($product->id, $product->offer_price);
+                    }
+                } elseif ($product->wasChanged('base_price')) {
+                    $originalBase = $product->getOriginal('base_price');
+                    if ($originalBase !== null && $product->base_price < $originalBase) {
+                        \App\Jobs\SendPriceDropNotificationJob::dispatch($product->id, $product->base_price);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Non-blocking if jobs fail to dispatch
+                \Illuminate\Support\Facades\Log::error('Failed to dispatch price/offer jobs: ' . $e->getMessage());
+            }
+
+
+            // Handle option groups update
+            if ($request->has('option_groups')) {
+                if (is_array($request->option_groups) && count($request->option_groups) > 0) {
+                    // Get current option group IDs
+                    $newOptionGroupIds = collect($request->option_groups)->pluck('option_group_id')->toArray();
+                    
+                    // Remove option groups that are not in the new list
+                    ProductOption::where('product_id', $product->id)
+                        ->whereNotIn('option_group_id', $newOptionGroupIds)
+                        ->delete();
+
+                    // Update or create option groups
+                    foreach ($request->option_groups as $optionGroup) {
+                        $productOption = ProductOption::updateOrCreate(
+                            [
+                                'product_id' => $product->id,
+                                'option_group_id' => $optionGroup['option_group_id']
+                            ],
+                            [
+                                'is_required' => $optionGroup['is_required'] ?? false,
+                                'sort_order' => $optionGroup['sort_order'] ?? 0,
+                            ]
+                        );
+
+                        // Handle option values if provided
+                        if (isset($optionGroup['option_values']) && is_array($optionGroup['option_values'])) {
+                            // Get new option value IDs
+                            $newOptionValueIds = collect($optionGroup['option_values'])->pluck('option_value_id')->toArray();
+                            
+                            // Remove option values that are not in the new list
+                            ProductOptionValue::where('product_option_id', $productOption->id)
+                                ->whereNotIn('option_value_id', $newOptionValueIds)
+                                ->delete();
+
+                            // Update or create option values
+                            foreach ($optionGroup['option_values'] as $optionValue) {
+                                // Verify option value belongs to this option group
+                                $valueExists = OptionValue::where('id', $optionValue['option_value_id'])
+                                    ->where('option_group_id', $optionGroup['option_group_id'])
+                                    ->exists();
+
+                                if ($valueExists) {
+                                    ProductOptionValue::updateOrCreate(
+                                        [
+                                            'product_option_id' => $productOption->id,
+                                            'option_value_id' => $optionValue['option_value_id']
+                                        ],
+                                        [
+                                            'price_type' => 'fixed', // Always fixed
+                                            'price_value' => $optionValue['price_value'],
+                                            'is_available' => $optionValue['is_available'] ?? true,
+                                        ]
+                                    );
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // If empty array provided, remove all option groups
+                    ProductOption::where('product_id', $product->id)->delete();
+                }
+            }
+
+            // Handle addons update
+            if ($request->has('addon_ids')) {
+                if (is_array($request->addon_ids)) {
+                    $product->addons()->sync($request->addon_ids);
+                } else {
+                    $product->addons()->detach();
+                }
+            }
+
+            $product->load(['store', 'category', 'subcategory', 'images', 'productOptions.optionGroup', 'productOptions.productOptionValues.optionValue', 'addons']);
+
+            DB::commit();
+
+            return $this->successResponse($product, 'success.product_updated');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Delete a product (soft delete)
+     */
+    public function destroy($id): JsonResponse
+    {
+        try {
+            $product = Product::find($id);
+
+            if (!$product) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            DB::beginTransaction();
+
+            // Remove this product from all user carts
+            $cartItems = CartItem::where('product_id', $product->id)->get();
+            foreach ($cartItems as $cartItem) {
+                // Delete related options and addons
+                $cartItem->options()->delete();
+                $cartItem->addons()->delete();
+                $cartItem->delete();
+            }
+
+            // Soft delete the product
+            $product->delete();
+
+            DB::commit();
+
+            return $this->successResponse(null, 'success.product_deleted');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Toggle product active status
+     */
+    public function toggleStatus($id): JsonResponse
+    {
+        try {
+            $product = Product::find($id);
+
+            if (!$product) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            $product->is_active = !$product->is_active;
+            $product->save();
+            $product->load(['store', 'category', 'images']);
+
+            return $this->successResponse($product, 'success.status_updated');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Upload product images
+     */
+    public function uploadImages(Request $request, $id): JsonResponse
+    {
+        try {
+            $product = Product::find($id);
+
+            if (!$product) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            $validator = ValidationService::make($request->all(), [
+                'images' => 'required|array',
+                'images.*' => 'image|mimes:jpeg,jpg,png,webp|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            $uploadedImages = [];
+            $hasPrimaryImage = $product->images()->where('is_primary', true)->exists();
+
+            foreach ($request->file('images') as $index => $image) {
+                $imagePath = $image->store('products', 'public');
+                $productImage = ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $imagePath,
+                    'is_primary' => !$hasPrimaryImage && $index === 0,
+                    'sort_order' => $product->images()->count() + $index,
+                ]);
+                $uploadedImages[] = $productImage;
+            }
+
+            DB::commit();
+
+            return $this->successResponse($uploadedImages, 'success.images_uploaded');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Delete a product image
+     */
+    public function deleteImage($id): JsonResponse
+    {
+        try {
+            $image = ProductImage::find($id);
+
+            if (!$image) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            DB::beginTransaction();
+
+            $wasPrimary = $image->is_primary;
+            $productId = $image->product_id;
+
+            // Delete image file
+            if (Storage::disk('public')->exists($image->image_path)) {
+                Storage::disk('public')->delete($image->image_path);
+            }
+
+            $image->delete();
+
+            // If deleted image was primary, set first remaining image as primary
+            if ($wasPrimary) {
+                $firstImage = ProductImage::where('product_id', $productId)->orderBy('sort_order')->first();
+                if ($firstImage) {
+                    $firstImage->is_primary = true;
+                    $firstImage->save();
+                }
+            }
+
+            DB::commit();
+
+            return $this->successResponse(null, 'success.image_deleted');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Set primary image
+     */
+    public function setPrimaryImage($id): JsonResponse
+    {
+        try {
+            $image = ProductImage::find($id);
+
+            if (!$image) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            DB::beginTransaction();
+
+            // Remove primary flag from other images
+            ProductImage::where('product_id', $image->product_id)
+                ->update(['is_primary' => false]);
+
+            // Set this image as primary
+            $image->is_primary = true;
+            $image->save();
+
+            DB::commit();
+
+            return $this->successResponse($image, 'success.primary_image_set');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Reorder images
+     */
+    public function reorderImages(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'images' => 'required|array',
+                'images.*.id' => 'required|integer|exists:product_images,id',
+                'images.*.sort_order' => 'required|integer|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            foreach ($request->images as $imageData) {
+                ProductImage::where('id', $imageData['id'])
+                    ->update(['sort_order' => $imageData['sort_order']]);
+            }
+
+            DB::commit();
+
+            return $this->successResponse(null, 'success.images_reordered');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Duplicate a product
+     */
+    public function duplicate($id): JsonResponse
+    {
+        try {
+            $product = Product::with(['images', 'productOptions.productOptionValues', 'addons'])->find($id);
+
+            if (!$product) {
+                return $this->errorResponse('errors.not_found', [], 404);
+            }
+
+            DB::beginTransaction();
+
+            // Create new product
+            $newProduct = $product->replicate();
+            $newProduct->name_en = $product->name_en . ' (Copy)';
+            $newProduct->name_ar = $product->name_ar . ' (نسخة)';
+            $newProduct->is_active = false;
+            $newProduct->view_count = 0;
+            $newProduct->sales_count = 0;
+            $newProduct->save();
+
+            // Copy images (reference same files, don't duplicate)
+            foreach ($product->images as $image) {
+                ProductImage::create([
+                    'product_id' => $newProduct->id,
+                    'image_path' => $image->image_path,
+                    'is_primary' => $image->is_primary,
+                    'sort_order' => $image->sort_order,
+                ]);
+            }
+
+            $newProduct->load(['store', 'category', 'images']);
+
+            DB::commit();
+
+            return $this->successResponse($newProduct, 'success.product_duplicated', [], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Reorder products (bulk update sort_order)
+     */
+    public function reorderProducts(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'products' => 'required|array',
+                'products.*.id' => 'required|integer|exists:products,id',
+                'products.*.sort_order' => 'required|integer|min:0',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            DB::beginTransaction();
+
+            foreach ($request->products as $productData) {
+                Product::where('id', $productData['id'])
+                    ->update(['sort_order' => $productData['sort_order']]);
+            }
+
+            DB::commit();
+
+            return $this->successResponse(null, 'success.products_reordered');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return $this->errorResponse('errors.server_error', [], 500);
+        }
+    }
+
+    /**
+     * Export all products as Excel
+     */
+    public function export(Request $request)
+    {
+        try {
+            $products = Product::select('id', 'name_en', 'name_ar', 'base_price', 'offer_price')
+                ->where('id', '!=', 74)
+                ->orderBy('id')
+                ->get();
+
+            $headings = ['ID', 'Name EN', 'Name AR', 'Base Price', 'Offer Price', 'Link'];
+
+            $mapper = fn($row) => [
+                $row['id'],
+                $row['name_en'],
+                $row['name_ar'],
+                $row['base_price'] ?? 0,
+                $row['offer_price'] ?? 0,
+                'https://makookeg.com/open-app/?id=' . $row['id'],
+            ];
+
+            return Excel::download(
+                new \App\Exports\ReportExport(collect($products), $headings, $mapper),
+                "products_export_" . now()->format('YmdHis') . ".xlsx"
+            );
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Import products from Excel
+     */
+    public function import(Request $request): JsonResponse
+    {
+        
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            Excel::import(new ProductsImport, $request->file('file'));
+
+            return $this->successResponse(null, 'success.products_imported');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Check for missing products from Excel and generate report
+     */
+    public function checkMissingProducts(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            // Clear previous report
+            Storage::disk('local')->delete('missing_products.txt');
+
+            Excel::import(new \App\Imports\CheckMissingProductsImport, $request->file('file'));
+
+            if (Storage::disk('local')->exists('missing_products.txt')) {
+                $content = Storage::disk('local')->get('missing_products.txt');
+                $missingList = array_filter(explode("\n", $content));
+                return $this->successResponse(['missing_products' => array_values($missingList)], 'success.missing_products_checked');
+            }
+
+            return $this->successResponse(['missing_products' => []], 'success.no_missing_products');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Import food products from Excel (without images)
+     */
+    public function importFood(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            Excel::import(new FoodProductsImport, $request->file('file'));
+
+            return $this->successResponse(null, 'success.products_imported');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Update product images from Excel (delete old images and re-upload from 'updated images' folder)
+     */
+    public function updateImages(Request $request): JsonResponse
+    {
+        try {
+            $validator = ValidationService::make($request->all(), [
+                'file' => 'required|file|mimes:xlsx,xls,csv',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->validationErrorWithFirstMessage($validator);
+            }
+
+            Excel::import(new UpdateProductImagesImport, $request->file('file'));
+
+            return $this->successResponse(null, 'success.images_updated');
+        } catch (\Exception $e) {
+            return $this->errorResponse('errors.server_error', ['error' => $e->getMessage()], 500);
+        }
+    }
+}
