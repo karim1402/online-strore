@@ -21,6 +21,8 @@ class Module extends Model
         'description_ar',
         'image',
         'image_ar',
+        'image_v2',
+        'image_ar_v2',
         'status',
         'sort_order',
     ];
@@ -77,6 +79,22 @@ class Module extends Model
     {
         if ($this->image_ar) {
             return Storage::disk('public')->url($this->image_ar);
+        }
+        return null;
+    }
+
+    public function getImageV2UrlAttribute()
+    {
+        if ($this->image_v2) {
+            return Storage::disk('public')->url($this->image_v2);
+        }
+        return null;
+    }
+
+    public function getImageArV2UrlAttribute()
+    {
+        if ($this->image_ar_v2) {
+            return Storage::disk('public')->url($this->image_ar_v2);
         }
         return null;
     }

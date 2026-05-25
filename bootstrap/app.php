@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function ($router) {
+            // ── v1 routes (unchanged) ──────────────────────────────────
             Route::middleware('api')
                 ->prefix('api')
                 ->group(function () {
@@ -19,6 +20,14 @@ return Application::configure(basePath: dirname(__DIR__))
                     require base_path('routes/api/store.php');
                     require base_path('routes/api/admin.php');
                     require base_path('routes/api/delivery.php');
+                });
+
+            // ── v2 routes ──────────────────────────────────────────────
+            Route::middleware('api')
+                ->prefix('api/v2')
+                ->group(function () {
+                    require base_path('routes/api/v2/user.php');
+                    require base_path('routes/api/v2/admin.php');
                 });
         }
     )

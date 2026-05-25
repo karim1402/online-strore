@@ -146,6 +146,9 @@ Route::prefix('user')->group(function () {
     // Home Ads route (public)
     Route::get('home-ads', [\App\Http\Controllers\Api\User\HomeAdController::class, 'index'])->name('user.home-ads.index');
     Route::get('home-ads/{id}/products', [\App\Http\Controllers\Api\User\HomeAdController::class, 'showProducts'])->name('user.home-ads.products');
+
+    // Featured Sections route (public)
+    Route::get('featured-sections', [\App\Http\Controllers\Api\User\FeaturedSectionController::class, 'index'])->name('user.featured-sections.index');
     
     // Check Service Area (public)
     Route::post('check-service-area', [AddressController::class, 'checkServiceArea'])->name('user.check-service-area');
