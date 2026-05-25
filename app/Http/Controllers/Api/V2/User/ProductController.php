@@ -105,6 +105,72 @@ class ProductController extends Controller
         ], 200);
     }
     /**
+     * Get products by category ID.
+     *
+     * @param int $categoryId
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function byCategory($categoryId, Request $request)
+    {
+        $page = (int) $request->input('page', 1);
+        $perPage = (int) $request->input('per_page', 15);
+
+        $products = Product::where('id', '!=', 74)
+            ->where('category_id', $categoryId)
+            ->with([
+                'primaryImage',
+                'category' => function ($query) {
+                    $query->select('id', 'name_en', 'name_ar');
+                }
+            ])
+            ->withExists('productOptions')
+            ->active()
+            ->orderBy('sort_order', 'asc')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Category']),
+            ], 404);
+        }
+
+        $productsData = collect($products->items())->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
+                'base_price' => $product->base_price,
+                'offer_price' => $product->offer_price,
+                'quantity' => $product->quantity,
+                'has_option_group' => $product->product_options_exists,
+                'image' => $product->primaryImage ? $product->primaryImage->image_url : null,
+                'category' => $product->category ? [
+                    'id' => $product->category->id,
+                    'name_en' => $product->category->name_en,
+                    'name_ar' => $product->category->name_ar,
+                ] : null,
+            ];
+        })->toArray();
+
+        $localizedProducts = LocalizationService::localizeCollection($productsData, ['name']);
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'products' => $localizedProducts,
+                'total' => $products->total(),
+                'page' => $products->currentPage(),
+                'per_page' => $products->perPage(),
+                'last_page' => $products->lastPage(),
+            ],
+        ], 200);
+    }
+
+    /**
      * Get best seller products.
      *
      * @param Request $request
