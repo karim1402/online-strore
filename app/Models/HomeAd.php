@@ -76,7 +76,7 @@ class HomeAd extends Model
             if (filter_var($this->image_v2, FILTER_VALIDATE_URL)) {
                 return $this->image_v2;
             }
-            return Storage::disk('public')->url($this->image_v2);
+            return Storage::disk('r2')->url($this->image_v2);
         }
         return null;
     }

@@ -66,7 +66,7 @@ class HomeAdController extends Controller
 
         // Handle Image Upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('home_ads/v2', 'public');
+            $path = $request->file('image')->store('home_ads/v2', 'r2');
             $data['image_v2'] = $path;
             unset($data['image']);
         }
@@ -132,11 +132,11 @@ class HomeAdController extends Controller
 
         if ($request->hasFile('image')) {
             // Delete old V2 image
-            if ($ad->image_v2 && Storage::disk('public')->exists($ad->image_v2)) {
-                Storage::disk('public')->delete($ad->image_v2);
+            if ($ad->image_v2 && Storage::disk('r2')->exists($ad->image_v2)) {
+                Storage::disk('r2')->delete($ad->image_v2);
             }
 
-            $path = $request->file('image')->store('home_ads/v2', 'public');
+            $path = $request->file('image')->store('home_ads/v2', 'r2');
             $data['image_v2'] = $path;
             unset($data['image']);
         }
@@ -172,6 +172,10 @@ class HomeAdController extends Controller
 
         if ($ad->image && Storage::disk('public')->exists($ad->image)) {
             Storage::disk('public')->delete($ad->image);
+        }
+
+        if ($ad->image_v2 && Storage::disk('r2')->exists($ad->image_v2)) {
+            Storage::disk('r2')->delete($ad->image_v2);
         }
 
         $ad->delete();
