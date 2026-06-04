@@ -76,7 +76,13 @@ class Product extends Model
     public function getBestSellerImageUrlAttribute()
     {
         if ($this->best_seller_image) {
-             return \Illuminate\Support\Facades\Storage::disk('public')->url($this->best_seller_image);
+             if (filter_var($this->best_seller_image, FILTER_VALIDATE_URL)) {
+                 return $this->best_seller_image;
+             }
+             if (\Illuminate\Support\Facades\Storage::disk('public')->exists($this->best_seller_image)) {
+                 return \Illuminate\Support\Facades\Storage::disk('public')->url($this->best_seller_image);
+             }
+             return \Illuminate\Support\Facades\Storage::disk('r2')->url($this->best_seller_image);
         }
         return null;
     }

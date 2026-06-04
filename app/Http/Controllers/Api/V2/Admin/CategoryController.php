@@ -127,7 +127,7 @@ class CategoryController extends Controller
             // Handle image upload
             $imagePath = null;
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('categories/v2', 'public');
+                $imagePath = $request->file('image')->store('categories/v2', 'r2');
             }
 
             $category = Category::create([
@@ -151,8 +151,10 @@ class CategoryController extends Controller
             DB::rollBack();
 
             // Clean up uploaded image if category creation failed
-            if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+            if (isset($imagePath)) {
+                if (Storage::disk('r2')->exists($imagePath)) {
+                    Storage::disk('r2')->delete($imagePath);
+                }
             }
             
             return $this->errorResponse('errors.server_error', [], 500);
@@ -191,12 +193,17 @@ class CategoryController extends Controller
             // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 // Delete old V2 image
-                if ($category->image_v2 && Storage::disk('public')->exists($category->image_v2)) {
-                    Storage::disk('public')->delete($category->image_v2);
+                if ($category->image_v2) {
+                    if (Storage::disk('public')->exists($category->image_v2)) {
+                        Storage::disk('public')->delete($category->image_v2);
+                    }
+                    if (Storage::disk('r2')->exists($category->image_v2)) {
+                        Storage::disk('r2')->delete($category->image_v2);
+                    }
                 }
 
                 // Upload new image to V2 folder
-                $category->image_v2 = $request->file('image')->store('categories/v2', 'public');
+                $category->image_v2 = $request->file('image')->store('categories/v2', 'r2');
             }
 
             // Handle parent_id update
@@ -255,8 +262,13 @@ class CategoryController extends Controller
             DB::beginTransaction();
 
             // Delete category V2 image
-            if ($category->image_v2 && Storage::disk('public')->exists($category->image_v2)) {
-                Storage::disk('public')->delete($category->image_v2);
+            if ($category->image_v2) {
+                if (Storage::disk('public')->exists($category->image_v2)) {
+                    Storage::disk('public')->delete($category->image_v2);
+                }
+                if (Storage::disk('r2')->exists($category->image_v2)) {
+                    Storage::disk('r2')->delete($category->image_v2);
+                }
             }
 
             $category->delete();

@@ -40,7 +40,13 @@ class ProductImage extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image_path) {
-            return Storage::disk('public')->url($this->image_path);
+            if (filter_var($this->image_path, FILTER_VALIDATE_URL)) {
+                return $this->image_path;
+            }
+            if (Storage::disk('public')->exists($this->image_path)) {
+                return Storage::disk('public')->url($this->image_path);
+            }
+            return Storage::disk('r2')->url($this->image_path);
         }
         return null;
     }
