@@ -81,14 +81,14 @@ class ModuleController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('modules/v2', 'public');
+                $imagePath = $request->file('image')->store('modules/v2', 'r2');
                 $data['image_v2'] = $imagePath;
                 unset($data['image']);
             }
 
             // Handle Arabic image upload
             if ($request->hasFile('image_ar')) {
-                $imageArPath = $request->file('image_ar')->store('modules/v2', 'public');
+                $imageArPath = $request->file('image_ar')->store('modules/v2', 'r2');
                 $data['image_ar_v2'] = $imageArPath;
                 unset($data['image_ar']);
             }
@@ -152,11 +152,11 @@ class ModuleController extends Controller
             // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
                 // Delete old V2 image if exists
-                if ($module->image_v2 && Storage::disk('public')->exists($module->image_v2)) {
-                    Storage::disk('public')->delete($module->image_v2);
+                if ($module->image_v2 && Storage::disk('r2')->exists($module->image_v2)) {
+                    Storage::disk('r2')->delete($module->image_v2);
                 }
 
-                $imagePath = $request->file('image')->store('modules/v2', 'public');
+                $imagePath = $request->file('image')->store('modules/v2', 'r2');
                 $data['image_v2'] = $imagePath;
                 unset($data['image']);
             }
@@ -164,11 +164,11 @@ class ModuleController extends Controller
             // Handle Arabic image upload
             if ($request->hasFile('image_ar') && $request->file('image_ar')->isValid()) {
                 // Delete old V2 Arabic image if exists
-                if ($module->image_ar_v2 && Storage::disk('public')->exists($module->image_ar_v2)) {
-                    Storage::disk('public')->delete($module->image_ar_v2);
+                if ($module->image_ar_v2 && Storage::disk('r2')->exists($module->image_ar_v2)) {
+                    Storage::disk('r2')->delete($module->image_ar_v2);
                 }
 
-                $imageArPath = $request->file('image_ar')->store('modules/v2', 'public');
+                $imageArPath = $request->file('image_ar')->store('modules/v2', 'r2');
                 $data['image_ar_v2'] = $imageArPath;
                 unset($data['image_ar']);
             }
@@ -194,13 +194,13 @@ class ModuleController extends Controller
             $module = Module::findOrFail($id);
 
             // Delete associated V2 image if exists
-            if ($module->image_v2 && Storage::disk('public')->exists($module->image_v2)) {
-                Storage::disk('public')->delete($module->image_v2);
+            if ($module->image_v2 && Storage::disk('r2')->exists($module->image_v2)) {
+                Storage::disk('r2')->delete($module->image_v2);
             }
 
             // Delete associated V2 Arabic image if exists
-            if ($module->image_ar_v2 && Storage::disk('public')->exists($module->image_ar_v2)) {
-                Storage::disk('public')->delete($module->image_ar_v2);
+            if ($module->image_ar_v2 && Storage::disk('r2')->exists($module->image_ar_v2)) {
+                Storage::disk('r2')->delete($module->image_ar_v2);
             }
 
             $module->delete();

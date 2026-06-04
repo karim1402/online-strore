@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\HomeAd;
 use App\Models\ModuleAd;
+use App\Models\Module;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -21,7 +22,7 @@ class MigrateAdsImagesToR2 extends Command
      *
      * @var string
      */
-    protected $description = 'Migrate existing Home Ads and Module Ads images from local public storage to Cloudflare R2';
+    protected $description = 'Migrate existing Home Ads, Module Ads, and Modules images from local public storage to Cloudflare R2';
 
     /**
      * Execute the console command.
@@ -30,13 +31,16 @@ class MigrateAdsImagesToR2 extends Command
     {
         $deleteLocal = $this->option('delete-local');
 
-        $this->info('Starting Ads Images Migration to Cloudflare R2...');
+        $this->info('Starting Images Migration to Cloudflare R2...');
 
         // 1. Migrate Home Ads
         $this->migrateHomeAds($deleteLocal);
 
         // 2. Migrate Module Ads
         $this->migrateModuleAds($deleteLocal);
+
+        // 3. Migrate Modules
+        $this->migrateModules($deleteLocal);
 
         $this->info('All migrations completed successfully!');
     }
@@ -118,5 +122,90 @@ class MigrateAdsImagesToR2 extends Command
         $bar->finish();
         $this->newLine(2);
         $this->info('Module Ads migration step finished.');
+    }
+
+    private function migrateModules(bool $deleteLocal)
+    {
+        $modules = Module::all();
+        $this->info("Found {$modules->count()} Modules to check.");
+
+        $bar = $this->output->createProgressBar($modules->count());
+        $bar->start();
+
+        foreach ($modules as $module) {
+            $updated = false;
+
+            // Handle legacy 'image' field (local public)
+            if ($module->image && !filter_var($module->image, FILTER_VALIDATE_URL)) {
+                if (Storage::disk('public')->exists($module->image)) {
+                    $fileName = basename($module->image);
+                    $newPath = 'modules/v2/' . $fileName;
+
+                    $fileContent = Storage::disk('public')->get($module->image);
+                    if (Storage::disk('r2')->put($newPath, $fileContent, 'public')) {
+                        $oldPath = $module->image;
+                        $module->image_v2 = $newPath;
+                        $module->image = null;
+                        $updated = true;
+                        if ($deleteLocal) {
+                            Storage::disk('public')->delete($oldPath);
+                        }
+                    }
+                }
+            }
+
+            // Handle legacy 'image_ar' field (local public)
+            if ($module->image_ar && !filter_var($module->image_ar, FILTER_VALIDATE_URL)) {
+                if (Storage::disk('public')->exists($module->image_ar)) {
+                    $fileName = basename($module->image_ar);
+                    $newPath = 'modules/v2/' . $fileName;
+
+                    $fileContent = Storage::disk('public')->get($module->image_ar);
+                    if (Storage::disk('r2')->put($newPath, $fileContent, 'public')) {
+                        $oldPath = $module->image_ar;
+                        $module->image_ar_v2 = $newPath;
+                        $module->image_ar = null;
+                        $updated = true;
+                        if ($deleteLocal) {
+                            Storage::disk('public')->delete($oldPath);
+                        }
+                    }
+                }
+            }
+
+            // Handle 'image_v2' if stored locally
+            if ($module->image_v2 && !filter_var($module->image_v2, FILTER_VALIDATE_URL)) {
+                if (Storage::disk('public')->exists($module->image_v2)) {
+                    $fileContent = Storage::disk('public')->get($module->image_v2);
+                    if (Storage::disk('r2')->put($module->image_v2, $fileContent, 'public')) {
+                        if ($deleteLocal) {
+                            Storage::disk('public')->delete($module->image_v2);
+                        }
+                    }
+                }
+            }
+
+            // Handle 'image_ar_v2' if stored locally
+            if ($module->image_ar_v2 && !filter_var($module->image_ar_v2, FILTER_VALIDATE_URL)) {
+                if (Storage::disk('public')->exists($module->image_ar_v2)) {
+                    $fileContent = Storage::disk('public')->get($module->image_ar_v2);
+                    if (Storage::disk('r2')->put($module->image_ar_v2, $fileContent, 'public')) {
+                        if ($deleteLocal) {
+                            Storage::disk('public')->delete($module->image_ar_v2);
+                        }
+                    }
+                }
+            }
+
+            if ($updated) {
+                $module->save();
+            }
+
+            $bar->advance();
+        }
+
+        $bar->finish();
+        $this->newLine(2);
+        $this->info('Modules migration step finished.');
     }
 }
