@@ -55,7 +55,13 @@ class ModuleAd extends Model
     public function getImageUrlAttribute(): ?string
     {
         if ($this->image) {
-            return Storage::disk('public')->url($this->image);
+            if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+                return $this->image;
+            }
+            if (Storage::disk('public')->exists($this->image)) {
+                return Storage::disk('public')->url($this->image);
+            }
+            return Storage::disk('r2')->url($this->image);
         }
         return null;
     }

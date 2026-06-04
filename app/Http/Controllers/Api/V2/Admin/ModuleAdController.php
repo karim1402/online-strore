@@ -66,7 +66,7 @@ class ModuleAdController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image')) {
-                $data['image'] = $request->file('image')->store('module_ads', 'public');
+                $data['image'] = $request->file('image')->store('module_ads', 'r2');
             }
 
             $data['status'] = $data['status'] ?? true;
@@ -134,9 +134,14 @@ class ModuleAdController extends Controller
             if ($request->hasFile('image')) {
                 // Delete old image
                 if ($ad->image) {
-                    Storage::disk('public')->delete($ad->image);
+                    if (Storage::disk('public')->exists($ad->image)) {
+                        Storage::disk('public')->delete($ad->image);
+                    }
+                    if (Storage::disk('r2')->exists($ad->image)) {
+                        Storage::disk('r2')->delete($ad->image);
+                    }
                 }
-                $data['image'] = $request->file('image')->store('module_ads', 'public');
+                $data['image'] = $request->file('image')->store('module_ads', 'r2');
             }
 
             $ad->update($data);
@@ -185,7 +190,12 @@ class ModuleAdController extends Controller
 
             // Delete image
             if ($ad->image) {
-                Storage::disk('public')->delete($ad->image);
+                if (Storage::disk('public')->exists($ad->image)) {
+                    Storage::disk('public')->delete($ad->image);
+                }
+                if (Storage::disk('r2')->exists($ad->image)) {
+                    Storage::disk('r2')->delete($ad->image);
+                }
             }
 
             $ad->delete();
