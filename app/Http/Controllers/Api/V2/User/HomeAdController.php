@@ -81,6 +81,7 @@ class HomeAdController extends Controller
     {
         $data = $ad->toArray();
         $data['image_url'] = $ad->image_v2_url ?? $ad->image_url;
+        $data['image_ar_url'] = $ad->image_ar_v2_url ?? $ad->image_ar_url;
         return $data;
     }
 }

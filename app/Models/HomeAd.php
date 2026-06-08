@@ -15,7 +15,9 @@ class HomeAd extends Model
         'link_type',
         'module_id',
         'image',
+        'image_ar',
         'image_v2',
+        'image_ar_v2',
         'sort_order',
         'is_active',
     ];
@@ -53,7 +55,7 @@ class HomeAd extends Model
         'updated_at' => 'datetime',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'image_ar_url'];
 
     /**
      * Get the image URL.
@@ -70,6 +72,17 @@ class HomeAd extends Model
         return null;
     }
 
+    public function getImageArUrlAttribute(): ?string
+    {
+        if ($this->image_ar) {
+            if (filter_var($this->image_ar, FILTER_VALIDATE_URL)) {
+                return $this->image_ar;
+            }
+            return Storage::disk('public')->url($this->image_ar);
+        }
+        return null;
+    }
+
     public function getImageV2UrlAttribute(): ?string
     {
         if ($this->image_v2) {
@@ -77,6 +90,17 @@ class HomeAd extends Model
                 return $this->image_v2;
             }
             return Storage::disk('r2')->url($this->image_v2);
+        }
+        return null;
+    }
+
+    public function getImageArV2UrlAttribute(): ?string
+    {
+        if ($this->image_ar_v2) {
+            if (filter_var($this->image_ar_v2, FILTER_VALIDATE_URL)) {
+                return $this->image_ar_v2;
+            }
+            return Storage::disk('public')->url($this->image_ar_v2);
         }
         return null;
     }

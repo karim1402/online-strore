@@ -48,6 +48,7 @@ class HomeAdController extends Controller
             'product_ids' => 'required_if:link_type,product|nullable|array',
             'product_ids.*' => 'exists:products,id',
             'image' => 'required|image', // Max 2MB
+            'image_ar' => 'nullable|image',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
@@ -69,6 +70,13 @@ class HomeAdController extends Controller
             $path = $request->file('image')->store('home_ads/v2', 'r2');
             $data['image_v2'] = $path;
             unset($data['image']);
+        }
+
+        // Handle Arabic Image Upload
+        if ($request->hasFile('image_ar')) {
+            $path = $request->file('image_ar')->store('home_ads/v2', 'public');
+            $data['image_ar_v2'] = $path;
+            unset($data['image_ar']);
         }
 
         $ad = HomeAd::create($data);
@@ -114,6 +122,7 @@ class HomeAdController extends Controller
             'product_ids' => 'required_if:link_type,product|nullable|array',
             'product_ids.*' => 'exists:products,id',
             'image' => 'nullable|image',
+            'image_ar' => 'nullable|image',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',
         ]);
@@ -139,6 +148,17 @@ class HomeAdController extends Controller
             $path = $request->file('image')->store('home_ads/v2', 'r2');
             $data['image_v2'] = $path;
             unset($data['image']);
+        }
+
+        if ($request->hasFile('image_ar')) {
+            // Delete old V2 Arabic image
+            if ($ad->image_ar_v2 && Storage::disk('public')->exists($ad->image_ar_v2)) {
+                Storage::disk('public')->delete($ad->image_ar_v2);
+            }
+
+            $path = $request->file('image_ar')->store('home_ads/v2', 'public');
+            $data['image_ar_v2'] = $path;
+            unset($data['image_ar']);
         }
 
         $ad->update($data);
@@ -173,6 +193,15 @@ class HomeAdController extends Controller
         if ($ad->image && Storage::disk('public')->exists($ad->image)) {
             Storage::disk('public')->delete($ad->image);
         }
+        if ($ad->image_ar && Storage::disk('public')->exists($ad->image_ar)) {
+            Storage::disk('public')->delete($ad->image_ar);
+        }
+        if ($ad->image_v2 && Storage::disk('public')->exists($ad->image_v2)) {
+            Storage::disk('public')->delete($ad->image_v2);
+        }
+        if ($ad->image_ar_v2 && Storage::disk('public')->exists($ad->image_ar_v2)) {
+            Storage::disk('public')->delete($ad->image_ar_v2);
+        }
 
         if ($ad->image_v2 && Storage::disk('r2')->exists($ad->image_v2)) {
             Storage::disk('r2')->delete($ad->image_v2);
@@ -203,6 +232,7 @@ class HomeAdController extends Controller
     {
         $data = $ad->toArray();
         $data['image_url'] = $ad->image_v2_url ?? $ad->image_url;
+        $data['image_ar_url'] = $ad->image_ar_v2_url ?? $ad->image_ar_url;
         return $data;
     }
 }
