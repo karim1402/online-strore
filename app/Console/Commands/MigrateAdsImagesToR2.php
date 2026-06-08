@@ -63,76 +63,17 @@ class MigrateAdsImagesToR2 extends Command
         $bar->start();
 
         foreach ($homeAds as $ad) {
-            $updated = false;
-
-            // Handle legacy 'image' field (local public)
-            if ($ad->image && !filter_var($ad->image, FILTER_VALIDATE_URL)) {
-                if (Storage::disk('public')->exists($ad->image)) {
-                    $fileName = basename($ad->image);
-                    $newPath = 'home_ads/v2/' . $fileName;
-
-                    $fileContent = Storage::disk('public')->get($ad->image);
-                    if (Storage::disk('r2')->put($newPath, $fileContent, 'public')) {
-                        $oldPath = $ad->image;
-                        $ad->image_v2 = $newPath;
-                        $ad->image = null;
-                        $updated = true;
-
+            foreach (['image', 'image_ar', 'image_v2', 'image_ar_v2'] as $field) {
+                $path = $ad->$field;
+                if ($path && !filter_var($path, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($path)) {
+                    $fileContent = Storage::disk('public')->get($path);
+                    if (Storage::disk('r2')->put($path, $fileContent, 'public')) {
                         if ($deleteLocal) {
-                            Storage::disk('public')->delete($oldPath);
+                            Storage::disk('public')->delete($path);
                         }
                     }
                 }
             }
-
-            // Handle legacy 'image_ar' field (local public)
-            if ($ad->image_ar && !filter_var($ad->image_ar, FILTER_VALIDATE_URL)) {
-                if (Storage::disk('public')->exists($ad->image_ar)) {
-                    $fileName = basename($ad->image_ar);
-                    $newPath = 'home_ads/v2/' . $fileName;
-
-                    $fileContent = Storage::disk('public')->get($ad->image_ar);
-                    if (Storage::disk('r2')->put($newPath, $fileContent, 'public')) {
-                        $oldPath = $ad->image_ar;
-                        $ad->image_ar_v2 = $newPath;
-                        $ad->image_ar = null;
-                        $updated = true;
-
-                        if ($deleteLocal) {
-                            Storage::disk('public')->delete($oldPath);
-                        }
-                    }
-                }
-            }
-
-            // Handle 'image_v2' if stored locally
-            if ($ad->image_v2 && !filter_var($ad->image_v2, FILTER_VALIDATE_URL)) {
-                if (Storage::disk('public')->exists($ad->image_v2)) {
-                    $fileContent = Storage::disk('public')->get($ad->image_v2);
-                    if (Storage::disk('r2')->put($ad->image_v2, $fileContent, 'public')) {
-                        if ($deleteLocal) {
-                            Storage::disk('public')->delete($ad->image_v2);
-                        }
-                    }
-                }
-            }
-
-            // Handle 'image_ar_v2' if stored locally
-            if ($ad->image_ar_v2 && !filter_var($ad->image_ar_v2, FILTER_VALIDATE_URL)) {
-                if (Storage::disk('public')->exists($ad->image_ar_v2)) {
-                    $fileContent = Storage::disk('public')->get($ad->image_ar_v2);
-                    if (Storage::disk('r2')->put($ad->image_ar_v2, $fileContent, 'public')) {
-                        if ($deleteLocal) {
-                            Storage::disk('public')->delete($ad->image_ar_v2);
-                        }
-                    }
-                }
-            }
-
-            if ($updated) {
-                $ad->save();
-            }
-
             $bar->advance();
         }
 
@@ -205,43 +146,17 @@ class MigrateAdsImagesToR2 extends Command
         $bar->start();
 
         foreach ($categories as $category) {
-            $updated = false;
-
-            // Handle legacy 'image' field (local public)
-            if ($category->image && !filter_var($category->image, FILTER_VALIDATE_URL)) {
-                if (Storage::disk('public')->exists($category->image)) {
-                    $fileName = basename($category->image);
-                    $newPath = 'categories/v2/' . $fileName;
-
-                    $fileContent = Storage::disk('public')->get($category->image);
-                    if (Storage::disk('r2')->put($newPath, $fileContent, 'public')) {
-                        $oldPath = $category->image;
-                        $category->image_v2 = $newPath;
-                        $category->image = null;
-                        $updated = true;
+            foreach (['image', 'image_v2'] as $field) {
+                $path = $category->$field;
+                if ($path && !filter_var($path, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($path)) {
+                    $fileContent = Storage::disk('public')->get($path);
+                    if (Storage::disk('r2')->put($path, $fileContent, 'public')) {
                         if ($deleteLocal) {
-                            Storage::disk('public')->delete($oldPath);
+                            Storage::disk('public')->delete($path);
                         }
                     }
                 }
             }
-
-            // Handle 'image_v2' if stored locally
-            if ($category->image_v2 && !filter_var($category->image_v2, FILTER_VALIDATE_URL)) {
-                if (Storage::disk('public')->exists($category->image_v2)) {
-                    $fileContent = Storage::disk('public')->get($category->image_v2);
-                    if (Storage::disk('r2')->put($category->image_v2, $fileContent, 'public')) {
-                        if ($deleteLocal) {
-                            Storage::disk('public')->delete($category->image_v2);
-                        }
-                    }
-                }
-            }
-
-            if ($updated) {
-                $category->save();
-            }
-
             $bar->advance();
         }
 

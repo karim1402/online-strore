@@ -63,11 +63,13 @@ class HomeAd extends Model
     public function getImageUrlAttribute(): ?string
     {
         if ($this->image) {
-            // Check if it's already a full URL or needs storage prefix
             if (filter_var($this->image, FILTER_VALIDATE_URL)) {
                 return $this->image;
             }
-            return Storage::disk('public')->url($this->image);
+            if (Storage::disk('public')->exists($this->image)) {
+                return Storage::disk('public')->url($this->image);
+            }
+            return Storage::disk('r2')->url($this->image);
         }
         return null;
     }
@@ -78,7 +80,10 @@ class HomeAd extends Model
             if (filter_var($this->image_ar, FILTER_VALIDATE_URL)) {
                 return $this->image_ar;
             }
-            return Storage::disk('public')->url($this->image_ar);
+            if (Storage::disk('public')->exists($this->image_ar)) {
+                return Storage::disk('public')->url($this->image_ar);
+            }
+            return Storage::disk('r2')->url($this->image_ar);
         }
         return null;
     }
