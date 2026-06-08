@@ -75,8 +75,27 @@ class MigrateAdsImagesToR2 extends Command
                     if (Storage::disk('r2')->put($newPath, $fileContent, 'public')) {
                         $oldPath = $ad->image;
                         $ad->image_v2 = $newPath;
-                        $ad->image = null; // Clear legacy field
-                        $ad->save();
+                        $ad->image = null;
+                        $updated = true;
+
+                        if ($deleteLocal) {
+                            Storage::disk('public')->delete($oldPath);
+                        }
+                    }
+                }
+            }
+
+            // Handle legacy 'image_ar' field (local public)
+            if ($ad->image_ar && !filter_var($ad->image_ar, FILTER_VALIDATE_URL)) {
+                if (Storage::disk('public')->exists($ad->image_ar)) {
+                    $fileName = basename($ad->image_ar);
+                    $newPath = 'home_ads/v2/' . $fileName;
+
+                    $fileContent = Storage::disk('public')->get($ad->image_ar);
+                    if (Storage::disk('r2')->put($newPath, $fileContent, 'public')) {
+                        $oldPath = $ad->image_ar;
+                        $ad->image_ar_v2 = $newPath;
+                        $ad->image_ar = null;
                         $updated = true;
 
                         if ($deleteLocal) {
@@ -96,6 +115,22 @@ class MigrateAdsImagesToR2 extends Command
                         }
                     }
                 }
+            }
+
+            // Handle 'image_ar_v2' if stored locally
+            if ($ad->image_ar_v2 && !filter_var($ad->image_ar_v2, FILTER_VALIDATE_URL)) {
+                if (Storage::disk('public')->exists($ad->image_ar_v2)) {
+                    $fileContent = Storage::disk('public')->get($ad->image_ar_v2);
+                    if (Storage::disk('r2')->put($ad->image_ar_v2, $fileContent, 'public')) {
+                        if ($deleteLocal) {
+                            Storage::disk('public')->delete($ad->image_ar_v2);
+                        }
+                    }
+                }
+            }
+
+            if ($updated) {
+                $ad->save();
             }
 
             $bar->advance();
