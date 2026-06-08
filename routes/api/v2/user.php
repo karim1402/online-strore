@@ -155,8 +155,10 @@ Route::prefix('user')->group(function () {
         Route::get('/best-sellers',            'bestSellers')->name('v2.user.products.bestSellers');
         Route::get('/search',                  'search')->name('v2.user.products.search');
         Route::get('/random',                  'random')->name('v2.user.products.random');
+        Route::get('/most-ordered',            'mostOrdered')->name('v2.user.products.mostOrdered');
         Route::get('/product-makook-sandwich', 'showMakookSandwich')->name('v2.user.products.showMakookSandwich');
         Route::get('/category/{categoryId}',   'byCategory')->name('v2.user.products.byCategory');
+        Route::get('/{productId}/related',     'relatedProducts')->name('v2.user.products.related');
         Route::get('/{productId}',             'show')->name('v2.user.products.show');
     });
 
