@@ -83,24 +83,30 @@ class HomeAd extends Model
         return null;
     }
 
-    public function getImageV2UrlAttribute(): ?string
-    {
-        if ($this->image_v2) {
-            if (filter_var($this->image_v2, FILTER_VALIDATE_URL)) {
-                return $this->image_v2;
-            }
-            return Storage::disk('r2')->url($this->image_v2);
-        }
-        return null;
-    }
-
     public function getImageArV2UrlAttribute(): ?string
     {
         if ($this->image_ar_v2) {
             if (filter_var($this->image_ar_v2, FILTER_VALIDATE_URL)) {
                 return $this->image_ar_v2;
             }
-            return Storage::disk('public')->url($this->image_ar_v2);
+            if (Storage::disk('public')->exists($this->image_ar_v2)) {
+                return Storage::disk('public')->url($this->image_ar_v2);
+            }
+            return Storage::disk('r2')->url($this->image_ar_v2);
+        }
+        return null;
+    }
+
+    public function getImageV2UrlAttribute(): ?string
+    {
+        if ($this->image_v2) {
+            if (filter_var($this->image_v2, FILTER_VALIDATE_URL)) {
+                return $this->image_v2;
+            }
+            if (Storage::disk('public')->exists($this->image_v2)) {
+                return Storage::disk('public')->url($this->image_v2);
+            }
+            return Storage::disk('r2')->url($this->image_v2);
         }
         return null;
     }
