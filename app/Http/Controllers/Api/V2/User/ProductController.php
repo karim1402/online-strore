@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V2\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\OrderItem;
 use App\Services\LocalizationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -243,6 +245,172 @@ class ProductController extends Controller
         ->get();
 
         // Transform the data
+        $productsData = $products->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
+                'base_price' => $product->base_price,
+                'offer_price' => $product->offer_price,
+                'quantity' => $product->quantity,
+                'has_option_group' => $product->product_options_exists,
+                'image_url' => $product->primaryImage ? $product->primaryImage->image_url : null,
+            ];
+        })->toArray();
+
+        // Localize the data
+        $localizedProducts = LocalizationService::localizeCollection($productsData, ['name']);
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'products' => $localizedProducts,
+                'count' => count($localizedProducts),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Get related products for a given product.
+     * Cascades: same category → same subcategory → same module.
+     *
+     * @param int $productId
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function relatedProducts($productId, Request $request)
+    {
+        $count = $request->input('count', 10);
+        $count = min(max((int)$count, 1), 20);
+
+        // Find the source product with its category
+        $product = Product::with(['category:id,module_id,parent_id'])->find($productId);
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => LocalizationService::getMessage('errors.not_found', ['resource' => 'Product']),
+            ], 404);
+        }
+
+        $relatedProducts = collect();
+
+        // 1. Same category
+        if ($product->category_id) {
+            $relatedProducts = Product::where('id', '!=', 74)
+                ->where('id', '!=', $productId)
+                ->where('category_id', $product->category_id)
+                ->with(['primaryImage'])
+                ->withExists('productOptions')
+                ->active()
+                ->inRandomOrder()
+                ->limit($count)
+                ->get();
+        }
+
+        // 2. Same subcategory (if not enough from category)
+        if ($relatedProducts->count() < $count && $product->subcategory_id) {
+            $existingIds = $relatedProducts->pluck('id')->push($productId)->push(74)->toArray();
+            $subcategoryProducts = Product::whereNotIn('id', $existingIds)
+                ->where('subcategory_id', $product->subcategory_id)
+                ->with(['primaryImage'])
+                ->withExists('productOptions')
+                ->active()
+                ->inRandomOrder()
+                ->limit($count - $relatedProducts->count())
+                ->get();
+
+            $relatedProducts = $relatedProducts->merge($subcategoryProducts);
+        }
+
+        // 3. Same module (via category.module_id) if still not enough
+        if ($relatedProducts->count() < $count && $product->category && $product->category->module_id) {
+            $existingIds = $relatedProducts->pluck('id')->push($productId)->push(74)->toArray();
+            $moduleProducts = Product::whereNotIn('id', $existingIds)
+                ->whereHas('category', function ($q) use ($product) {
+                    $q->where('module_id', $product->category->module_id);
+                })
+                ->with(['primaryImage'])
+                ->withExists('productOptions')
+                ->active()
+                ->inRandomOrder()
+                ->limit($count - $relatedProducts->count())
+                ->get();
+
+            $relatedProducts = $relatedProducts->merge($moduleProducts);
+        }
+
+        // Transform the data (same format as random)
+        $productsData = $relatedProducts->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name_en' => $product->name_en,
+                'name_ar' => $product->name_ar,
+                'base_price' => $product->base_price,
+                'offer_price' => $product->offer_price,
+                'quantity' => $product->quantity,
+                'has_option_group' => $product->product_options_exists,
+                'image_url' => $product->primaryImage ? $product->primaryImage->image_url : null,
+            ];
+        })->toArray();
+
+        // Localize the data
+        $localizedProducts = LocalizationService::localizeCollection($productsData, ['name']);
+
+        return response()->json([
+            'success' => true,
+            'message' => LocalizationService::getMessage('success.data_retrieved'),
+            'data' => [
+                'products' => $localizedProducts,
+                'count' => count($localizedProducts),
+            ],
+        ], 200);
+    }
+
+    /**
+     * Get the most ordered products (top N by total quantity ordered).
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function mostOrdered(Request $request)
+    {
+        $count = $request->input('count', 10);
+        $count = min(max((int)$count, 1), 20);
+
+        // Get top product IDs by total ordered quantity
+        $topProductIds = OrderItem::select('product_id', DB::raw('SUM(quantity) as total_ordered'))
+            ->groupBy('product_id')
+            ->orderByDesc('total_ordered')
+            ->limit($count)
+            ->pluck('product_id')
+            ->toArray();
+
+        if (empty($topProductIds)) {
+            return response()->json([
+                'success' => true,
+                'message' => LocalizationService::getMessage('success.data_retrieved'),
+                'data' => [
+                    'products' => [],
+                    'count' => 0,
+                ],
+            ], 200);
+        }
+
+        // Fetch the products preserving the order
+        $products = Product::where('id', '!=', 74)
+            ->whereIn('id', $topProductIds)
+            ->with(['primaryImage'])
+            ->withExists('productOptions')
+            ->active()
+            ->get()
+            ->sortBy(function ($product) use ($topProductIds) {
+                return array_search($product->id, $topProductIds);
+            })
+            ->values();
+
+        // Transform the data (same format as random)
         $productsData = $products->map(function ($product) {
             return [
                 'id' => $product->id,
