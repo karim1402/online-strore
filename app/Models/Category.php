@@ -23,7 +23,9 @@ class Category extends Model
         'description_en',
         'description_ar',
         'image',
+        'image_ar',
         'image_v2',
+        'image_ar_v2',
         'is_active',
         'sort_order',
     ];
@@ -38,7 +40,7 @@ class Category extends Model
      *
      * @var array
      */
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'image_ar_url'];
 
     /**
      * Get the module that owns the category
@@ -129,6 +131,34 @@ class Category extends Model
                 return Storage::disk('public')->url($this->image);
             }
             return Storage::disk('r2')->url($this->image);
+        }
+        return null;
+    }
+
+    public function getImageArUrlAttribute()
+    {
+        if ($this->image_ar) {
+            if (filter_var($this->image_ar, FILTER_VALIDATE_URL)) {
+                return $this->image_ar;
+            }
+            if (Storage::disk('public')->exists($this->image_ar)) {
+                return Storage::disk('public')->url($this->image_ar);
+            }
+            return Storage::disk('r2')->url($this->image_ar);
+        }
+        return null;
+    }
+
+    public function getImageArV2UrlAttribute()
+    {
+        if ($this->image_ar_v2) {
+            if (filter_var($this->image_ar_v2, FILTER_VALIDATE_URL)) {
+                return $this->image_ar_v2;
+            }
+            if (Storage::disk('public')->exists($this->image_ar_v2)) {
+                return Storage::disk('public')->url($this->image_ar_v2);
+            }
+            return Storage::disk('r2')->url($this->image_ar_v2);
         }
         return null;
     }

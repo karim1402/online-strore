@@ -146,7 +146,7 @@ class MigrateAdsImagesToR2 extends Command
         $bar->start();
 
         foreach ($categories as $category) {
-            foreach (['image', 'image_v2'] as $field) {
+            foreach (['image', 'image_ar', 'image_v2', 'image_ar_v2'] as $field) {
                 $path = $category->$field;
                 if ($path && !filter_var($path, FILTER_VALIDATE_URL) && Storage::disk('public')->exists($path)) {
                     $fileContent = Storage::disk('public')->get($path);

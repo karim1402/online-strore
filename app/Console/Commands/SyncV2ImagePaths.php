@@ -82,7 +82,11 @@ class SyncV2ImagePaths extends Command
 
     private function syncCategories()
     {
-        $categories = Category::whereNotNull('image')->whereNull('image_v2')->get();
+        $categories = Category::where(function ($q) {
+            $q->whereNotNull('image')->whereNull('image_v2');
+        })->orWhere(function ($q) {
+            $q->whereNotNull('image_ar')->whereNull('image_ar_v2');
+        })->get();
 
         $this->info("Found {$categories->count()} Categories to sync.");
         $bar = $this->output->createProgressBar($categories->count());
@@ -91,6 +95,9 @@ class SyncV2ImagePaths extends Command
         foreach ($categories as $category) {
             if ($category->image && !$category->image_v2) {
                 $category->image_v2 = $category->image;
+            }
+            if ($category->image_ar && !$category->image_ar_v2) {
+                $category->image_ar_v2 = $category->image_ar;
             }
             $category->save();
             $bar->advance();

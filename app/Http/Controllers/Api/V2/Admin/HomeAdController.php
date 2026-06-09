@@ -74,7 +74,7 @@ class HomeAdController extends Controller
 
         // Handle Arabic Image Upload
         if ($request->hasFile('image_ar')) {
-            $path = $request->file('image_ar')->store('home_ads/v2', 'public');
+            $path = $request->file('image_ar')->store('home_ads/v2', 'r2');
             $data['image_ar_v2'] = $path;
             unset($data['image_ar']);
         }
@@ -151,12 +151,11 @@ class HomeAdController extends Controller
         }
 
         if ($request->hasFile('image_ar')) {
-            // Delete old V2 Arabic image
-            if ($ad->image_ar_v2 && Storage::disk('public')->exists($ad->image_ar_v2)) {
-                Storage::disk('public')->delete($ad->image_ar_v2);
+            if ($ad->image_ar_v2) {
+                Storage::disk('public')->exists($ad->image_ar_v2) && Storage::disk('public')->delete($ad->image_ar_v2);
+                Storage::disk('r2')->exists($ad->image_ar_v2) && Storage::disk('r2')->delete($ad->image_ar_v2);
             }
-
-            $path = $request->file('image_ar')->store('home_ads/v2', 'public');
+            $path = $request->file('image_ar')->store('home_ads/v2', 'r2');
             $data['image_ar_v2'] = $path;
             unset($data['image_ar']);
         }
@@ -190,21 +189,11 @@ class HomeAdController extends Controller
             return $this->notFoundResponse();
         }
 
-        if ($ad->image && Storage::disk('public')->exists($ad->image)) {
-            Storage::disk('public')->delete($ad->image);
-        }
-        if ($ad->image_ar && Storage::disk('public')->exists($ad->image_ar)) {
-            Storage::disk('public')->delete($ad->image_ar);
-        }
-        if ($ad->image_v2 && Storage::disk('public')->exists($ad->image_v2)) {
-            Storage::disk('public')->delete($ad->image_v2);
-        }
-        if ($ad->image_ar_v2 && Storage::disk('public')->exists($ad->image_ar_v2)) {
-            Storage::disk('public')->delete($ad->image_ar_v2);
-        }
-
-        if ($ad->image_v2 && Storage::disk('r2')->exists($ad->image_v2)) {
-            Storage::disk('r2')->delete($ad->image_v2);
+        foreach (['image', 'image_ar', 'image_v2', 'image_ar_v2'] as $field) {
+            if ($ad->$field) {
+                Storage::disk('public')->exists($ad->$field) && Storage::disk('public')->delete($ad->$field);
+                Storage::disk('r2')->exists($ad->$field) && Storage::disk('r2')->delete($ad->$field);
+            }
         }
 
         $ad->delete();
