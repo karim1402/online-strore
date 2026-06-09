@@ -45,7 +45,7 @@ class CategoryController extends Controller
                 'name_ar' => $category->name_ar,
                 'description_en' => $category->description_en,
                 'description_ar' => $category->description_ar,
-                'image_url' => $category->image_v2_url ?? $category->image_url,
+                'image_url' => (app()->getLocale() === 'ar' && ($category->image_ar_v2 ?? $category->image_ar)) ? ($category->image_ar_v2_url ?? $category->image_ar_url) : ($category->image_v2_url ?? $category->image_url),
                 'is_active' => $category->is_active,
                 'sort_order' => $category->sort_order,
             ];
@@ -106,7 +106,7 @@ class CategoryController extends Controller
             'name_ar' => $category->name_ar,
             'description_en' => $category->description_en,
             'description_ar' => $category->description_ar,
-            'image_url' => $category->image_v2_url ?? $category->image_url,
+            'image_url' => (app()->getLocale() === 'ar' && ($category->image_ar_v2 ?? $category->image_ar)) ? ($category->image_ar_v2_url ?? $category->image_ar_url) : ($category->image_v2_url ?? $category->image_url),
             'is_active' => $category->is_active,
             'sort_order' => $category->sort_order,
             'products' => $category->products->map(function ($product) {
@@ -133,7 +133,7 @@ class CategoryController extends Controller
                     'name_ar' => $child->name_ar,
                     'description_en' => $child->description_en,
                     'description_ar' => $child->description_ar,
-                    'image_url' => $child->image_url,
+                    'image_url' => (app()->getLocale() === 'ar' && ($child->image_ar_v2 ?? $child->image_ar)) ? ($child->image_ar_v2_url ?? $child->image_ar_url) : ($child->image_v2_url ?? $child->image_url),
                     'is_active' => $child->is_active,
                     'sort_order' => $child->sort_order,
                     'products' => $child->products->map(function ($product) {
@@ -224,7 +224,7 @@ class CategoryController extends Controller
                 'name_ar' => $subcategory->name_ar,
                 'description_en' => $subcategory->description_en,
                 'description_ar' => $subcategory->description_ar,
-                'image_url' => $subcategory->image_url,
+                'image_url' => (app()->getLocale() === 'ar' && ($subcategory->image_ar_v2 ?? $subcategory->image_ar)) ? ($subcategory->image_ar_v2_url ?? $subcategory->image_ar_url) : ($subcategory->image_v2_url ?? $subcategory->image_url),
                 'is_active' => $subcategory->is_active,
                 'sort_order' => $subcategory->sort_order,
                 'products' => $subcategory->products->map(function ($product) {
@@ -297,7 +297,7 @@ class CategoryController extends Controller
                 'name_ar' => $category->name_ar,
                 'description_en' => $category->description_en,
                 'description_ar' => $category->description_ar,
-                'image_url' => $category->image_v2_url ?? $category->image_url,
+                'image_url' => (app()->getLocale() === 'ar' && ($category->image_ar_v2 ?? $category->image_ar)) ? ($category->image_ar_v2_url ?? $category->image_ar_url) : ($category->image_v2_url ?? $category->image_url),
                 'sort_order' => $category->sort_order,
                 'products' => $category->products->map(function ($product) {
                     return [
@@ -323,7 +323,7 @@ class CategoryController extends Controller
                         'name_ar' => $child->name_ar,
                         'description_en' => $child->description_en,
                         'description_ar' => $child->description_ar,
-                        'image_url' => $child->image_url,
+                        'image_url' => (app()->getLocale() === 'ar' && ($child->image_ar_v2 ?? $child->image_ar)) ? ($child->image_ar_v2_url ?? $child->image_ar_url) : ($child->image_v2_url ?? $child->image_url),
                         'sort_order' => $child->sort_order,
                         'products' => $child->products->map(function ($product) {
                             return [
