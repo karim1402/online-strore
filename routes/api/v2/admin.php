@@ -125,9 +125,10 @@ Route::prefix('admin')->group(function () {
         // Users
         Route::controller(UserController::class)->prefix('users')->group(function () {
             Route::middleware('permission:users.view,admins')->group(function () {
-                Route::get('/',           'index');
-                Route::get('/export',     'export');
-                Route::get('/deleted',    'deletedIndex');
+                Route::get('/',                    'index');
+                Route::get('/export',              'export');
+                Route::get('/export-low-orders',   'exportLowOrderUsers');
+                Route::get('/deleted',             'deletedIndex');
                 Route::get('/{id}',       'show');
                 Route::get('/{id}/orders','userOrders');
             });

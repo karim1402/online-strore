@@ -242,6 +242,36 @@ class UserController extends Controller
     }
 
     /**
+     * Export users with 0 or 1 orders (name, phone, order count, created_at).
+     */
+    public function exportLowOrderUsers(Request $request)
+    {
+        try {
+            $users = User::withCount('orders')
+                ->having('orders_count', '<=', 1)
+                ->orderBy('orders_count', 'asc')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            $headings = ['Name', 'Phone', 'Order Count', 'Created At'];
+
+            $mapper = fn($row) => [
+                $row['name'],
+                $row['phone'],
+                $row['orders_count'],
+                \Carbon\Carbon::parse($row['created_at'])->format('d-m-Y'),
+            ];
+
+            return Excel::download(
+                new ReportExport(collect($users), $headings, $mapper),
+                "users_low_orders_" . now()->format('YmdHis') . ".xlsx"
+            );
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Export all users with name, phone, orders count and created_at.
      */
     public function export(Request $request)
