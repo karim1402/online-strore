@@ -27,7 +27,7 @@ class SmsMisrService
                     'environment' => env('SMS_MISR_ENVIRONMENT', 1),
                     'username'    => self::USERNAME,
                     'password'    => self::PASSWORD,
-                    'sender'      => env('SMS_MISR_MARKETING_SENDER', 'Makook'),
+                    'sender'      =>self::OTP_SENDER,
                     'language'    => 2, // Arabic / Unicode
                     'mobile'      => implode(',', $batch),
                     'message'     => $message,

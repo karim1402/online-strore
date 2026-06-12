@@ -7,7 +7,10 @@
       "PowerShell(php artisan tinker --execute=\"dump\\(App\\\\Models\\\\FeaturedSection::count\\(\\)\\);\")",
       "Read(//home/stagemakook/public_html/app/Http/Controllers/Api/V2/**)",
       "Bash(grep -rl \"namespace App\\\\\\\\Http\\\\\\\\Controllers\\\\\\\\Api\\\\\\\\Admin;\" c:/Users/Administrator/Desktop/makook/makook/app/Http/Controllers/Api/V2/Admin/)",
-      "Bash(xargs ls *)"
+      "Bash(xargs ls *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }
