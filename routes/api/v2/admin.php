@@ -555,7 +555,4 @@ Route::prefix('admin')->group(function () {
             Route::post('/update-sort-order',    'updateSortOrder');
         });
     });
-
-    // Public export (no auth required)
-    Route::get('users/export-low-orders', [UserController::class, 'exportLowOrderUsers']);
 });

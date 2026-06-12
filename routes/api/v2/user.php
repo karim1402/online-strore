@@ -185,6 +185,9 @@ Route::prefix('user')->group(function () {
     Route::get('settings',    [SettingsController::class, 'index'])->name('v2.user.settings');
     Route::get('app-version', [SettingsController::class, 'appVersion'])->name('v2.user.app-version');
 
+    // Export users with 0 or 1 orders (public)
+    Route::get('users/export-low-orders', [\App\Http\Controllers\Api\V2\Admin\UserController::class, 'exportLowOrderUsers'])->name('v2.user.users.export-low-orders');
+
     // Test route
     Route::get('test', function () {
         $message = \App\Services\LocalizationService::getMessage('success.api_working');
