@@ -7,6 +7,50 @@ use Illuminate\Support\Facades\Log;
 
 class SmsMisrService
 {
+    private const USERNAME = '34144164-6497-41a0-acd4-d982c40d45f5';
+    private const PASSWORD = '5a308f6040662a0243846d345b0a1d5c9d5a3a115ef76f93f1a0a9ce3f710654';
+    private const OTP_SENDER = 'b4dc28584837651e020f9916cc9fa682353fe86205478f8570e4695fe884d4d8';
+
+    /**
+     * Send a bulk marketing campaign via SMS MISR.
+     * Phones are sent in batches of 100.
+     * Returns ['sent' => N, 'failed' => N].
+     */
+    public static function sendCampaign(array $phones, string $message): array
+    {
+        $sent   = 0;
+        $failed = 0;
+
+        foreach (array_chunk($phones, 100) as $batch) {
+            try {
+                $response = Http::post('https://smsmisr.com/api/SMS/', [
+                    'environment' => env('SMS_MISR_ENVIRONMENT', 1),
+                    'username'    => self::USERNAME,
+                    'password'    => self::PASSWORD,
+                    'sender'      => env('SMS_MISR_MARKETING_SENDER', 'Makook'),
+                    'language'    => 2, // Arabic / Unicode
+                    'mobile'      => implode(',', $batch),
+                    'message'     => $message,
+                ]);
+
+                $body = $response->json();
+                Log::info('SMS MISR campaign batch response: ' . $response->body());
+
+                if ($response->successful() && isset($body['code']) && $body['code'] == '1901') {
+                    $sent += \count($batch);
+                } else {
+                    $failed += \count($batch);
+                    Log::error('SMS MISR campaign batch failed: ' . $response->body());
+                }
+            } catch (\Exception $e) {
+                $failed += \count($batch);
+                Log::error('SMS MISR campaign exception: ' . $e->getMessage());
+            }
+        }
+
+        return ['sent' => $sent, 'failed' => $failed];
+    }
+
     /**
      * Send OTP via SMS MISR API.
      *
@@ -18,10 +62,10 @@ class SmsMisrService
     {
         try {
             $response = Http::post('https://smsmisr.com/api/OTP/', [
-                'environment' => 1,
-                'username' => '34144164-6497-41a0-acd4-d982c40d45f5',// config('services.smsmisr.username'),
-                'password' => "5a308f6040662a0243846d345b0a1d5c9d5a3a115ef76f93f1a0a9ce3f710654",//config('services.smsmisr.password'),
-                'sender' => 'b4dc28584837651e020f9916cc9fa682353fe86205478f8570e4695fe884d4d8', //config('services.smsmisr.sender'),
+                'environment' => env('SMS_MISR_ENVIRONMENT', 1),
+                'username' => self::USERNAME,
+                'password' => self::PASSWORD,
+                'sender'   => self::OTP_SENDER,
                 'mobile' => $phone,
                 'template' => "e83faf6025ec41d0f40256d2812629f5fa9291d05c8322f31eea834302501da8",
                 'otp' => $otp
