@@ -248,22 +248,33 @@ class UserController extends Controller
     {
         try {
             $users = User::withCount('orders')
+                ->with(['orders' => fn($q) => $q->latest()->limit(1)])
                 ->having('orders_count', '<=', 1)
                 ->orderBy('orders_count', 'asc')
                 ->orderBy('id', 'desc')
                 ->get();
 
-            $headings = ['Name', 'Phone', 'Order Count', 'Created At'];
-
-            $mapper = fn($row) => [
-                $row['name'],
-                $row['phone'],
-                $row['orders_count'],
-                \Carbon\Carbon::parse($row['created_at'])->format('d-m-Y'),
+            $headings = [
+                'Name', 'Phone', 'Order Count', 'Created At',
+                'Last Order #', 'Last Order Date', 'Last Order Total', 'Last Order Status',
             ];
 
+            $mapper = function ($user) {
+                $order = $user->orders->first();
+                return [
+                    $user->name,
+                    $user->phone,
+                    $user->orders_count,
+                    \Carbon\Carbon::parse($user->created_at)->format('d-m-Y'),
+                    $order?->order_number ?? '',
+                    $order ? \Carbon\Carbon::parse($order->created_at)->format('d-m-Y') : '',
+                    $order?->total ?? '',
+                    $order?->simple_status ?? '',
+                ];
+            };
+
             return Excel::download(
-                new ReportExport(collect($users), $headings, $mapper),
+                new ReportExport($users, $headings, $mapper),
                 "users_low_orders_" . now()->format('YmdHis') . ".xlsx"
             );
         } catch (\Exception $e) {
