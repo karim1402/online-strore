@@ -127,7 +127,6 @@ Route::prefix('admin')->group(function () {
             Route::middleware('permission:users.view,admins')->group(function () {
                 Route::get('/',                    'index');
                 Route::get('/export',              'export');
-                Route::get('/export-low-orders',   'exportLowOrderUsers');
                 Route::get('/deleted',             'deletedIndex');
                 Route::get('/{id}',       'show');
                 Route::get('/{id}/orders','userOrders');
@@ -556,4 +555,7 @@ Route::prefix('admin')->group(function () {
             Route::post('/update-sort-order',    'updateSortOrder');
         });
     });
+
+    // Public export (no auth required)
+    Route::get('users/export-low-orders', [UserController::class, 'exportLowOrderUsers']);
 });
