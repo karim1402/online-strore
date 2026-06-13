@@ -90,8 +90,16 @@ class Voucher extends Model
             return 'errors.voucher_usage_limit_reached';
         }
 
-        if ($this->min_order_amount && $orderAmount < $this->min_order_amount) {
-            return 'errors.voucher_min_order_amount';
+        if ($this->min_order_amount) {
+            $amountToCheck = ($this->module_id && $cartItems && $cartItems->isNotEmpty())
+                ? $cartItems
+                    ->filter(fn($item) => optional($item->product)->module_id == $this->module_id)
+                    ->sum(fn($item) => $item->item_total)
+                : $orderAmount;
+
+            if ($amountToCheck < $this->min_order_amount) {
+                return 'errors.voucher_min_order_amount';
+            }
         }
 
         if ($user) {
@@ -123,11 +131,6 @@ class Voucher extends Model
 
         if ($this->failsModuleRestriction($cartItems)) {
             return 'errors.voucher_module_restricted';
-        }
-
-        // Block voucher if cart contains restricted products
-        if ($cartItems && self::cartHasRestrictedProducts($cartItems)) {
-            return 'errors.voucher_restricted_products';
         }
 
         // Night Voucher Validation (Only valid from 9:00 PM to 9:00 AM)
