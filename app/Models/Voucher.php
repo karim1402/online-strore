@@ -91,13 +91,15 @@ class Voucher extends Model
         }
 
         if ($this->min_order_amount) {
-            $amountToCheck = ($this->module_id && $cartItems && $cartItems->isNotEmpty())
-                ? $cartItems
+            if ($this->module_id && $cartItems && $cartItems->isNotEmpty()) {
+                $moduleSubtotal = $cartItems
                     ->filter(fn($item) => optional($item->product)->module_id == $this->module_id)
-                    ->sum(fn($item) => $item->item_total)
-                : $orderAmount;
+                    ->sum(fn($item) => $item->item_total);
 
-            if ($amountToCheck < $this->min_order_amount) {
+                if ($moduleSubtotal < $this->min_order_amount) {
+                    return 'errors.voucher_min_module_order_amount';
+                }
+            } elseif ($orderAmount < $this->min_order_amount) {
                 return 'errors.voucher_min_order_amount';
             }
         }
