@@ -230,7 +230,7 @@ class ProductController extends Controller
 
             // Handle Best Seller Image
             if ($request->hasFile('best_seller_image')) {
-                $path = $request->file('best_seller_image')->store('products/bestseller', 'public');
+                $path = $request->file('best_seller_image')->store('products/bestseller', 'r2');
                 $product->best_seller_image = $path;
                 $product->save();
             }
@@ -246,7 +246,7 @@ class ProductController extends Controller
                 }
                 
                 foreach ($images as $index => $image) {
-                    $imagePath = $image->store('products', 'public');
+                    $imagePath = $image->store('products', 'r2');
                     
                     // Check if this image index matches the primary_image_index
                     $isPrimary = ($index == $primaryImageIndex);
@@ -460,11 +460,16 @@ class ProductController extends Controller
             // Handle Best Seller Image Update
             if ($request->hasFile('best_seller_image')) {
                 // Delete old image if exists
-                if ($product->best_seller_image && Storage::disk('public')->exists($product->best_seller_image)) {
-                    Storage::disk('public')->delete($product->best_seller_image);
+                if ($product->best_seller_image) {
+                    if (Storage::disk('public')->exists($product->best_seller_image)) {
+                        Storage::disk('public')->delete($product->best_seller_image);
+                    }
+                    if (Storage::disk('r2')->exists($product->best_seller_image)) {
+                        Storage::disk('r2')->delete($product->best_seller_image);
+                    }
                 }
                 
-                $path = $request->file('best_seller_image')->store('products/bestseller', 'public');
+                $path = $request->file('best_seller_image')->store('products/bestseller', 'r2');
                 $product->best_seller_image = $path;
             }
 
@@ -657,7 +662,7 @@ class ProductController extends Controller
             $hasPrimaryImage = $product->images()->where('is_primary', true)->exists();
 
             foreach ($request->file('images') as $index => $image) {
-                $imagePath = $image->store('products', 'public');
+                $imagePath = $image->store('products', 'r2');
                 $productImage = ProductImage::create([
                     'product_id' => $product->id,
                     'image_path' => $imagePath,
@@ -694,8 +699,13 @@ class ProductController extends Controller
             $productId = $image->product_id;
 
             // Delete image file
-            if (Storage::disk('public')->exists($image->image_path)) {
-                Storage::disk('public')->delete($image->image_path);
+            if ($image->image_path) {
+                if (Storage::disk('public')->exists($image->image_path)) {
+                    Storage::disk('public')->delete($image->image_path);
+                }
+                if (Storage::disk('r2')->exists($image->image_path)) {
+                    Storage::disk('r2')->delete($image->image_path);
+                }
             }
 
             $image->delete();

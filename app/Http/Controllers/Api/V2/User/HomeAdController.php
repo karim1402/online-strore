@@ -80,7 +80,8 @@ class HomeAdController extends Controller
     private function transformAd(HomeAd $ad): array
     {
         $data = $ad->toArray();
-        $data['image_url'] = $ad->image_v2_url ?? $ad->image_url;
+        $data['image_url'] = (app()->getLocale() === 'ar' && ($ad->image_ar_v2 ?? $ad->image_ar)) ? ($ad->image_ar_v2_url ?? $ad->image_ar_url) : ($ad->image_v2_url ?? $ad->image_url);
+        $data['image_ar_url'] = $ad->image_ar_v2_url ?? $ad->image_ar_url;
         return $data;
     }
 }

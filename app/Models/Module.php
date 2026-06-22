@@ -70,7 +70,13 @@ class Module extends Model
     public function getImageUrlAttribute()
     {
         if ($this->image) {
-            return Storage::disk('public')->url($this->image);
+            if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+                return $this->image;
+            }
+            if (Storage::disk('public')->exists($this->image)) {
+                return Storage::disk('public')->url($this->image);
+            }
+            return Storage::disk('r2')->url($this->image);
         }
         return null;
     }
@@ -78,7 +84,13 @@ class Module extends Model
     public function getImageArUrlAttribute()
     {
         if ($this->image_ar) {
-            return Storage::disk('public')->url($this->image_ar);
+            if (filter_var($this->image_ar, FILTER_VALIDATE_URL)) {
+                return $this->image_ar;
+            }
+            if (Storage::disk('public')->exists($this->image_ar)) {
+                return Storage::disk('public')->url($this->image_ar);
+            }
+            return Storage::disk('r2')->url($this->image_ar);
         }
         return null;
     }
@@ -86,7 +98,13 @@ class Module extends Model
     public function getImageV2UrlAttribute()
     {
         if ($this->image_v2) {
-            return Storage::disk('public')->url($this->image_v2);
+            if (filter_var($this->image_v2, FILTER_VALIDATE_URL)) {
+                return $this->image_v2;
+            }
+            if (Storage::disk('public')->exists($this->image_v2)) {
+                return Storage::disk('public')->url($this->image_v2);
+            }
+            return Storage::disk('r2')->url($this->image_v2);
         }
         return null;
     }
@@ -94,7 +112,13 @@ class Module extends Model
     public function getImageArV2UrlAttribute()
     {
         if ($this->image_ar_v2) {
-            return Storage::disk('public')->url($this->image_ar_v2);
+            if (filter_var($this->image_ar_v2, FILTER_VALIDATE_URL)) {
+                return $this->image_ar_v2;
+            }
+            if (Storage::disk('public')->exists($this->image_ar_v2)) {
+                return Storage::disk('public')->url($this->image_ar_v2);
+            }
+            return Storage::disk('r2')->url($this->image_ar_v2);
         }
         return null;
     }

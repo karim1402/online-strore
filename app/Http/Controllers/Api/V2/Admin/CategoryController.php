@@ -108,6 +108,7 @@ class CategoryController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'image_ar' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
             ]);
@@ -127,7 +128,12 @@ class CategoryController extends Controller
             // Handle image upload
             $imagePath = null;
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('categories/v2', 'public');
+                $imagePath = $request->file('image')->store('categories/v2', 'r2');
+            }
+
+            $imageArPath = null;
+            if ($request->hasFile('image_ar')) {
+                $imageArPath = $request->file('image_ar')->store('categories/v2', 'r2');
             }
 
             $category = Category::create([
@@ -138,6 +144,7 @@ class CategoryController extends Controller
                 'description_en' => $request->description_en,
                 'description_ar' => $request->description_ar,
                 'image_v2' => $imagePath,
+                'image_ar_v2' => $imageArPath,
                 'is_active' => $request->boolean('is_active', true),
                 'sort_order' => $request->get('sort_order', 0),
             ]);
@@ -150,9 +157,11 @@ class CategoryController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            // Clean up uploaded image if category creation failed
-            if (isset($imagePath) && Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
+            // Clean up uploaded images if category creation failed
+            foreach (array_filter([$imagePath ?? null, $imageArPath ?? null]) as $path) {
+                if (Storage::disk('r2')->exists($path)) {
+                    Storage::disk('r2')->delete($path);
+                }
             }
             
             return $this->errorResponse('errors.server_error', [], 500);
@@ -178,6 +187,7 @@ class CategoryController extends Controller
                 'description_en' => 'nullable|string',
                 'description_ar' => 'nullable|string',
                 'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+                'image_ar' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
                 'is_active' => 'nullable|boolean',
                 'sort_order' => 'nullable|integer|min:0',
             ]);
@@ -190,13 +200,20 @@ class CategoryController extends Controller
 
             // Handle image upload
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                // Delete old V2 image
-                if ($category->image_v2 && Storage::disk('public')->exists($category->image_v2)) {
-                    Storage::disk('public')->delete($category->image_v2);
+                if ($category->image_v2) {
+                    Storage::disk('public')->exists($category->image_v2) && Storage::disk('public')->delete($category->image_v2);
+                    Storage::disk('r2')->exists($category->image_v2) && Storage::disk('r2')->delete($category->image_v2);
                 }
+                $category->image_v2 = $request->file('image')->store('categories/v2', 'r2');
+            }
 
-                // Upload new image to V2 folder
-                $category->image_v2 = $request->file('image')->store('categories/v2', 'public');
+            // Handle Arabic image upload
+            if ($request->hasFile('image_ar') && $request->file('image_ar')->isValid()) {
+                if ($category->image_ar_v2) {
+                    Storage::disk('public')->exists($category->image_ar_v2) && Storage::disk('public')->delete($category->image_ar_v2);
+                    Storage::disk('r2')->exists($category->image_ar_v2) && Storage::disk('r2')->delete($category->image_ar_v2);
+                }
+                $category->image_ar_v2 = $request->file('image_ar')->store('categories/v2', 'r2');
             }
 
             // Handle parent_id update
@@ -254,9 +271,11 @@ class CategoryController extends Controller
 
             DB::beginTransaction();
 
-            // Delete category V2 image
-            if ($category->image_v2 && Storage::disk('public')->exists($category->image_v2)) {
-                Storage::disk('public')->delete($category->image_v2);
+            foreach (['image_v2', 'image_ar_v2'] as $field) {
+                if ($category->$field) {
+                    Storage::disk('public')->exists($category->$field) && Storage::disk('public')->delete($category->$field);
+                    Storage::disk('r2')->exists($category->$field) && Storage::disk('r2')->delete($category->$field);
+                }
             }
 
             $category->delete();
@@ -384,6 +403,7 @@ class CategoryController extends Controller
     {
         $data = $category->toArray();
         $data['image_url'] = $category->image_v2_url ?? $category->image_url;
+        $data['image_ar_url'] = $category->image_ar_v2_url ?? $category->image_ar_url;
         return $data;
     }
 }
