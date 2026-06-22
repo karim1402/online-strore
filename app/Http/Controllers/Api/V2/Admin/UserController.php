@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ReportExport;
+use App\Services\SmsMisrService;
 
 class UserController extends Controller
 {
@@ -242,6 +243,47 @@ class UserController extends Controller
     }
 
     /**
+     * Export users with 0 or 1 orders (name, phone, order count, created_at).
+     */
+    public function exportLowOrderUsers(Request $request)
+    {
+        try {
+            $users = User::withCount('orders')
+                ->with(['orders' => fn($q) => $q->latest()->limit(1)])
+                ->having('orders_count', '<=', 1)
+                ->orderBy('orders_count', 'asc')
+                ->orderBy('id', 'desc')
+                ->get();
+
+            $headings = [
+                'Name', 'Phone', 'Order Count', 'Created At',
+                'Last Order #', 'Last Order Date', 'Last Order Total', 'Last Order Status',
+            ];
+
+            $mapper = function ($user) {
+                $order = $user->orders->first();
+                return [
+                    $user->name,
+                    $user->phone,
+                    $user->orders_count,
+                    \Carbon\Carbon::parse($user->created_at)->format('d-m-Y'),
+                    $order?->order_number ?? '',
+                    $order ? \Carbon\Carbon::parse($order->created_at)->format('d-m-Y') : '',
+                    $order?->total ?? '',
+                    $order?->simple_status ?? '',
+                ];
+            };
+
+            return Excel::download(
+                new ReportExport($users, $headings, $mapper),
+                "users_low_orders_" . now()->format('YmdHis') . ".xlsx"
+            );
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
      * Export all users with name, phone, orders count and created_at.
      */
     public function export(Request $request)
@@ -367,5 +409,112 @@ class UserController extends Controller
         } catch (\Throwable $e) {
             return $this->errorResponse('errors.server_error', [], 500);
         }
+    }
+
+    // ─── SMS Campaign Endpoints ───────────────────────────────────────────
+
+    private const CAMPAIGN_MESSAGE = "⚽ هدية من مطعم مكوك!\nاستخدم برومو كود: WORLDCUP\nعلى طلبك القادم من مطعم مكوك\nواستمتع بالخصم 🔥\nhttp://bit.ly/4aqZ7KQ\nحمله الان";
+
+    /**
+     * Day 0 (test): send only to 201207048631.
+     */
+    public function smsDay0()
+    {
+        $result = SmsMisrService::sendCampaign(['201207048631'], self::CAMPAIGN_MESSAGE);
+
+        return response()->json(['success' => true, 'data' => [...$result, 'total_numbers' => 1]]);
+    }
+
+    /**
+     * Day 1: first 800 users with 0 orders + first 280 users with 1 order.
+     */
+    public function smsDay1()
+    {
+        $phones = $this->collectPhones([
+            $this->smsUsers(0, 0, 800),
+            $this->smsUsers(1, 0, 280),
+        ]);
+
+        $result = SmsMisrService::sendCampaign($phones, self::CAMPAIGN_MESSAGE);
+
+        return response()->json(['success' => true, 'data' => [...$result, 'total_numbers' => \count($phones)]]);
+    }
+
+    /**
+     * Day 2: next 800 users with 0 orders + next 280 users with 1 order.
+     */
+    public function smsDay2()
+    {
+        $phones = $this->collectPhones([
+            $this->smsUsers(0, 800, 800),
+            $this->smsUsers(1, 280, 280),
+        ]);
+
+        $result = SmsMisrService::sendCampaign($phones, self::CAMPAIGN_MESSAGE);
+
+        return response()->json(['success' => true, 'data' => [...$result, 'total_numbers' => \count($phones)]]);
+    }
+
+    /**
+     * Day 3: next 400 users with 0 orders only.
+     */
+    public function smsDay3()
+    {
+        $phones = $this->collectPhones([
+            $this->smsUsers(0, 1600, 400),
+        ]);
+
+        $result = SmsMisrService::sendCampaign($phones, self::CAMPAIGN_MESSAGE);
+
+        return response()->json(['success' => true, 'data' => [...$result, 'total_numbers' => \count($phones)]]);
+    }
+
+    /** Merge multiple smsUsers() result sets into a flat array of phone strings. */
+    private function collectPhones(array $groups): array
+    {
+        $phones = ['201207048631']; // always included
+        foreach ($groups as $group) {
+            foreach ($group as $user) {
+                $phones[] = $user['phone'];
+            }
+        }
+        return array_values(array_unique($phones));
+    }
+
+    /**
+     * Fetch users with exactly $orderCount orders, apply phone cleaning,
+     * skip invalid numbers, and return [name, phone] pairs.
+     */
+    private function smsUsers(int $orderCount, int $skip, int $take): array
+    {
+        $users = User::withCount('orders')
+            ->having('orders_count', $orderCount)
+            ->orderBy('id', 'desc')
+            ->skip($skip)
+            ->take($take)
+            ->get(['id', 'name', 'phone']);
+
+        $result = [];
+        foreach ($users as $user) {
+            $phone = $this->cleanPhone($user->phone);
+            if ($phone !== null) {
+                $result[] = ['name' => $user->name, 'phone' => $phone];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Prepend '2' if not present, then reject if length < 10 or > 13.
+     */
+    private function cleanPhone(?string $phone): ?string
+    {
+        if (empty($phone)) return null;
+        if (!str_starts_with($phone, '2')) {
+            $phone = '2' . $phone;
+        }
+        $len = strlen($phone);
+        if ($len < 10 || $len > 13) return null;
+        return $phone;
     }
 }

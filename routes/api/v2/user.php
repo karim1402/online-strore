@@ -185,6 +185,15 @@ Route::prefix('user')->group(function () {
     Route::get('settings',    [SettingsController::class, 'index'])->name('v2.user.settings');
     Route::get('app-version', [SettingsController::class, 'appVersion'])->name('v2.user.app-version');
 
+    // Export users with 0 or 1 orders (public)
+    Route::get('users/export-low-orders', [\App\Http\Controllers\Api\V2\Admin\UserController::class, 'exportLowOrderUsers'])->name('v2.user.users.export-low-orders');
+
+    // SMS campaign batches (public)
+    Route::get('sms/day-0', [\App\Http\Controllers\Api\V2\Admin\UserController::class, 'smsDay0'])->name('v2.user.sms.day0');
+    Route::get('sms/day-1', [\App\Http\Controllers\Api\V2\Admin\UserController::class, 'smsDay1'])->name('v2.user.sms.day1');
+    Route::get('sms/day-2', [\App\Http\Controllers\Api\V2\Admin\UserController::class, 'smsDay2'])->name('v2.user.sms.day2');
+    Route::get('sms/day-3', [\App\Http\Controllers\Api\V2\Admin\UserController::class, 'smsDay3'])->name('v2.user.sms.day3');
+
     // Test route
     Route::get('test', function () {
         $message = \App\Services\LocalizationService::getMessage('success.api_working');

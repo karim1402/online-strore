@@ -54,6 +54,11 @@ class VoucherController extends Controller
                 $messageParams['amount'] = number_format($voucher->min_order_amount, 2);
             }
 
+            if ($messageKey === 'errors.voucher_min_module_order_amount') {
+                $messageParams['amount'] = number_format($voucher->min_order_amount, 2);
+                $messageParams['module'] = $voucher->module->name ?? 'the required module';
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => LocalizationService::getMessage($messageKey, $messageParams),
