@@ -8,7 +8,6 @@ use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class NewOrderEvent implements ShouldBroadcastNow
 {
@@ -38,34 +37,6 @@ class NewOrderEvent implements ShouldBroadcastNow
             'order' => $orderWithRelations,
         ];
 
-        // Log how many admins are currently subscribed to the channel
-        $this->logAdminSubscriberCount($order->order_number);
-    }
-
-    /**
-     * Log the number of admin subscribers on the Pusher channel.
-     */
-    private function logAdminSubscriberCount(string $orderNumber): void
-    {
-        try {
-            $pusher = new \Pusher\Pusher(
-                config('broadcasting.connections.pusher.key'),
-                config('broadcasting.connections.pusher.secret'),
-                config('broadcasting.connections.pusher.app_id'),
-                [
-                    'cluster' => config('broadcasting.connections.pusher.options.cluster'),
-                    'useTLS'  => true,
-                ]
-            );
-
-            $channelInfo = $pusher->getChannelInfo('admin-notifications', ['info' => 'subscription_count']);
-
-            $subscriberCount = $channelInfo->subscription_count ?? 0;
-
-            Log::info("NewOrderEvent broadcast: Order #{$orderNumber} — {$subscriberCount} admin(s) currently subscribed to channel 'admin-notifications'");
-        } catch (\Exception $e) {
-            Log::warning("NewOrderEvent: Could not fetch subscriber count for order #{$orderNumber}: " . $e->getMessage());
-        }
     }
 
     /**
