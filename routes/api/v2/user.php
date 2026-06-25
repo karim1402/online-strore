@@ -92,7 +92,7 @@ Route::prefix('user')->group(function () {
         });
 
         // Cart Management
-        Route::controller(CartController::class)->prefix('cart')->group(function () {
+        Route::middleware('forward.live')->controller(CartController::class)->prefix('cart')->group(function () {
             Route::get('/',                  'index')->name('v2.user.cart.index');
             Route::post('/items',            'addItem')->name('v2.user.cart.addItem');
             Route::put('/items/{itemId}',    'updateQuantity')->name('v2.user.cart.updateQuantity');
@@ -103,8 +103,8 @@ Route::prefix('user')->group(function () {
         });
 
         // Order Management
-        Route::post('checkout', [OrderController::class, 'checkout'])->name('v2.user.checkout');
-        Route::controller(OrderController::class)->prefix('orders')->group(function () {
+        Route::post('checkout', [OrderController::class, 'checkout'])->middleware('forward.live')->name('v2.user.checkout');
+        Route::middleware('forward.live')->controller(OrderController::class)->prefix('orders')->group(function () {
             Route::get('/',                           'index')->name('v2.user.orders.index');
             Route::get('/{orderId}',                  'show')->name('v2.user.orders.show');
             Route::post('/{orderId}/cancel',          'cancel')->name('v2.user.orders.cancel');

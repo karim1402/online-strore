@@ -13,7 +13,6 @@ use App\Models\Payment;
 use App\Services\LocalizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -420,31 +419,6 @@ class OrderController extends Controller
                 event(new \App\Events\NewOrderEvent($order));
             } catch (\Exception $e) {
                 Log::error('Failed to broadcast new order event: ' . $e->getMessage());
-            }
-
-            // Forward checkout request to live server
-            try {
-                $token = $request->bearerToken();
-                $liveUrl = 'https://mainmak.devdigitalvibes.com/public/api/v2/user/checkout';
-
-                $liveResponse = Http::withToken($token)
-                    ->timeout(15)
-                    ->withHeaders([
-                        'Accept' => 'application/json',
-                        'Accept-Language' => app()->getLocale(),
-                    ])
-                    ->post($liveUrl, $request->all());
-
-                Log::info('Live server checkout forwarded', [
-                    'order_number' => $orderNumber,
-                    'status' => $liveResponse->status(),
-                    'response' => $liveResponse->json(),
-                ]);
-            } catch (\Exception $e) {
-                Log::error('Failed to forward checkout to live server', [
-                    'order_number' => $orderNumber,
-                    'error' => $e->getMessage(),
-                ]);
             }
 
             // Prepare response
