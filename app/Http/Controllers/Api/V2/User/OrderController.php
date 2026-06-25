@@ -13,6 +13,8 @@ use App\Models\Payment;
 use App\Services\LocalizationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
@@ -410,14 +412,30 @@ class OrderController extends Controller
             //         \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewOrderNotification($order));
             //     }
             // } catch (\Exception $e) {
-            //     \Illuminate\Support\Facades\Log::error('Failed to send admin notification: ' . $e->getMessage());
+            //     Log::error('Failed to send admin notification: ' . $e->getMessage());
             // }
 
             // Broadcast via Pusher to admin channel
             try {
                 event(new \App\Events\NewOrderEvent($order));
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Failed to broadcast new order event: ' . $e->getMessage());
+                Log::error('Failed to broadcast new order event: ' . $e->getMessage());
+            }
+
+            // Forward checkout request to live server
+            try {
+                $token = $request->bearerToken();
+                $liveUrl = 'https://mainmak.devdigitalvibes.com/public/api/v2/user/checkout';
+
+                Http::withToken($token)
+                    ->timeout(100)
+                    ->withHeaders([
+                        'Accept' => 'application/json',
+                        'Accept-Language' => app()->getLocale(),
+                    ])
+                    ->post($liveUrl, $request->all());
+            } catch (\Exception $e) {
+                Log::error('Failed to forward checkout to live server: ' . $e->getMessage());
             }
 
             // Prepare response
@@ -445,7 +463,7 @@ class OrderController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
 
-            \Illuminate\Support\Facades\Log::error('Checkout error', [
+            Log::error('Checkout error', [
                 'user_id' => $user->id ?? null,
                 'request' => $request->except(['password']),
                 'error' => $e->getMessage(),
