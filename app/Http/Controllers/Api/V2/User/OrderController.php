@@ -427,15 +427,24 @@ class OrderController extends Controller
                 $token = $request->bearerToken();
                 $liveUrl = 'https://mainmak.devdigitalvibes.com/public/api/v2/user/checkout';
 
-                Http::withToken($token)
-                    ->timeout(100)
+                $liveResponse = Http::withToken($token)
+                    ->timeout(15)
                     ->withHeaders([
                         'Accept' => 'application/json',
                         'Accept-Language' => app()->getLocale(),
                     ])
                     ->post($liveUrl, $request->all());
+
+                Log::info('Live server checkout forwarded', [
+                    'order_number' => $orderNumber,
+                    'status' => $liveResponse->status(),
+                    'response' => $liveResponse->json(),
+                ]);
             } catch (\Exception $e) {
-                Log::error('Failed to forward checkout to live server: ' . $e->getMessage());
+                Log::error('Failed to forward checkout to live server', [
+                    'order_number' => $orderNumber,
+                    'error' => $e->getMessage(),
+                ]);
             }
 
             // Prepare response
