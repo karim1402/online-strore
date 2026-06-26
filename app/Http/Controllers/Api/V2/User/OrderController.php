@@ -470,7 +470,7 @@ class OrderController extends Controller
         $user = auth('api')->user();
 
         $query = Order::where('user_id', $user->id)
-            ->with([/*'store',*/ 'items'])
+            ->with([/*'store',*/ 'items.product.primaryImage', 'items.product.images'])
             ->orderBy('created_at', 'desc');
 
         // Filter by simple status
@@ -929,11 +929,15 @@ class OrderController extends Controller
     {
         $locale = LocalizationService::getCurrentLocale();
 
-        // Get product images from the order items' snapshots
+        // Prefer the live product image (URLs moved to Cloudflare/R2), fall back to
+        // the snapshot image only if the product was deleted.
+        $resolveImage = fn ($item) => optional($item->product)->image_url
+            ?? ($item->product_snapshot['image_url'] ?? null);
+
         $firstItem = $order->items->first();
-        $productImage = $firstItem->product_snapshot['image_url'] ?? null;
+        $productImage = $firstItem ? $resolveImage($firstItem) : null;
         $productImages = $order->items
-            ->map(fn ($item) => $item->product_snapshot['image_url'] ?? null)
+            ->map($resolveImage)
             ->filter()
             ->values();
 
