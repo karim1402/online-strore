@@ -929,6 +929,10 @@ class OrderController extends Controller
     {
         $locale = LocalizationService::getCurrentLocale();
 
+        // Get one product image from the first order item's snapshot
+        $firstItem = $order->items->first();
+        $productImage = $firstItem->product_snapshot['image_url'] ?? null;
+
         return [
             'id' => $order->id,
             'order_number' => $order->order_number,
@@ -937,6 +941,7 @@ class OrderController extends Controller
             //     'name' => $order->store->{"name_{$locale}"} ?? $order->store->name_en,
             //     'logo_url' => $order->store->logo_url ?? null,
             // ],
+            'product_image' => $productImage,
             'status' => $order->order_status,
             'status_label' => $order->status_label,
             'simple_status' => $order->simple_status,
