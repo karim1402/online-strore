@@ -510,7 +510,7 @@ class OrderController extends Controller
 
         $order = Order::where('id', $orderId)
             ->where('user_id', $user->id)
-            ->with([/*'store',*/ 'items.options', 'items.addons', 'delivery'])
+            ->with([/*'store',*/ 'items.options', 'items.addons', 'items.product.primaryImage', 'items.product.images', 'delivery'])
             ->first();
 
         if (!$order) {
@@ -994,7 +994,10 @@ class OrderController extends Controller
                     'product' => [
                         'name' => $item->product_snapshot["name_{$locale}"] ?? $item->product_snapshot['name_en'],
                         'description' => $item->product_snapshot["description_{$locale}"] ?? $item->product_snapshot['description_en'] ?? '',
-                        'image_url' => $item->product_snapshot['image_url'] ?? null,
+                        // Prefer the live product image (URLs moved to Cloudflare/R2),
+                        // fall back to the snapshot only if the product was deleted.
+                        'image_url' => optional($item->product)->image_url
+                            ?? ($item->product_snapshot['image_url'] ?? null),
                     ],
                     'quantity' => $item->quantity,
                     'selected_options' => $item->options->map(function ($option) use ($locale) {
