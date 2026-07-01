@@ -131,6 +131,16 @@ class UserAddress extends Model
         });
     }
 
+    // Delivery zone center
+    private const ZONE_CENTER_LAT = 30.79065887518099;
+    private const ZONE_CENTER_LNG = 30.99946975708008;
+
+    // Inner zone radius in meters — normal fee calculation
+    private const INNER_ZONE_RADIUS_M = 2691.967667786481;
+
+    // Outer zone radius in meters — flat fee of 35.00
+    private const OUTER_ZONE_RADIUS_M = 3513.1458918722105;
+
     /**
      * Calculate delivery fee for this address
      *
@@ -144,6 +154,19 @@ class UserAddress extends Model
             return 10.00;
         }
 
+        // Check delivery zone first — outer zone always pays flat 35.00 regardless of subtotal
+        if ($this->latitude !== null && $this->longitude !== null) {
+            $distanceMeters = $this->haversineMeters(
+                self::ZONE_CENTER_LAT, self::ZONE_CENTER_LNG,
+                (float) $this->latitude, (float) $this->longitude
+            );
+
+            if ($distanceMeters > self::INNER_ZONE_RADIUS_M && $distanceMeters <= self::OUTER_ZONE_RADIUS_M) {
+                return 35.00;
+            }
+        }
+
+        // Inner zone: apply normal fee logic
         // Free delivery if subtotal is above threshold
         if ($subtotal > 149) {
             return 0.00;
@@ -168,27 +191,35 @@ class UserAddress extends Model
         $totalFee = $baseFee;
 
         if ($startLat !== null && $startLng !== null && $this->latitude !== null && $this->longitude !== null) {
-            $earthRadius = 6371; // Earth's radius in kilometers
+            $distanceKm = max(1, round($this->haversineMeters(
+                (float) $startLat, (float) $startLng,
+                (float) $this->latitude, (float) $this->longitude
+            ) / 1000));
 
-            $latFrom = deg2rad((float)$startLat);
-            $lonFrom = deg2rad((float)$startLng);
-            $latTo = deg2rad((float)$this->latitude);
-            $lonTo = deg2rad((float)$this->longitude);
-
-            $latDelta = $latTo - $latFrom;
-            $lonDelta = $lonTo - $lonFrom;
-
-            $a = sin($latDelta / 2) * sin($latDelta / 2) +
-                 cos($latFrom) * cos($latTo) *
-                 sin($lonDelta / 2) * sin($lonDelta / 2);
-            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
-            $distanceKm = max(1, round($earthRadius * $c));
-            
-            // Base fee + (Distance in km * Km Fee)
             $totalFee += ($distanceKm * $kmFee);
         }
 
         return round($totalFee, 2);
+    }
+
+    /**
+     * Calculate distance between two coordinates in meters using the Haversine formula.
+     */
+    private function haversineMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371000; // meters
+
+        $latFrom = deg2rad($lat1);
+        $lonFrom = deg2rad($lng1);
+        $latTo   = deg2rad($lat2);
+        $lonTo   = deg2rad($lng2);
+
+        $latDelta = $latTo - $latFrom;
+        $lonDelta = $lonTo - $lonFrom;
+
+        $a = sin($latDelta / 2) ** 2
+            + cos($latFrom) * cos($latTo) * sin($lonDelta / 2) ** 2;
+
+        return 2 * $earthRadius * atan2(sqrt($a), sqrt(1 - $a));
     }
 }
