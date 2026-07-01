@@ -131,6 +131,11 @@ class UserAddress extends Model
         });
     }
 
+    private const ZONE_CENTER_LAT     = 30.79065887518099;
+    private const ZONE_CENTER_LNG     = 30.99946975708008;
+    private const INNER_ZONE_RADIUS_M = 2691.967667786481;
+    private const OUTER_ZONE_RADIUS_M = 3513.1458918722105;
+
     /**
      * Calculate delivery fee for this address
      *
@@ -139,56 +144,66 @@ class UserAddress extends Model
      */
     public function calculateDeliveryFee(float $subtotal = 0, $cartItems = null): float
     {
-        // If cart contains restricted products, delivery fee is fixed at 10
         if ($cartItems && \App\Models\Voucher::cartHasRestrictedProducts($cartItems)) {
             return 10.00;
         }
 
-        // Free delivery if subtotal is above threshold
+        // Outer zone always pays flat 35.00 regardless of subtotal or order history
+        if ($this->latitude !== null && $this->longitude !== null) {
+            $distanceMeters = $this->haversineMeters(
+                self::ZONE_CENTER_LAT, self::ZONE_CENTER_LNG,
+                (float) $this->latitude, (float) $this->longitude
+            );
+
+            if ($distanceMeters > self::INNER_ZONE_RADIUS_M && $distanceMeters <= self::OUTER_ZONE_RADIUS_M) {
+                return 35.00;
+            }
+        }
+
+        // Inner zone: normal fee logic
         if ($subtotal > 149) {
             return 0.00;
         }
 
-        // Free delivery for the user's first order if subtotal is over 100
         if ($this->user_id) {
-            $deliveredOrdersCount = \App\Models\Order::where('user_id', $this->user_id)
-                // ->where('simple_status', 'delivered')
-                ->count();
+            $deliveredOrdersCount = \App\Models\Order::where('user_id', $this->user_id)->count();
 
             if ($deliveredOrdersCount < 1 && $subtotal > 100) {
                 return 0.00;
             }
         }
 
-        $baseFee = (float) \App\Models\AppSetting::get('delivery_base_fee', '0');
-        $kmFee   = (float) \App\Models\AppSetting::get('delivery_km_fee', '0');
+        $baseFee  = (float) \App\Models\AppSetting::get('delivery_base_fee', '0');
+        $kmFee    = (float) \App\Models\AppSetting::get('delivery_km_fee', '0');
         $startLat = \App\Models\AppSetting::get('delivery_start_lat');
         $startLng = \App\Models\AppSetting::get('delivery_start_lng');
 
         $totalFee = $baseFee;
 
         if ($startLat !== null && $startLng !== null && $this->latitude !== null && $this->longitude !== null) {
-            $earthRadius = 6371; // Earth's radius in kilometers
+            $distanceKm = max(1, round($this->haversineMeters(
+                (float) $startLat, (float) $startLng,
+                (float) $this->latitude, (float) $this->longitude
+            ) / 1000));
 
-            $latFrom = deg2rad((float)$startLat);
-            $lonFrom = deg2rad((float)$startLng);
-            $latTo = deg2rad((float)$this->latitude);
-            $lonTo = deg2rad((float)$this->longitude);
-
-            $latDelta = $latTo - $latFrom;
-            $lonDelta = $lonTo - $lonFrom;
-
-            $a = sin($latDelta / 2) * sin($latDelta / 2) +
-                 cos($latFrom) * cos($latTo) *
-                 sin($lonDelta / 2) * sin($lonDelta / 2);
-            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
-
-            $distanceKm = max(1, round($earthRadius * $c));
-            
-            // Base fee + (Distance in km * Km Fee)
             $totalFee += ($distanceKm * $kmFee);
         }
 
         return round($totalFee, 2);
+    }
+
+    private function haversineMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earthRadius = 6371000;
+        $latFrom     = deg2rad($lat1);
+        $lonFrom     = deg2rad($lng1);
+        $latTo       = deg2rad($lat2);
+        $lonTo       = deg2rad($lng2);
+        $latDelta    = $latTo - $latFrom;
+        $lonDelta    = $lonTo - $lonFrom;
+
+        $a = sin($latDelta / 2) ** 2 + cos($latFrom) * cos($latTo) * sin($lonDelta / 2) ** 2;
+
+        return 2 * $earthRadius * atan2(sqrt($a), sqrt(1 - $a));
     }
 }
