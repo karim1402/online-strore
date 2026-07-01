@@ -155,7 +155,7 @@ class UserAddress extends Model
                 (float) $this->latitude, (float) $this->longitude
             );
 
-            if ($distanceMeters > self::INNER_ZONE_RADIUS_M && $distanceMeters <= self::OUTER_ZONE_RADIUS_M) {
+            if ($distanceMeters > self::INNER_ZONE_RADIUS_M) {
                 return 35.00;
             }
         }
